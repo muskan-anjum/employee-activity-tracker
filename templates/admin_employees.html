@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employees | WorkAI</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f7fb;
+            color: #1f2937;
+        }
+
+        .sidebar {
+            position: fixed;
+            width: 220px;
+            height: 100vh;
+            background: #172033;
+            color: white;
+            padding: 25px 20px;
+        }
+
+        .brand {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 35px;
+        }
+
+        .admin-label {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-bottom: 20px;
+        }
+
+        .nav-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 7px;
+            cursor: pointer;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: #26334d;
+        }
+
+        .main {
+            margin-left: 220px;
+            padding: 35px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+
+        .header p {
+            color: #6b7280;
+        }
+
+        .card {
+            background: white;
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 14px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .status {
+            color: #16a34a;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+    <div class="brand">AI &nbsp; WorkAI</div>
+
+    <div class="admin-label">ADMIN CONSOLE</div>
+
+    <div class="nav-item"
+         onclick="window.location.href='/admin/dashboard'">
+        Dashboard
+    </div>
+
+    <div class="nav-item active">
+        Employees
+    </div>
+
+    <div class="nav-item">Projects & Tasks</div>
+    <div class="nav-item">Activity Monitoring</div>
+    <div class="nav-item">AI Analysis</div>
+    <div class="nav-item">Reports</div>
+</aside>
+
+<main class="main">
+
+    <div class="header">
+        <h1>Employee Management</h1>
+        <p>View and manage employees in your organization.</p>
+    </div>
+
+    <div class="card">
+        <h2>Employees</h2>
+
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for employee in employees %}
+<tr>
+    <td>{{ employee.name }}</td>
+    <td>{{ employee.email }}</td>
+    <td>{{ employee.role | title }}</td>
+    <td class="status">Active</td>
+</tr>
+{% else %}
+<tr>
+    <td colspan="4">No employees found.</td>
+</tr>
+{% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+<div class="card">
+    <h2>Add Employee</h2>
+
+    <form method="POST" action="/admin/employees">
+        <p>
+            <input type="text" name="name" placeholder="Employee Name" required>
+        </p>
+
+        <p>
+            <input type="email" name="email" placeholder="Employee Email" required>
+        </p>
+
+        <p>
+            <input type="password" name="password" placeholder="Password" required>
+        </p>
+
+        <button type="submit">Add Employee</button>
+    </form>
+</div>
+
+</main>
+
+</body>
+</html>

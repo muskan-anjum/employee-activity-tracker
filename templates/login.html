@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkAI | Employee Activity Tracker</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background:
+                radial-gradient(circle at top left, #1e3a8a 0, transparent 35%),
+                radial-gradient(circle at bottom right, #0f766e 0, transparent 35%),
+                #0f172a;
+            color: #e2e8f0;
+            padding: 20px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 1000px;
+            min-height: 590px;
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35);
+        }
+
+        .hero {
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: linear-gradient(
+                135deg,
+                rgba(37, 99, 235, 0.25),
+                rgba(15, 118, 110, 0.12)
+            );
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 40px;
+            font-weight: 700;
+            font-size: 22px;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #3b82f6, #14b8a6);
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 44px;
+            line-height: 1.12;
+            margin-bottom: 20px;
+            color: #f8fafc;
+        }
+
+        .hero h1 span {
+            color: #5eead4;
+        }
+
+        .hero p {
+            color: #cbd5e1;
+            line-height: 1.7;
+            max-width: 500px;
+            margin-bottom: 32px;
+        }
+
+        .features {
+            display: grid;
+            gap: 14px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #dbeafe;
+            font-size: 14px;
+        }
+
+        .check {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: rgba(20, 184, 166, 0.15);
+            color: #5eead4;
+            font-weight: bold;
+        }
+
+        .login-panel {
+            background: #ffffff;
+            color: #0f172a;
+            padding: 55px 45px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-panel h2 {
+            font-size: 30px;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            outline: none;
+            font-size: 15px;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            padding-right: 65px;
+        }
+
+        .show-password {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            color: #2563eb;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .login-button {
+            width: 100%;
+            border: none;
+            border-radius: 10px;
+            padding: 14px;
+            margin-top: 6px;
+            background: linear-gradient(135deg, #2563eb, #0f766e);
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .login-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+        }
+
+        .alert {
+            padding: 11px 13px;
+            margin-bottom: 18px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .security-note {
+            text-align: center;
+            margin-top: 24px;
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        @media (max-width: 800px) {
+            .login-container {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                padding: 35px;
+            }
+
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .login-panel {
+                padding: 40px 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login-container">
+
+    <section class="hero">
+        <div class="logo">
+            <div class="logo-icon">AI</div>
+            WorkAI
+        </div>
+
+        <h1>
+            Smarter work.<br>
+            Better <span>insights.</span>
+        </h1>
+
+        <p>
+            AI-powered employee work activity and time tracking
+            for transparent productivity, project monitoring,
+            intelligent analysis and better workforce decisions.
+        </p>
+
+        <div class="features">
+            <div class="feature">
+                <span class="check">✓</span>
+                Automatic work & break tracking
+            </div>
+
+            <div class="feature">
+                <span class="check">✓</span>
+                AI-powered activity analysis
+            </div>
+
+            <div class="feature">
+                <span class="check">✓</span>
+                Project-wise productivity insights
+            </div>
+
+            <div class="feature">
+                <span class="check">✓</span>
+                Admin analytics & reports
+            </div>
+        </div>
+    </section>
+
+    <section class="login-panel">
+
+        <h2>Welcome back</h2>
+
+        <p class="subtitle">
+            Sign in to access your workspace.
+        </p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('auth.login') }}">
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="employee@company.com"
+                    autocomplete="email"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+
+                <div class="password-wrapper">
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                    <button
+                        type="button"
+                        class="show-password"
+                        onclick="togglePassword()"
+                    >
+                        Show
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="login-button">
+                Sign In
+            </button>
+
+        </form>
+
+        <p class="security-note">
+            🔒 Secure employee & administrator access
+        </p>
+
+    </section>
+
+</div>
+
+<script>
+    function togglePassword() {
+        const password = document.getElementById("password");
+        const button = document.querySelector(".show-password");
+
+        if (password.type === "password") {
+            password.type = "text";
+            button.textContent = "Hide";
+        } else {
+            password.type = "password";
+            button.textContent = "Show";
+        }
+    }
+</script>
+
+</body>
+</html>

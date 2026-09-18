@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | WorkAI</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 245px;
+            height: 100vh;
+            background: #0f172a;
+            color: white;
+            padding: 28px 20px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 21px;
+            font-weight: 700;
+            margin-bottom: 42px;
+        }
+
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #3b82f6, #14b8a6);
+        }
+
+        .admin-label {
+            color: #94a3b8;
+            font-size: 11px;
+            margin: -25px 0 28px 48px;
+        }
+
+        .nav-item {
+            padding: 13px 15px;
+            margin-bottom: 7px;
+            border-radius: 9px;
+            color: #cbd5e1;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            background: #1e293b;
+            color: white;
+        }
+
+        .main {
+            margin-left: 245px;
+            padding: 30px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .topbar h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .topbar p {
+            color: #64748b;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-weight: 700;
+        }
+
+        .logout {
+            color: #dc2626;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 21px;
+            box-shadow: 0 3px 12px rgba(15, 23, 42, 0.05);
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .blue { color: #2563eb; }
+        .green { color: #059669; }
+        .orange { color: #ea580c; }
+        .purple { color: #7c3aed; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1.35fr 0.65fr;
+            gap: 20px;
+            margin-bottom: 22px;
+        }
+
+        .section-title {
+            font-size: 17px;
+            margin-bottom: 18px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            color: #64748b;
+            font-size: 12px;
+            padding: 12px 8px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        td {
+            padding: 14px 8px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 13px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .active-badge {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .idle-badge {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .offline-badge {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .chart-placeholder {
+            height: 210px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            gap: 10px;
+            padding-top: 20px;
+        }
+
+        .bar {
+            width: 34px;
+            background: linear-gradient(#3b82f6, #14b8a6);
+            border-radius: 7px 7px 0 0;
+        }
+
+        .bar:nth-child(1) { height: 45%; }
+        .bar:nth-child(2) { height: 70%; }
+        .bar:nth-child(3) { height: 55%; }
+        .bar:nth-child(4) { height: 85%; }
+        .bar:nth-child(5) { height: 64%; }
+        .bar:nth-child(6) { height: 78%; }
+        .bar:nth-child(7) { height: 50%; }
+
+        .analytics-note {
+            color: #64748b;
+            font-size: 12px;
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .action {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 18px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+        }
+
+        .action-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .action h4 {
+            margin-bottom: 5px;
+        }
+
+        .action p {
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 1000px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .stats,
+            .action-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .stats,
+            .action-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+
+    <div class="brand">
+        <div class="brand-icon">AI</div>
+        WorkAI
+    </div>
+
+    <div class="admin-label">ADMIN CONSOLE</div>
+
+    <div class="nav-item active">Dashboard</div>
+    <div class="nav-item" onclick="window.location.href='/admin/employees'">Employees</div>
+    <div class="nav-item" onclick="window.location.href='/admin/projects'">Projects & Tasks</div>
+    <div class="nav-item">Activity Monitoring</div>
+    <div class="nav-item">AI Analysis</div>
+    <div class="nav-item">Reports</div>
+
+</aside>
+
+<main class="main">
+
+    <header class="topbar">
+
+        <div>
+            <h1>Admin Dashboard</h1>
+            <p>Monitor workforce activity, projects and productivity.</p>
+        </div>
+
+        <div class="profile">
+
+            <div class="avatar">
+                {{ user.name[0] | upper }}
+            </div>
+
+            <div>
+                <strong>{{ user.name }}</strong><br>
+                <a class="logout" href="{{ url_for('auth.logout') }}">
+                    Logout
+                </a>
+            </div>
+
+        </div>
+
+    </header>
+
+    <section class="stats">
+
+        <div class="card">
+            <div class="stat-label">TOTAL EMPLOYEES</div>
+            <div class="stat-value blue">0</div>
+        </div>
+
+        <div class="card">
+            <div class="stat-label">CURRENTLY ACTIVE</div>
+            <div class="stat-value green">0</div>
+        </div>
+
+        <div class="card">
+            <div class="stat-label">ACTIVE PROJECTS</div>
+            <div class="stat-value purple">0</div>
+        </div>
+
+        <div class="card">
+            <div class="stat-label">ACTIVITY ALERTS</div>
+            <div class="stat-value orange">0</div>
+        </div>
+
+    </section>
+
+    <section class="grid">
+
+        <div class="card">
+
+            <h3 class="section-title">Employee Activity</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Status</th>
+                        <th>Work Time</th>
+                        <th>Active</th>
+                        <th>Project</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td colspan="5" style="text-align:center; color:#94a3b8;">
+                            Employee activity will appear here.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+        <div class="card">
+
+            <h3 class="section-title">Weekly Activity</h3>
+
+            <div class="chart-placeholder">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+
+            <p class="analytics-note">
+                Live analytics will be generated from employee activity records.
+            </p>
+
+        </div>
+
+    </section>
+
+    <section>
+
+        <h3 class="section-title">Management & Analytics</h3>
+
+        <div class="action-grid">
+
+            <div class="action">
+                <div class="action-icon">👥</div>
+                <h4>Employee Management</h4>
+                <p>Add employees and manage employee accounts.</p>
+            </div>
+
+            <div class="action">
+                <div class="action-icon">📁</div>
+                <h4>Projects & Tasks</h4>
+                <p>Create projects and assign work to employees.</p>
+            </div>
+
+            <div class="action">
+                <div class="action-icon">🤖</div>
+                <h4>AI Activity Analysis</h4>
+                <p>Analyze activity patterns and identify unusual behavior.</p>
+            </div>
+
+            <div class="action">
+                <div class="action-icon">📊</div>
+                <h4>Reports & Export</h4>
+                <p>Generate daily, weekly and monthly reports with CSV export.</p>
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+</body>
+</html>
