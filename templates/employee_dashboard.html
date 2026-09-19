@@ -370,11 +370,21 @@
         <div class="card">
             <h3 class="section-title">Today's Work Session</h3>
 
-            <span class="status" id="workStatus">Ready to start</span>
+            <span class="status" id="workStatus">
+    {% if active_session %}
+        Working
+    {% else %}
+        Ready to start
+    {% endif %}
+</span>
 
-            <div class="timer" id="timer">
-                00:00:00
-            </div>
+<div class="timer" id="timer">
+    {% if active_session %}
+        {{ active_session.total_work_seconds | default(0) }}
+    {% else %}
+        00:00:00
+    {% endif %}
+</div>
 
             <p>
                 Start your work session to begin tracking your
@@ -485,9 +495,9 @@
 
 </main>
 <script>
-let seconds = 0;
+let seconds = {{ active_session.total_work_seconds | default(0) if active_session else 0 }};
 let timer = null;
-let isWorking = false;
+let isWorking = {{ 'true' if active_session else 'false' }};
 
 const startBtn = document.getElementById("startWork");
 const breakBtn = document.getElementById("breakWork");
@@ -505,6 +515,10 @@ function updateTimer() {
     document.querySelectorAll(".timer, .time-display").forEach(element => {
         element.textContent = time;
     });
+}
+if (isWorking) {
+    timer = setInterval(updateTimer, 1000);
+    startBtn.textContent = "Working...";
 }
 
 startBtn.addEventListener("click", function () {
@@ -540,5 +554,6 @@ endBtn.addEventListener("click", function () {
     startBtn.textContent = "▶ Start Work";
 });
 </script>
+<script src="{{ url_for('static', filename='activity_tracker.js') }}"></script>
 </body>
 </html>

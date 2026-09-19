@@ -28,11 +28,18 @@ def role_required(role):
 @role_required("employee")
 def employee_dashboard():
     tasks = Task.query.filter_by(employee_id=current_user.id).all()
+    from models.work_session import WorkSession
+
+    active_session = WorkSession.query.filter_by(
+        employee_id=current_user.id,
+        end_time=None
+    ).order_by(WorkSession.start_time.desc()).first()
 
     return render_template(
         "employee_dashboard.html",
         user=current_user,
-        tasks=tasks
+        tasks=tasks,
+        active_session=active_session
     )
 
 
@@ -205,3 +212,45 @@ def admin_reports():
         "admin_reports.html",
         user=current_user
     )
+@dashboard_bp.route("/employee/activity", methods=["POST"])
+@login_required
+@role_required("employee")
+def record_employee_activity():
+    from flask import request, jsonify
+    from models.work_session import WorkSession
+    from services.activity_tracker import save_activity
+
+    # Find the employee's current working session
+    session = WorkSession.query.filter_by(
+        employee_id=current_user.id,
+        end_time=None
+    ).order_by(WorkSession.start_time.desc()).first()
+
+    if not session:
+        return jsonify({
+            "success": False,
+            "message": "No active work session"
+        }), 400
+
+    data = request.get_json(silent=True) or {}
+
+    try:
+        activity = save_activity(
+            employee_id=current_user.id,
+            session_id=session.id,
+            active_seconds=data.get("active_seconds", 0),
+            idle_seconds=data.get("idle_seconds", 0),
+            keyboard_events=data.get("keyboard_events", 0),
+            mouse_events=data.get("mouse_events", 0)
+        )
+
+        return jsonify({
+            "success": True,
+            "activity_id": activity.id
+        }), 201
+
+    except (TypeError, ValueError):
+        return jsonify({
+            "success": False,
+            "message": "Invalid activity data"
+        }), 400
