@@ -316,7 +316,7 @@
     <div class="nav-item active">Dashboard</div>
     <div class="nav-item">My Projects</div>
     <div class="nav-item">Activity History</div>
-    <div class="nav-item">Work Summary</div>
+    <div class="nav-item" onclick="window.location.href='/employee/work-summary'">Work Summary</div>
 </aside>
 
 <main class="main">
@@ -493,6 +493,21 @@
 
     </section>
 
+<section class="project-box">
+    <div class="card">
+        <h3>AI Work Summary</h3>
+
+        {% if work_summary %}
+            <p>{{ work_summary }}</p>
+        {% else %}
+            <p>No work summary available yet. Start a work session and record activity to generate your daily summary.</p>
+        {% endif %}
+    </div>
+</section>
+
+</main>
+
+<script>
 </main>
 <script>
 let seconds = {{ active_session.total_work_seconds | default(0) if active_session else 0 }};

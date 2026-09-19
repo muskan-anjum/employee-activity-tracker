@@ -27,22 +27,70 @@ def role_required(role):
 @login_required
 @role_required("employee")
 def employee_dashboard():
-    tasks = Task.query.filter_by(employee_id=current_user.id).all()
     from models.work_session import WorkSession
+    from models.activity import ActivityLog
+    from services.work_summary import generate_work_summary
+
+    tasks = Task.query.filter_by(employee_id=current_user.id).all()
 
     active_session = WorkSession.query.filter_by(
         employee_id=current_user.id,
         end_time=None
     ).order_by(WorkSession.start_time.desc()).first()
 
+    work_sessions = WorkSession.query.filter_by(
+        employee_id=current_user.id
+    ).all()
+
+    activity_logs = ActivityLog.query.filter_by(
+        employee_id=current_user.id
+    ).all()
+
+    work_summary = generate_work_summary(
+        current_user,
+        tasks,
+        work_sessions,
+        activity_logs
+    )
+
     return render_template(
         "employee_dashboard.html",
         user=current_user,
         tasks=tasks,
-        active_session=active_session
+        active_session=active_session,
+        work_summary=work_summary
     )
 
+@dashboard_bp.route("/employee/work-summary")
+@login_required
+@role_required("employee")
+def employee_work_summary():
+    from models.work_session import WorkSession
+    from models.activity import ActivityLog
+    from services.work_summary import generate_work_summary
 
+    tasks = Task.query.filter_by(employee_id=current_user.id).all()
+
+    work_sessions = WorkSession.query.filter_by(
+        employee_id=current_user.id
+    ).all()
+
+    activity_logs = ActivityLog.query.filter_by(
+        employee_id=current_user.id
+    ).all()
+
+    work_summary = generate_work_summary(
+        current_user,
+        tasks,
+        work_sessions,
+        activity_logs
+    )
+
+    return render_template(
+        "employee_work_summary.html",
+        user=current_user,
+        work_summary=work_summary
+    )
 @dashboard_bp.route("/admin/dashboard")
 @login_required
 @role_required("admin")
@@ -200,9 +248,26 @@ def admin_activity():
 @login_required
 @role_required("admin")
 def admin_ai_analysis():
+    from models.activity import ActivityLog
+    from services.ml_analyzer import analyze_activity
+
+    activity_records = ActivityLog.query.order_by(
+        ActivityLog.timestamp.desc()
+    ).limit(100).all()
+
+    analysis_results = analyze_activity(activity_records)
+
+    unusual_count = sum(
+        1 for result in analysis_results
+        if result["status"] == "Unusual"
+    )
+
     return render_template(
         "admin_ai_analysis.html",
-        user=current_user
+        user=current_user,
+        analysis_results=analysis_results,
+        unusual_count=unusual_count,
+        total_analyzed=len(analysis_results)
     )
 @dashboard_bp.route("/admin/reports")
 @login_required

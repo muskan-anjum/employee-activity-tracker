@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work Summary | WorkAI</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f7fb;
+            color: #1f2937;
+        }
+
+        .sidebar {
+            position: fixed;
+            width: 220px;
+            height: 100vh;
+            background: #172033;
+            color: white;
+            padding: 28px 20px;
+        }
+
+        .brand {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 40px;
+        }
+
+        .nav-item {
+            padding: 13px 12px;
+            margin-bottom: 8px;
+            border-radius: 7px;
+            cursor: pointer;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: #26344f;
+        }
+
+        .main {
+            margin-left: 220px;
+            padding: 35px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 7px;
+        }
+
+        .header p {
+            color: #6b7280;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-top: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .card p {
+            color: #6b7280;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .card h2 {
+            font-size: 25px;
+        }
+
+        .summary-box {
+            background: white;
+            margin-top: 25px;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .summary-box h2 {
+            margin-bottom: 18px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 14px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+
+        @media (max-width: 900px) {
+            .cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+    <div class="brand">AI WorkAI</div>
+
+    <div class="nav-item"
+         onclick="window.location.href='/employee/dashboard'">
+        Dashboard
+    </div>
+
+    <div class="nav-item">My Projects</div>
+
+    <div class="nav-item">Activity History</div>
+
+    <div class="nav-item active">
+        Work Summary
+    </div>
+</aside>
+
+<main class="main">
+
+    <div class="header">
+        <h1>Work Summary</h1>
+        <p>Your overall work activity and productivity summary.</p>
+    </div>
+
+    <div class="cards">
+
+        <div class="card">
+            <p>TOTAL WORK TIME</p>
+            <h2>{{ work_summary.total_work_time | default('00:00:00') }}</h2>
+        </div>
+
+        <div class="card">
+            <p>ACTIVE TIME</p>
+            <h2>{{ work_summary.active_time | default('00:00:00') }}</h2>
+        </div>
+
+        <div class="card">
+            <p>IDLE TIME</p>
+            <h2>{{ work_summary.idle_time | default('00:00:00') }}</h2>
+        </div>
+
+        <div class="card">
+            <p>TASK PROGRESS</p>
+            <h2>{{ work_summary.task_progress | default(0) }}%</h2>
+        </div>
+
+    </div>
+
+    <div class="summary-box">
+        <h2>Productivity Overview</h2>
+
+        <div class="summary-row">
+            <span>Employee</span>
+            <strong>{{ user.name }}</strong>
+        </div>
+
+        <div class="summary-row">
+            <span>Completed Tasks</span>
+            <strong>{{ work_summary.completed_tasks | default(0) }}</strong>
+        </div>
+
+        <div class="summary-row">
+            <span>Total Tasks</span>
+            <strong>{{ work_summary.total_tasks | default(0) }}</strong>
+        </div>
+
+        <div class="summary-row">
+            <span>Productivity Score</span>
+            <strong>{{ work_summary.productivity_score | default(0) }}%</strong>
+        </div>
+
+    </div>
+
+</main>
+
+</body>
+</html>

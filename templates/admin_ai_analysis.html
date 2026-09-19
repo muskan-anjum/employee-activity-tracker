@@ -70,12 +70,12 @@
 
         .stats {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 18px;
             margin-bottom: 25px;
         }
 
-        .card {
+        .card, .analysis-box {
             background: white;
             padding: 22px;
             border-radius: 10px;
@@ -93,10 +93,6 @@
         }
 
         .analysis-box {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             margin-bottom: 22px;
         }
 
@@ -106,25 +102,7 @@
 
         .analysis-box > p {
             color: #64748b;
-            margin-bottom: 22px;
-        }
-
-        .insight {
-            padding: 16px;
-            background: #f8fafc;
-            border-left: 4px solid #3b82f6;
-            margin-bottom: 12px;
-            border-radius: 5px;
-        }
-
-        .insight h3 {
-            font-size: 15px;
-            margin-bottom: 6px;
-        }
-
-        .insight p {
-            color: #64748b;
-            font-size: 14px;
+            margin-bottom: 20px;
         }
 
         table {
@@ -148,19 +126,24 @@
             font-size: 14px;
         }
 
-        .good {
+        .normal {
             color: #16a34a;
             font-weight: bold;
         }
 
-        .medium {
-            color: #d97706;
+        .unusual {
+            color: #dc2626;
             font-weight: bold;
+        }
+
+        .empty {
+            color: #64748b;
+            padding: 20px 0;
         }
 
         @media(max-width: 900px) {
             .stats {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -170,7 +153,7 @@
 
 <aside class="sidebar">
 
-    <div class="brand">AI&nbsp; WorkAI</div>
+    <div class="brand">AI WorkAI</div>
     <div class="admin-label">ADMIN CONSOLE</div>
 
     <div class="nav-item"
@@ -198,106 +181,133 @@
     </div>
 
     <div class="nav-item"
-    onclick="window.location.href='/admin/reports'">
-    Reports
-</div>>
+         onclick="window.location.href='/admin/reports'">
+        Reports
+    </div>
+
 </aside>
 
 <main class="main">
 
     <div class="header">
         <h1>AI Activity Analysis</h1>
-        <p>Analyze employee work patterns and productivity insights.</p>
+        <p>
+            Machine-learning analysis of employee activity patterns
+            using Isolation Forest anomaly detection.
+        </p>
     </div>
 
     <div class="stats">
 
         <div class="card">
-            <p>PRODUCTIVITY SCORE</p>
-            <h2>82%</h2>
+            <p>ACTIVITY RECORDS ANALYZED</p>
+            <h2>{{ total_analyzed }}</h2>
         </div>
 
         <div class="card">
-            <p>ACTIVE EMPLOYEES</p>
-            <h2>2</h2>
+            <p>UNUSUAL ACTIVITY ALERTS</p>
+            <h2>{{ unusual_count }}</h2>
         </div>
 
         <div class="card">
-            <p>ACTIVITY ALERTS</p>
-            <h2>0</h2>
-        </div>
-
-        <div class="card">
-            <p>WORK EFFICIENCY</p>
-            <h2>Good</h2>
+            <p>ML MODEL</p>
+            <h2>Isolation Forest</h2>
         </div>
 
     </div>
 
     <div class="analysis-box">
 
-        <h2>AI Productivity Insights</h2>
-        <p>Automated observations based on employee activity patterns.</p>
+        <h2>Machine Learning Analysis</h2>
 
-        <div class="insight">
-            <h3>Productivity Pattern</h3>
-            <p>
-                Employee activity indicates consistent work patterns
-                with normal break intervals.
-            </p>
-        </div>
+        <p>
+            The system analyzes active time, idle time, keyboard-event
+            counts and mouse-event counts to identify unusual employee
+            activity patterns.
+        </p>
 
-        <div class="insight">
-            <h3>Work Session Analysis</h3>
-            <p>
-                Active and idle time can be analyzed to identify
-                productivity trends during work sessions.
+        {% if total_analyzed < 5 %}
+            <p class="empty">
+                At least 5 activity records are required for meaningful
+                anomaly detection. Current records: {{ total_analyzed }}.
             </p>
-        </div>
-
-        <div class="insight">
-            <h3>Activity Monitoring</h3>
-            <p>
-                No unusual activity patterns are currently detected.
+        {% elif unusual_count == 0 %}
+            <p class="normal">
+                No unusual activity patterns were detected in the
+                analyzed records.
             </p>
-        </div>
+        {% else %}
+            <p class="unusual">
+                {{ unusual_count }} unusual activity record(s) detected.
+            </p>
+        {% endif %}
 
     </div>
 
     <div class="analysis-box">
 
-        <h2>Employee Productivity Analysis</h2>
+        <h2>Activity Analysis Results</h2>
+
+        {% if analysis_results %}
 
         <table>
-
             <thead>
                 <tr>
-                    <th>Employee</th>
-                    <th>Activity Level</th>
-                    <th>Productivity</th>
-                    <th>Analysis</th>
+                    <th>Employee ID</th>
+                    <th>Active Time</th>
+                    <th>Idle Time</th>
+                    <th>Keyboard Events</th>
+                    <th>Mouse Events</th>
+                    <th>ML Result</th>
+                    <th>Anomaly Score</th>
                 </tr>
             </thead>
 
             <tbody>
 
-                <tr>
-                    <td>Demo Employee</td>
-                    <td>High</td>
-                    <td class="good">85%</td>
-                    <td>Productive</td>
-                </tr>
+                {% for result in analysis_results %}
 
                 <tr>
-                    <td>Test Employee</td>
-                    <td>Moderate</td>
-                    <td class="medium">72%</td>
-                    <td>Normal</td>
+                    <td>{{ result.record.employee_id }}</td>
+
+                    <td>
+                        {{ result.record.active_seconds or 0 }} sec
+                    </td>
+
+                    <td>
+                        {{ result.record.idle_seconds or 0 }} sec
+                    </td>
+
+                    <td>
+                        {{ result.record.keyboard_events or 0 }}
+                    </td>
+
+                    <td>
+                        {{ result.record.mouse_events or 0 }}
+                    </td>
+
+                    <td class="{{ 'unusual' if result.status == 'Unusual' else 'normal' }}">
+                        {{ result.status }}
+                    </td>
+
+                    <td>
+                        {{ result.anomaly_score }}
+                    </td>
                 </tr>
+
+                {% endfor %}
 
             </tbody>
-
         </table>
+
+        {% else %}
+
+        <p class="empty">
+            No activity records are available yet. Employee activity
+            will appear here after work sessions generate activity data.
+        </p>
+
+        {% endif %}
 
     </div>
 
