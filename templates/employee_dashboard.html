@@ -536,11 +536,26 @@ if (isWorking) {
     startBtn.textContent = "Working...";
 }
 
-startBtn.addEventListener("click", function () {
-    if (!isWorking) {
-        isWorking = true;
-        timer = setInterval(updateTimer, 1000);
-        startBtn.textContent = "Working...";
+startBtn.addEventListener("click", async function () {
+    try {
+        const response = await fetch("/employee/start-work", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            isWorking = true;
+            timer = setInterval(updateTimer, 1000);
+            startBtn.textContent = "Working...";
+        } else {
+            alert(data.message);
+        }
+    } catch (error) {
+        console.error("Start work error:", error);
     }
 });
 
