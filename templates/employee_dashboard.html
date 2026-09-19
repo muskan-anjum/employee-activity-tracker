@@ -553,20 +553,39 @@ breakBtn.addEventListener("click", function () {
     }
 });
 
-endBtn.addEventListener("click", function () {
-    if (timer) {
-        clearInterval(timer);
+endBtn.addEventListener("click", async function () {
+    try {
+        const response = await fetch("/employee/end-work", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            if (timer) {
+                clearInterval(timer);
+            }
+
+            timer = null;
+            isWorking = false;
+            seconds = 0;
+
+            document.querySelectorAll(".timer, .time-display").forEach(element => {
+                element.textContent = "00:00:00";
+            });
+
+            startBtn.textContent = "▶ Start Work";
+            alert("Work session ended successfully");
+            window.location.reload();
+        } else {
+            alert(data.message || "Unable to end work session");
+        }
+    } catch (error) {
+        alert("Error ending work session");
     }
-
-    timer = null;
-    isWorking = false;
-    // seconds = 0;
-
-    document.querySelectorAll(".timer, .time-display").forEach(element => {
-        element.textContent = "00:00:00";
-    });
-
-    startBtn.textContent = "▶ Start Work";
 });
 </script>
 <script src="{{ url_for('static', filename='activity_tracker.js') }}"></script>
