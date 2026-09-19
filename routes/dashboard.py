@@ -189,3 +189,19 @@ def admin_activity():
         "admin_activity.html",
         user=current_user
     )
+@dashboard_bp.route("/admin/ai-analysis")
+@login_required
+@role_required("admin")
+def admin_ai_analysis():
+    return render_template(
+        "admin_ai_analysis.html",
+        user=current_user
+    )
+@dashboard_bp.route("/admin/reports")
+@login_required
+@role_required("admin")
+def admin_reports():
+    return render_template(
+        "admin_reports.html",
+        user=current_user
+    )

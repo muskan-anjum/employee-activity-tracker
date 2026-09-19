@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Analysis | WorkAI</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f7fb;
+            color: #1f2937;
+        }
+
+        .sidebar {
+            position: fixed;
+            width: 220px;
+            height: 100vh;
+            background: #172033;
+            color: white;
+            padding: 28px 20px;
+        }
+
+        .brand {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .admin-label {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-bottom: 30px;
+        }
+
+        .nav-item {
+            padding: 12px 10px;
+            margin-bottom: 6px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #dbe3ef;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: #25324a;
+            color: white;
+        }
+
+        .main {
+            margin-left: 220px;
+            padding: 35px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 7px;
+        }
+
+        .header p {
+            color: #64748b;
+            margin-bottom: 30px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .card p {
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .card h2 {
+            font-size: 25px;
+        }
+
+        .analysis-box {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 22px;
+        }
+
+        .analysis-box h2 {
+            margin-bottom: 8px;
+        }
+
+        .analysis-box > p {
+            color: #64748b;
+            margin-bottom: 22px;
+        }
+
+        .insight {
+            padding: 16px;
+            background: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            margin-bottom: 12px;
+            border-radius: 5px;
+        }
+
+        .insight h3 {
+            font-size: 15px;
+            margin-bottom: 6px;
+        }
+
+        .insight p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 18px;
+        }
+
+        th, td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        td {
+            font-size: 14px;
+        }
+
+        .good {
+            color: #16a34a;
+            font-weight: bold;
+        }
+
+        .medium {
+            color: #d97706;
+            font-weight: bold;
+        }
+
+        @media(max-width: 900px) {
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+
+    <div class="brand">AI&nbsp; WorkAI</div>
+    <div class="admin-label">ADMIN CONSOLE</div>
+
+    <div class="nav-item"
+         onclick="window.location.href='/admin/dashboard'">
+        Dashboard
+    </div>
+
+    <div class="nav-item"
+         onclick="window.location.href='/admin/employees'">
+        Employees
+    </div>
+
+    <div class="nav-item"
+         onclick="window.location.href='/admin/projects'">
+        Projects & Tasks
+    </div>
+
+    <div class="nav-item"
+         onclick="window.location.href='/admin/activity'">
+        Activity Monitoring
+    </div>
+
+    <div class="nav-item active">
+        AI Analysis
+    </div>
+
+    <div class="nav-item"
+    onclick="window.location.href='/admin/reports'">
+    Reports
+</div>>
+</aside>
+
+<main class="main">
+
+    <div class="header">
+        <h1>AI Activity Analysis</h1>
+        <p>Analyze employee work patterns and productivity insights.</p>
+    </div>
+
+    <div class="stats">
+
+        <div class="card">
+            <p>PRODUCTIVITY SCORE</p>
+            <h2>82%</h2>
+        </div>
+
+        <div class="card">
+            <p>ACTIVE EMPLOYEES</p>
+            <h2>2</h2>
+        </div>
+
+        <div class="card">
+            <p>ACTIVITY ALERTS</p>
+            <h2>0</h2>
+        </div>
+
+        <div class="card">
+            <p>WORK EFFICIENCY</p>
+            <h2>Good</h2>
+        </div>
+
+    </div>
+
+    <div class="analysis-box">
+
+        <h2>AI Productivity Insights</h2>
+        <p>Automated observations based on employee activity patterns.</p>
+
+        <div class="insight">
+            <h3>Productivity Pattern</h3>
+            <p>
+                Employee activity indicates consistent work patterns
+                with normal break intervals.
+            </p>
+        </div>
+
+        <div class="insight">
+            <h3>Work Session Analysis</h3>
+            <p>
+                Active and idle time can be analyzed to identify
+                productivity trends during work sessions.
+            </p>
+        </div>
+
+        <div class="insight">
+            <h3>Activity Monitoring</h3>
+            <p>
+                No unusual activity patterns are currently detected.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="analysis-box">
+
+        <h2>Employee Productivity Analysis</h2>
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Activity Level</th>
+                    <th>Productivity</th>
+                    <th>Analysis</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr>
+                    <td>Demo Employee</td>
+                    <td>High</td>
+                    <td class="good">85%</td>
+                    <td>Productive</td>
+                </tr>
+
+                <tr>
+                    <td>Test Employee</td>
+                    <td>Moderate</td>
+                    <td class="medium">72%</td>
+                    <td>Normal</td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</main>
+
+</body>
+</html>

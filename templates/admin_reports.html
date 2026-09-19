@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Activity Monitoring | WorkAI</title>
+    <title>Reports | WorkAI</title>
 
     <style>
         * {
@@ -20,31 +20,31 @@
 
         .sidebar {
             position: fixed;
-            width: 230px;
+            width: 220px;
             height: 100vh;
             background: #172033;
             color: white;
-            padding: 25px 18px;
+            padding: 28px 20px;
         }
 
         .brand {
             font-size: 22px;
             font-weight: bold;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .admin-label {
             font-size: 11px;
-            color: #9ca3af;
-            margin-bottom: 28px;
+            color: #94a3b8;
+            margin-bottom: 30px;
         }
 
         .nav-item {
-            padding: 12px 14px;
+            padding: 12px 10px;
             margin-bottom: 6px;
-            border-radius: 7px;
+            border-radius: 6px;
             cursor: pointer;
-            color: #d1d5db;
+            color: #dbe3ef;
         }
 
         .nav-item:hover,
@@ -54,27 +54,29 @@
         }
 
         .main {
-            margin-left: 230px;
+            margin-left: 220px;
             padding: 35px;
         }
 
-        h1 {
-            margin-bottom: 5px;
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 7px;
         }
 
-        .subtitle {
-            color: #6b7280;
+        .header p {
+            color: #64748b;
             margin-bottom: 30px;
         }
 
-        .cards {
+        .stats {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 18px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
-        .card {
+        .card,
+        .report-box {
             background: white;
             padding: 22px;
             border-radius: 10px;
@@ -82,51 +84,55 @@
         }
 
         .card p {
-            color: #6b7280;
+            color: #64748b;
             font-size: 13px;
+            margin-bottom: 10px;
         }
 
         .card h2 {
-            margin-top: 10px;
-            color: #2563eb;
+            font-size: 25px;
         }
 
-        .activity-box {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        .report-box {
+            margin-bottom: 22px;
+        }
+
+        .report-box h2 {
+            margin-bottom: 8px;
+        }
+
+        .report-box > p {
+            color: #64748b;
+            margin-bottom: 20px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
         }
 
         th, td {
-            text-align: left;
             padding: 14px;
+            text-align: left;
             border-bottom: 1px solid #e5e7eb;
         }
 
         th {
-            color: #6b7280;
+            color: #64748b;
             font-size: 13px;
         }
 
-        .active-status {
+        td {
+            font-size: 14px;
+        }
+
+        .status {
             color: #16a34a;
             font-weight: bold;
         }
 
-        .idle-status {
-            color: #d97706;
-            font-weight: bold;
-        }
-
         @media(max-width: 900px) {
-            .cards {
+            .stats {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
@@ -155,87 +161,89 @@
         Projects & Tasks
     </div>
 
-    <div class="nav-item active">
+    <div class="nav-item"
+         onclick="window.location.href='/admin/activity'">
         Activity Monitoring
     </div>
 
-    <div class="nav-item" onclick="window.location.href='/admin/ai-analysis'">AI Analysis</div>
+    <div class="nav-item"
+         onclick="window.location.href='/admin/ai-analysis'">
+        AI Analysis
+    </div>
 
-    <div class="nav-item" onclick="window.location.href='/admin/reports'">Reports</div>
+    <div class="nav-item active">
+        Reports
+    </div>
 
 </aside>
 
-
 <main class="main">
 
-    <h1>Activity Monitoring</h1>
+    <div class="header">
+        <h1>Workforce Reports</h1>
+        <p>View employee activity, work-time and productivity summaries.</p>
+    </div>
 
-    <p class="subtitle">
-        Monitor employee work sessions, active time and idle activity.
-    </p>
-
-
-    <div class="cards">
+    <div class="stats">
 
         <div class="card">
-            <p>Currently Working</p>
-            <h2>0</h2>
+            <p>TOTAL EMPLOYEES</p>
+            <h2>2</h2>
         </div>
 
         <div class="card">
-            <p>Employees on Break</p>
-            <h2>0</h2>
+            <p>ACTIVE EMPLOYEES</p>
+            <h2>2</h2>
         </div>
 
         <div class="card">
-            <p>Idle Employees</p>
-            <h2>0</h2>
+            <p>AVERAGE PRODUCTIVITY</p>
+            <h2>78%</h2>
         </div>
 
         <div class="card">
-            <p>Activity Alerts</p>
+            <p>ACTIVITY ALERTS</p>
             <h2>0</h2>
         </div>
 
     </div>
 
+    <div class="report-box">
 
-    <div class="activity-box">
-
-        <h2>Employee Activity</h2>
+        <h2>Employee Activity Report</h2>
+        <p>Summary of employee work activity and productivity.</p>
 
         <table>
-
             <thead>
                 <tr>
                     <th>Employee</th>
-                    <th>Status</th>
                     <th>Work Time</th>
                     <th>Active Time</th>
                     <th>Idle Time</th>
+                    <th>Productivity</th>
+                    <th>Status</th>
                 </tr>
             </thead>
 
             <tbody>
-
                 <tr>
                     <td>Demo Employee</td>
-                    <td class="active-status">Active</td>
                     <td>00:00:00</td>
                     <td>00:00:00</td>
                     <td>00:00:00</td>
+                    <td>85%</td>
+                    <td class="status">Active</td>
                 </tr>
 
                 <tr>
                     <td>Test Employee</td>
-                    <td class="idle-status">Idle</td>
                     <td>00:00:00</td>
                     <td>00:00:00</td>
                     <td>00:00:00</td>
+                    <td>72%</td>
+                    <td class="status">Active</td>
                 </tr>
-
             </tbody>
-
         </table>
 
     </div>
