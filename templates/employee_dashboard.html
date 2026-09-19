@@ -508,8 +508,6 @@
 </main>
 
 <script>
-</main>
-<script>
 let seconds = {{ active_session.total_work_seconds | default(0) if active_session else 0 }};
 let timer = null;
 let isWorking = {{ 'true' if active_session else 'false' }};
@@ -600,6 +598,42 @@ document.getElementById("endWork").addEventListener("click", async function () {
         }
     } catch (error) {
         alert("Error ending work session");
+    }
+});
+document.getElementById("endWork").addEventListener("click", async function () {
+    try {
+        const response = await fetch("/employee/end-work", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            if (timer) {
+                clearInterval(timer);
+            }
+
+            timer = null;
+            isWorking = false;
+            seconds = 0;
+
+            document.querySelectorAll(".timer, .time-display").forEach(element => {
+                element.textContent = "00:00:00";
+            });
+
+            startBtn.textContent = "▶ Start Work";
+
+            alert("Work session ended successfully");
+            window.location.reload();
+        } else {
+            alert(data.message || "No active work session");
+        }
+    } catch (error) {
+        console.error("End Work error:", error);
+        alert("Unable to end work session");
     }
 });
 </script>
