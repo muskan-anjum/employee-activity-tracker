@@ -181,3 +181,11 @@ def start_work():
 
     flash("Work session started successfully.", "success")
     return redirect(url_for("dashboard.employee_dashboard"))
+@dashboard_bp.route("/admin/activity")
+@login_required
+@role_required("admin")
+def admin_activity():
+    return render_template(
+        "admin_activity.html",
+        user=current_user
+    )
