@@ -319,3 +319,38 @@ def record_employee_activity():
             "success": False,
             "message": "Invalid activity data"
         }), 400
+
+@dashboard_bp.route("/employee/end-work", methods=["POST"])
+@login_required
+@role_required("employee")
+def end_work():
+    from datetime import datetime
+    from models import db
+    from models.work_session import WorkSession
+
+    session = WorkSession.query.filter_by(
+        employee_id=current_user.id,
+        end_time=None
+    ).order_by(WorkSession.start_time.desc()).first()
+
+    if not session:
+        return jsonify({
+            "success": False,
+            "message": "No active work session"
+        }), 400
+
+    session.end_time = datetime.utcnow()
+
+    if session.start_time:
+        session.total_work_seconds = max(
+            0,
+            int((session.end_time - session.start_time).total_seconds())
+        )
+
+    db.session.commit()
+
+    return jsonify({
+        "success": True,
+        "message": "Work session ended successfully",
+        "total_work_seconds": session.total_work_seconds
+    })
