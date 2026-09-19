@@ -570,7 +570,7 @@ breakBtn.addEventListener("click", function () {
 
 document.getElementById("endWork").addEventListener("click", async function () {
     try {
-        const response = await fetch("/employee/end-work", {
+        const response = await fetch("/employee/work/start", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
