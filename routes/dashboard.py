@@ -70,6 +70,32 @@ def employee_dashboard():
         active_break=active_break,
         work_summary=work_summary
     )
+@dashboard_bp.route("/employee/projects")
+@login_required
+@role_required("employee")
+def employee_projects():
+    projects = Project.query.all()
+
+    return render_template(
+        "employee_projects.html",
+        projects=projects
+    )
+
+
+@dashboard_bp.route("/employee/activity-history")
+@login_required
+@role_required("employee")
+def employee_activity_history():
+    from models.activity import ActivityLog
+
+    activities = ActivityLog.query.filter_by(
+        employee_id=current_user.id
+    ).all()
+
+    return render_template(
+        "employee_activity_history.html",
+        activities=activities
+    )
 @dashboard_bp.route("/employee/work-summary")
 @login_required
 @role_required("employee")

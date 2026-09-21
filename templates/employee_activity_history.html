@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity History | WorkAI</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f7fb;
+            color: #1f2937;
+        }
+
+        .sidebar {
+            position: fixed;
+            width: 220px;
+            height: 100vh;
+            background: #111827;
+            color: white;
+            padding: 30px 20px;
+        }
+
+        .brand {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 45px;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 13px 15px;
+            margin-bottom: 8px;
+            border-radius: 7px;
+            color: #d1d5db;
+            text-decoration: none;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .main {
+            margin-left: 220px;
+            padding: 40px;
+        }
+
+        h1 {
+            margin-bottom: 7px;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 14px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .empty {
+            text-align: center;
+            color: #6b7280;
+            padding: 35px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <aside class="sidebar">
+        <div class="brand">AI WorkAI</div>
+
+        <a class="nav-item"
+           href="{{ url_for('dashboard.employee_dashboard') }}">
+            Dashboard
+        </a>
+
+        <a class="nav-item"
+           href="{{ url_for('dashboard.employee_projects') }}">
+            My Projects
+        </a>
+
+        <a class="nav-item active"
+           href="{{ url_for('dashboard.employee_activity_history') }}">
+            Activity History
+        </a>
+
+        <a class="nav-item"
+           href="{{ url_for('dashboard.employee_work_summary') }}">
+            Work Summary
+        </a>
+    </aside>
+
+    <main class="main">
+
+        <h1>Activity History</h1>
+        <p class="subtitle">
+            View your recorded work activity and productivity history.
+        </p>
+
+        <div class="card">
+
+            <h2>Recent Activity</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date / Time</th>
+                        <th>Active Time</th>
+                        <th>Idle Time</th>
+                        <th>Keyboard Events</th>
+                        <th>Mouse Events</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for activity in activities %}
+                    <tr>
+                        <td>{{ activity.timestamp }}</td>
+                        <td>{{ activity.active_seconds }} sec</td>
+                        <td>{{ activity.idle_seconds }} sec</td>
+                        <td>{{ activity.keyboard_events }}</td>
+                        <td>{{ activity.mouse_events }}</td>
+                    </tr>
+
+                    {% else %}
+
+                    <tr>
+                        <td colspan="5" class="empty">
+                            No activity history recorded yet.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+            </table>
+
+        </div>
+
+    </main>
+
+</body>
+</html>
