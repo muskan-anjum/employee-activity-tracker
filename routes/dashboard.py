@@ -383,9 +383,36 @@ def admin_ai_analysis():
 @login_required
 @role_required("admin")
 def admin_reports():
+    from models.user import User
+    from models.task import Task
+    from models.work_session import WorkSession
+    from models.activity import ActivityLog
+    from services.work_summary import generate_work_summary
+
+    employees = User.query.filter_by(role="employee").all()
+    reports = []
+
+    for employee in employees:
+        summary = generate_work_summary(
+    employee,
+    Task.query.filter_by(employee_id=employee.id).all(),
+    WorkSession.query.filter_by(employee_id=employee.id).all(),
+    ActivityLog.query.filter_by(employee_id=employee.id).all()
+)
+
+        reports.append({
+            "employee": employee,
+            "work_time": summary.get("total_work_time", "00:00:00"),
+            "active_time": summary.get("active_time", "00:00:00"),
+            "idle_time": summary.get("idle_time", "00:00:00"),
+            "productivity": summary.get("productivity_score", 0)
+        })
+
+    
     return render_template(
         "admin_reports.html",
-        user=current_user
+        user=current_user,
+        reports=reports
     )
 @dashboard_bp.route("/employee/activity", methods=["POST"])
 @login_required
