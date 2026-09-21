@@ -398,10 +398,11 @@
     </button>
 </form>
 
-                <button class="break" id="breakWork">
-                    ☕ Start Break
-                </button>
-
+                <form method="POST" action="{{ url_for('dashboard.start_break') }}" style="display:inline;">
+    <button type="submit" class="break" id="breakWork">
+        🟠 Start Break
+    </button>
+</form>
                 <button class="end" id="endWork">
                     ■ End Work
                 </button>

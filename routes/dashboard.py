@@ -17,6 +17,7 @@ def role_required(role):
             if current_user.role != role:
                 flash("You are not authorized to access this page.", "danger")
                 return redirect(url_for("dashboard.employee_dashboard"))
+
             return function(*args, **kwargs)
 
         return wrapped_function
@@ -236,6 +237,43 @@ def start_work():
 
     flash("Work session started successfully.", "success")
     return redirect(url_for("dashboard.employee_dashboard"))
+
+@dashboard_bp.route("/employee/work/break", methods=["POST"])
+@login_required
+@role_required("employee")
+def start_break():
+    from models.work_session import WorkSession, Break
+
+    session = WorkSession.query.filter_by(
+        employee_id=current_user.id,
+        end_time=None
+    ).order_by(WorkSession.start_time.desc()).first()
+
+    if not session:
+        return jsonify({
+            "success": False,
+            "message": "No active work session"
+        }), 400
+
+    active_break = Break.query.filter_by(
+        session_id=session.id,
+        end_time=None
+    ).first()
+
+    if active_break:
+        return jsonify({
+            "success": False,
+            "message": "Break already active"
+        }), 400
+
+    new_break = Break(session_id=session.id)
+    session.status = "On Break"
+
+    db.session.add(new_break)
+    db.session.commit()
+
+    flash("Break started successfully.", "success")
+    return redirect(url_for("dashboard.employee_dashboard"))
 @dashboard_bp.route("/admin/activity")
 @login_required
 @role_required("admin")
@@ -326,7 +364,7 @@ def record_employee_activity():
 def end_work():
     from datetime import datetime
     from models import db
-    from models.work_session import WorkSession
+    from models.work_session import WorkSession, Break
 
     session = WorkSession.query.filter_by(
         employee_id=current_user.id,
@@ -346,11 +384,24 @@ def end_work():
             0,
             int((session.end_time - session.start_time).total_seconds())
         )
+        
+    active_break = Break.query.filter_by(
+        session_id=session.id,
+        end_time=None
+    ).first()
+
+    if active_break:
+        active_break.end_time = datetime.utcnow()
+        active_break.duration_seconds = max(
+            0,
+            int((active_break.end_time - active_break.start_time).total_seconds())
+        )
 
     db.session.commit()
-
     return jsonify({
-        "success": True,
-        "message": "Work session ended successfully",
-        "total_work_seconds": session.total_work_seconds
-    })
+    "success": True,
+    "message": "Work session ended successfully",
+    "total_work_seconds": session.total_work_seconds
+})
+
+    
