@@ -28,7 +28,7 @@ def role_required(role):
 @login_required
 @role_required("employee")
 def employee_dashboard():
-    from models.work_session import WorkSession
+    from models.work_session import WorkSession, Break
     from models.activity import ActivityLog
     from services.work_summary import generate_work_summary
 
@@ -38,6 +38,14 @@ def employee_dashboard():
         employee_id=current_user.id,
         end_time=None
     ).order_by(WorkSession.start_time.desc()).first()
+
+    active_break = None
+
+    if active_session:
+        active_break = Break.query.filter_by(
+            session_id=active_session.id,
+            end_time=None
+        ).first()
 
     work_sessions = WorkSession.query.filter_by(
         employee_id=current_user.id
@@ -59,14 +67,14 @@ def employee_dashboard():
         user=current_user,
         tasks=tasks,
         active_session=active_session,
+        active_break=active_break,
         work_summary=work_summary
     )
-
 @dashboard_bp.route("/employee/work-summary")
 @login_required
 @role_required("employee")
 def employee_work_summary():
-    from models.work_session import WorkSession
+    from models.work_session import WorkSession, Break
     from models.activity import ActivityLog
     from services.work_summary import generate_work_summary
 
@@ -272,8 +280,46 @@ def start_break():
     db.session.add(new_break)
     db.session.commit()
 
-    flash("Break started successfully.", "success")
-    return redirect(url_for("dashboard.employee_dashboard"))
+    return jsonify({
+    "success": True,
+    "message": "Break started successfully"
+})
+@dashboard_bp.route("/employee/work/end-break", methods=["POST"])
+@login_required
+@role_required("employee")
+def end_break():
+    from datetime import datetime
+    from models.work_session import WorkSession, Break
+
+    session = WorkSession.query.filter_by(
+        employee_id=current_user.id,
+        end_time=None
+    ).order_by(WorkSession.start_time.desc()).first()
+
+    if not session:
+        return jsonify({"success": False, "message": "No active work session"}), 400
+
+    active_break = Break.query.filter_by(
+        session_id=session.id,
+        end_time=None
+    ).first()
+
+    if not active_break:
+        return jsonify({"success": False, "message": "No active break"}), 400
+
+    active_break.end_time = datetime.utcnow()
+    active_break.duration_seconds = max(
+        0,
+        int((active_break.end_time - active_break.start_time).total_seconds())
+    )
+    session.status = "Working"
+
+    db.session.commit()
+
+    return jsonify({
+        "success": True,
+        "message": "Break ended successfully"
+    })
 @dashboard_bp.route("/admin/activity")
 @login_required
 @role_required("admin")

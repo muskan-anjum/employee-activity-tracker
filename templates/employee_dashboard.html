@@ -398,11 +398,13 @@
     </button>
 </form>
 
-                <form method="POST" action="{{ url_for('dashboard.start_break') }}" style="display:inline;">
-    <button type="submit" class="break" id="breakWork">
+                <button type="button" class="break" id="breakWork">
+    {% if active_break %}
+        🟠 End Break
+    {% else %}
         🟠 Start Break
-    </button>
-</form>
+    {% endif %}
+</button>
                 <button class="end" id="endWork">
                     ■ End Work
                 </button>
@@ -530,7 +532,7 @@ function updateTimer() {
         element.textContent = time;
     });
 }
-if (isWorking) {
+if (isWorking && !breakBtn.textContent.includes("End Break")) {
     timer = setInterval(updateTimer, 1000);
     startBtn.textContent = "Working...";
 }
@@ -558,18 +560,44 @@ startBtn.addEventListener("click", async function () {
     }
 });
 
-breakBtn.addEventListener("click", function () {
-    if (timer) {
-        clearInterval(timer);
-        timer = null;
-        isWorking = false;
-        startBtn.textContent = "▶ Start Work";
+breakBtn.addEventListener("click", async function () {
+    try {
+        const url = breakBtn.textContent.includes("End Break")
+            ? "/employee/work/end-break"
+            : "/employee/work/break";
+
+        const response = await fetch(url, {
+            method: "POST"
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            if (url === "/employee/work/break") {
+                if (timer) {
+                    clearInterval(timer);
+                    timer = null;
+                }
+                isWorking = false;
+                breakBtn.textContent = "End Break";
+                alert("Break started successfully");
+            } else {
+                isWorking = true;
+                timer = setInterval(updateTimer, 1000);
+                breakBtn.textContent = "Start Break";
+                alert("Break ended successfully");
+            }
+        } else {
+            alert(data.message || "Unable to update break");
+        }
+    } catch (error) {
+        console.error("Break error:", error);
+        alert("Unable to update break");
     }
 });
-
 document.getElementById("endWork").addEventListener("click", async function () {
     try {
-        const response = await fetch("/employee/work/start", {
+        const response = await fetch("/employee/end-work", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
