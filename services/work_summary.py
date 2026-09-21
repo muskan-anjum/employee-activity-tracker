@@ -15,14 +15,15 @@ def generate_work_summary(user, tasks, work_sessions, activity_logs):
         if session.start_time and session.start_time.date() == today
     ]
 
-    # Calculate work duration
+    # Calculate total work duration
     total_work_seconds = 0
 
     for session in today_sessions:
         if session.start_time:
             end_time = session.end_time or datetime.utcnow()
             total_work_seconds += max(
-                0, int((end_time - session.start_time).total_seconds())
+                0,
+                int((end_time - session.start_time).total_seconds())
             )
 
     work_hours = total_work_seconds // 3600
@@ -35,19 +36,29 @@ def generate_work_summary(user, tasks, work_sessions, activity_logs):
     ]
 
     active_seconds = sum(
-        activity.active_seconds or 0 for activity in today_activity
+        activity.active_seconds or 0
+        for activity in today_activity
     )
 
     idle_seconds = sum(
-        activity.idle_seconds or 0 for activity in today_activity
+        activity.idle_seconds or 0
+        for activity in today_activity
     )
 
     # Task information
     total_tasks = len(tasks)
 
     completed_tasks = sum(
-        1 for task in tasks
+        1
+        for task in tasks
         if str(getattr(task, "status", "")).lower() == "completed"
+    )
+
+    # Task progress
+    task_progress = (
+        round((completed_tasks / total_tasks) * 100, 1)
+        if total_tasks > 0
+        else 0
     )
 
     # Productivity calculation
@@ -55,16 +66,15 @@ def generate_work_summary(user, tasks, work_sessions, activity_logs):
 
     if monitored_seconds > 0:
         productivity = round(
-            (active_seconds / monitored_seconds) * 100, 1
+            (active_seconds / monitored_seconds) * 100,
+            1
         )
     else:
         productivity = 0
 
-    # Generate summary
+    # Summary text
     if not today_sessions and not today_activity:
-        summary_text = (
-            "No work activity has been recorded for today yet."
-        )
+        summary_text = "No work activity has been recorded for today yet."
     else:
         summary_text = (
             f"{user.name} worked for approximately "
@@ -75,14 +85,26 @@ def generate_work_summary(user, tasks, work_sessions, activity_logs):
             f"{productivity}% based on active and idle time."
         )
 
+    def format_time(seconds):
+        seconds = int(seconds or 0)
+        hours = seconds // 3600
+        minutes = (seconds % 3600) // 60
+        secs = seconds % 60
+        return f"{hours:02d}:{minutes:02d}:{secs:02d}"
+
     return {
         "date": today.strftime("%d-%m-%Y"),
-        "work_hours": work_hours,
-        "work_minutes": work_minutes,
+        "total_work_time": format_time(total_work_seconds),
+        "active_time": format_time(active_seconds),
+        "idle_time": format_time(idle_seconds),
         "total_tasks": total_tasks,
         "completed_tasks": completed_tasks,
+        "task_progress": task_progress,
+        "productivity_score": productivity,
+        "summary": summary_text,
+        "work_hours": work_hours,
+        "work_minutes": work_minutes,
         "active_seconds": active_seconds,
         "idle_seconds": idle_seconds,
         "productivity": productivity,
-        "summary": summary_text,
     }
