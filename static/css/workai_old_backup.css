@@ -1,0 +1,953 @@
+/* =========================================
+   WorkAI - Employee Intelligence Dashboard
+   ========================================= */
+
+:root {
+    --primary: #4f46e5;
+    --primary-dark: #3730a3;
+    --secondary: #7c3aed;
+    --background: #f6f8fc;
+    --card: #ffffff;
+    --text: #172033;
+    --muted: #718096;
+    --border: #e8ecf4;
+    --success: #16a34a;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --sidebar: #111827;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    background: var(--background);
+    color: var(--text);
+}
+
+/* SIDEBAR */
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 250px;
+    height: 100vh;
+    padding: 28px 18px;
+    background: linear-gradient(180deg, #111827 0%, #1e1b4b 100%);
+    color: white;
+    z-index: 100;
+}
+
+.sidebar h2 {
+    margin: 0 0 34px;
+    padding-left: 12px;
+    font-size: 27px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.sidebar h2::after {
+    content: " AI";
+    color: #a5b4fc;
+}
+
+.sidebar a,
+.sidebar button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin: 7px 0;
+    padding: 13px 14px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: #cbd5e1;
+    font-size: 14px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.sidebar a:hover,
+.sidebar button:hover {
+    background: rgba(255, 255, 255, 0.09);
+    color: white;
+}
+
+/* MAIN CONTENT */
+
+.main-content,
+.content {
+    margin-left: 250px;
+    padding: 32px;
+    min-height: 100vh;
+}
+
+.header,
+.dashboard-header {
+    margin-bottom: 28px;
+}
+
+.header h1,
+.dashboard-header h1 {
+    margin: 0;
+    font-size: 29px;
+    font-weight: 750;
+    letter-spacing: -0.7px;
+}
+
+.header p,
+.dashboard-header p {
+    margin-top: 7px;
+    color: var(--muted);
+}
+
+/* CARDS */
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 5px 18px rgba(15, 23, 42, 0.05);
+}
+
+.card h2,
+.card h3 {
+    margin-top: 0;
+}
+
+/* STATISTICS */
+
+.stats-grid,
+.stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    position: relative;
+    overflow: hidden;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 21px;
+    box-shadow: 0 5px 18px rgba(15, 23, 42, 0.05);
+}
+
+.stat-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(
+        180deg,
+        var(--primary),
+        var(--secondary)
+    );
+}
+
+.stat-card h3,
+.stat-card .label {
+    margin: 0 0 10px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.stat-card .value,
+.stat-card strong {
+    color: var(--text);
+    font-size: 25px;
+    font-weight: 750;
+}
+
+/* DASHBOARD LAYOUT */
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 20px;
+    margin-bottom: 22px;
+}
+
+/* SESSION */
+
+.session-card {
+    background: linear-gradient(135deg, #ffffff, #f8f7ff);
+}
+
+.session-card h2 {
+    font-size: 18px;
+}
+
+.timer,
+#workTimer {
+    margin: 20px 0;
+    font-size: 43px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #312e81;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 6px 11px;
+    border-radius: 20px;
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* BUTTONS */
+
+button,
+.btn {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 9px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+button:hover,
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.start-btn,
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.break-btn {
+    background: var(--warning);
+    color: white;
+}
+
+.end-btn,
+.btn-danger {
+    background: var(--danger);
+    color: white;
+}
+
+/* ACTIVITY */
+
+.activity-bar {
+    width: 100%;
+    height: 10px;
+    margin: 9px 0 17px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: #edf0f6;
+}
+
+.activity-fill {
+    height: 100%;
+    border-radius: 20px;
+    background: linear-gradient(90deg, #4f46e5, #7c3aed);
+}
+
+/* AI INSIGHT */
+
+.ai-insight {
+    position: relative;
+    margin-top: 20px;
+    padding: 22px;
+    overflow: hidden;
+    border: 1px solid #ddd6fe;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #f5f3ff, #eef2ff);
+}
+
+.ai-insight::before {
+    content: "✦";
+    position: absolute;
+    right: 18px;
+    top: 13px;
+    color: #7c3aed;
+    font-size: 25px;
+}
+
+.ai-insight h3 {
+    margin: 0 0 9px;
+    color: #4338ca;
+}
+
+.ai-insight p {
+    margin-bottom: 0;
+    color: #475569;
+    line-height: 1.6;
+}
+
+/* PROJECT / TASK */
+
+.project-card,
+.task-card {
+    margin-bottom: 14px;
+    padding: 17px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: white;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    margin-top: 10px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: #e9edf5;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 20px;
+    background: linear-gradient(90deg, #4f46e5, #8b5cf6);
+}
+
+/* TABLES */
+
+table {
+    width: 100%;
+    overflow: hidden;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+}
+
+th {
+    padding: 13px;
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 12px;
+    text-align: left;
+    text-transform: uppercase;
+}
+
+td {
+    padding: 14px 13px;
+    border-top: 1px solid #eef2f7;
+}
+
+tr:hover td {
+    background: #fafbff;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+    .stats-grid,
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+
+    .main-content,
+    .content {
+        margin-left: 0;
+        padding: 18px;
+    }
+
+    .stats-grid,
+    .stats {
+        grid-template-columns: 1fr;
+    }
+}
+/* =========================================
+   EMPLOYEE DASHBOARD - NEW WORKAI UI
+   ========================================= */
+
+body {
+    background: #f4f7fb !important;
+    color: #172033 !important;
+}
+
+/* New modern sidebar */
+.sidebar {
+    width: 245px !important;
+    background: linear-gradient(180deg, #101828 0%, #1e1b4b 100%) !important;
+    padding: 26px 18px !important;
+    box-shadow: 6px 0 25px rgba(15, 23, 42, 0.08);
+}
+
+.brand {
+    display: flex !important;
+    align-items: center !important;
+    gap: 11px !important;
+    margin-bottom: 35px !important;
+    padding: 0 8px !important;
+    font-size: 22px !important;
+    font-weight: 800 !important;
+    color: #ffffff !important;
+}
+
+.brand-icon {
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 11px !important;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+    color: white !important;
+    font-size: 14px !important;
+    box-shadow: 0 7px 18px rgba(99, 102, 241, 0.3);
+}
+
+.nav-item {
+    padding: 13px 15px !important;
+    margin: 7px 0 !important;
+    border-radius: 10px !important;
+    color: #cbd5e1 !important;
+    transition: 0.2s ease !important;
+}
+
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: white !important;
+    transform: translateX(3px);
+}
+
+.nav-item.active {
+    background: linear-gradient(
+        90deg,
+        rgba(99, 102, 241, 0.25),
+        rgba(139, 92, 246, 0.12)
+    ) !important;
+    color: white !important;
+    border-left: 3px solid #818cf8;
+}
+
+/* Main dashboard area */
+.main {
+    margin-left: 245px !important;
+    padding: 35px 38px !important;
+    min-height: 100vh;
+    background: #f4f7fb !important;
+}
+
+/* Welcome heading */
+.main > h1,
+.main h1 {
+    color: #172033 !important;
+    font-size: 29px !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.6px;
+}
+
+.subtitle {
+    color: #718096 !important;
+}
+
+/* Statistic cards */
+.stats {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 18px !important;
+    margin: 26px 0 !important;
+}
+
+.stat-card {
+    background: #ffffff !important;
+    border: 1px solid #e8edf5 !important;
+    border-radius: 16px !important;
+    padding: 21px !important;
+    box-shadow: 0 7px 22px rgba(15, 23, 42, 0.055) !important;
+    transition: 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.09) !important;
+}
+
+.stat-title {
+    color: #7c8799 !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    margin-top: 9px !important;
+    font-size: 25px !important;
+    font-weight: 800 !important;
+}
+
+/* General dashboard cards */
+.card {
+    border: 1px solid #e7ebf3 !important;
+    border-radius: 17px !important;
+    background: #ffffff !important;
+    box-shadow: 0 7px 24px rgba(15, 23, 42, 0.05) !important;
+    padding: 24px !important;
+}
+
+.card h2,
+.card h3 {
+    color: #1e293b !important;
+}
+
+/* Work timer */
+.timer {
+    color: #4338ca !important;
+    font-size: 44px !important;
+    font-weight: 800 !important;
+    letter-spacing: 1px;
+}
+
+/* Buttons */
+.btn-start,
+.start-btn {
+    background: linear-gradient(135deg, #16a34a, #22c55e) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 9px !important;
+}
+
+.btn-break,
+.break-btn {
+    background: linear-gradient(135deg, #f59e0b, #fbbf24) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 9px !important;
+}
+
+.btn-end,
+.end-btn {
+    background: linear-gradient(135deg, #dc2626, #ef4444) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 9px !important;
+}
+
+button {
+    transition: 0.2s ease !important;
+}
+
+button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(15, 23, 42, 0.12);
+}
+
+/* Activity section */
+.activity-row {
+    margin-bottom: 18px !important;
+}
+
+.activity-bar {
+    height: 10px !important;
+    background: #edf1f7 !important;
+    border-radius: 20px !important;
+    overflow: hidden !important;
+}
+
+/* Assigned project */
+.project-card {
+    border: 1px solid #e8ecf4 !important;
+    border-radius: 14px !important;
+    background: linear-gradient(135deg, #ffffff, #fafaff) !important;
+}
+
+/* Tasks */
+.task-card {
+    border: 1px solid #e8ecf4 !important;
+    border-radius: 14px !important;
+    background: white !important;
+    transition: 0.2s ease;
+}
+
+.task-card:hover {
+    border-color: #c7d2fe !important;
+    transform: translateY(-2px);
+}
+
+/* Progress bars */
+.progress-bar {
+    background: #edf0f6 !important;
+    border-radius: 20px !important;
+    overflow: hidden !important;
+}
+
+.progress-fill {
+    background: linear-gradient(90deg, #4f46e5, #8b5cf6) !important;
+    border-radius: 20px !important;
+}
+
+/* Responsive */
+@media (max-width: 1050px) {
+    .stats {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 700px) {
+    .sidebar {
+        position: relative !important;
+        width: 100% !important;
+        height: auto !important;
+    }
+
+    .main {
+        margin-left: 0 !important;
+        padding: 20px !important;
+    }
+
+    .stats {
+        grid-template-columns: 1fr !important;
+    }
+}
+/* =========================================
+   WORKAI - AI DAILY INSIGHT
+   ========================================= */
+
+.ai-daily-card {
+    padding: 28px !important;
+    border: 1px solid #ddd6fe !important;
+    background: linear-gradient(135deg, #ffffff 0%, #f5f3ff 100%) !important;
+    box-shadow: 0 10px 30px rgba(79, 70, 229, 0.08) !important;
+}
+
+.ai-daily-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.ai-label {
+    display: block;
+    margin-bottom: 5px;
+    color: #6366f1;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.ai-daily-header h3 {
+    margin: 0 !important;
+    font-size: 22px !important;
+    color: #1e293b !important;
+}
+
+.ai-status {
+    padding: 7px 11px;
+    border: 1px solid #c7d2fe;
+    border-radius: 20px;
+    background: #eef2ff;
+    color: #4338ca;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.ai-summary-text {
+    margin: 0 0 22px;
+    padding: 16px 18px;
+    border-left: 4px solid #6366f1;
+    border-radius: 0 10px 10px 0;
+    background: rgba(255, 255, 255, 0.75);
+    color: #475569;
+    line-height: 1.65;
+}
+
+.ai-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.ai-metric {
+    padding: 16px;
+    border: 1px solid #e8e7f7;
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.ai-metric span {
+    display: block;
+    margin-bottom: 7px;
+    color: #7c8799;
+    font-size: 12px;
+}
+
+.ai-metric strong {
+    color: #312e81;
+    font-size: 20px;
+}
+
+.ai-recommendation {
+    padding: 17px 18px;
+    border: 1px solid #dbeafe;
+    border-radius: 12px;
+    background: #eff6ff;
+}
+
+.ai-recommendation strong {
+    color: #1e40af;
+}
+
+.ai-recommendation p {
+    margin: 7px 0 0;
+    color: #475569;
+    line-height: 1.55;
+}
+
+@media (max-width: 700px) {
+    .ai-metrics {
+        grid-template-columns: 1fr;
+    }
+
+    .ai-daily-header {
+        flex-direction: column;
+    }
+}
+
+/* =====================================================
+   WORKAI - TASK INTELLIGENCE
+   ===================================================== */
+
+.task-intelligence-card {
+    padding: 26px;
+}
+
+.task-section-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 22px;
+}
+
+.task-eyebrow {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    color: #4f7cff;
+    margin-bottom: 6px;
+}
+
+.task-section-header .section-title {
+    margin: 0;
+    font-size: 22px;
+    color: #172033;
+}
+
+.task-subtitle {
+    margin: 5px 0 0;
+    color: #7b8497;
+    font-size: 13px;
+}
+
+.task-count {
+    background: #eef3ff;
+    color: #4169d8;
+    padding: 7px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* Individual task card */
+
+.smart-task {
+    background: #ffffff;
+    border: 1px solid #e8ecf4;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 14px rgba(31, 45, 75, 0.05);
+}
+
+.smart-task:last-child {
+    margin-bottom: 0;
+}
+
+.smart-task-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 18px;
+}
+
+.smart-task h4 {
+    margin: 0 0 6px;
+    color: #172033;
+    font-size: 16px;
+}
+
+.smart-task p {
+    margin: 0;
+    color: #7b8497;
+    font-size: 13px;
+}
+
+/* Status badge */
+
+.task-status {
+    padding: 6px 11px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.status-pending {
+    background: #fff5df;
+    color: #a66b00;
+}
+
+.status-progress {
+    background: #eaf1ff;
+    color: #3569d4;
+}
+
+.status-completed {
+    background: #e8f8ef;
+    color: #18864b;
+}
+
+/* Progress */
+
+.task-progress-info {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 18px;
+    margin-bottom: 7px;
+    font-size: 12px;
+    color: #687287;
+}
+
+.task-progress-info strong {
+    color: #27334a;
+}
+
+.task-progress-track {
+    width: 100%;
+    height: 7px;
+    background: #edf0f5;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.task-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4776e6, #6c8cff);
+    border-radius: 20px;
+    transition: width 0.3s ease;
+}
+
+/* Update controls */
+
+.task-update-form {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 17px;
+    border-top: 1px solid #edf0f5;
+}
+
+.task-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.task-field label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #687287;
+}
+
+.task-field select,
+.task-field input {
+    height: 38px;
+    border: 1px solid #dce2ec;
+    border-radius: 8px;
+    padding: 0 10px;
+    background: #ffffff;
+    color: #27334a;
+    outline: none;
+}
+
+.task-field input {
+    width: 90px;
+}
+
+.task-field select:focus,
+.task-field input:focus {
+    border-color: #5c7cfa;
+    box-shadow: 0 0 0 3px rgba(92, 124, 250, 0.10);
+}
+
+.task-update-btn {
+    height: 38px;
+    padding: 0 17px;
+    border: none;
+    border-radius: 8px;
+    background: #4169e1;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.task-update-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 12px rgba(65, 105, 225, 0.20);
+}
+
+.empty-task {
+    text-align: center;
+    padding: 30px;
+}
+
+/* Mobile */
+
+@media (max-width: 700px) {
+    .task-section-header,
+    .smart-task-top {
+        flex-direction: column;
+    }
+
+    .task-update-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .task-field input {
+        width: 100%;
+    }
+
+    .task-update-btn {
+        width: 100%;
+    }
+}

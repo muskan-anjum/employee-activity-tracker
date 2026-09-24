@@ -66,18 +66,15 @@ async function sendActivityData() {
     };
 
     try {
-
         const response = await fetch("/employee/activity", {
             method: "POST",
-
             headers: {
                 "Content-Type": "application/json"
             },
-
             body: JSON.stringify(payload)
         });
 
-        if (response.ok) {
+        if (response.ok || response.status === 400) {
             activeSeconds = 0;
             idleSeconds = 0;
             keyboardEvents = 0;
@@ -88,8 +85,6 @@ async function sendActivityData() {
         console.error("Activity tracking error:", error);
     }
 }
-
-
 setInterval(sendActivityData, 30000);
 
 

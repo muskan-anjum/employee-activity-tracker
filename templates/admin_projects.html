@@ -15,11 +15,14 @@
 
         body {
             background: #f5f7fb;
-            color: #1f2937;
+            color: #172033;
         }
 
+        /* SIDEBAR */
         .sidebar {
             position: fixed;
+            left: 0;
+            top: 0;
             width: 220px;
             height: 100vh;
             background: #172033;
@@ -29,52 +32,284 @@
 
         .brand {
             font-size: 22px;
-            font-weight: bold;
+            font-weight: 800;
             margin-bottom: 35px;
         }
 
+        .brand span {
+            color: #3b82f6;
+        }
+
         .admin-label {
-            font-size: 12px;
-            color: #9ca3af;
+            font-size: 11px;
+            color: #94a3b8;
+            letter-spacing: 1px;
             margin-bottom: 20px;
         }
 
         .nav-item {
             padding: 12px;
             margin-bottom: 8px;
-            border-radius: 7px;
+            border-radius: 8px;
             cursor: pointer;
+            color: #d1d5db;
+            font-size: 14px;
+            transition: 0.2s;
         }
 
         .nav-item:hover,
         .nav-item.active {
             background: #26334d;
+            color: white;
         }
 
+        .nav-item.active {
+            border-left: 3px solid #3b82f6;
+        }
+
+        /* MAIN */
         .main {
             margin-left: 220px;
-            padding: 35px;
+            padding: 34px 40px 50px;
         }
 
-        .header h1 {
-            font-size: 28px;
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 26px;
+        }
+
+        .eyebrow {
+            color: #2563eb;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.3px;
+            margin-bottom: 7px;
+        }
+
+        .top-header h1 {
+            font-size: 29px;
             margin-bottom: 6px;
+            color: #0f172a;
         }
 
-        .header p {
-            color: #6b7280;
-            margin-bottom: 30px;
+        .top-header p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .live-badge {
+            background: #ecfdf5;
+            color: #15803d;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        /* STATS */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            color: #0f172a;
+            font-size: 27px;
+            font-weight: 800;
+        }
+
+        .stat-description {
+            color: #94a3b8;
+            font-size: 11px;
+            margin-top: 5px;
+        }
+
+        /* GRID */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1.55fr 1fr;
+            gap: 22px;
+            margin-bottom: 24px;
         }
 
         .card {
             background: white;
-            padding: 25px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 24px;
+            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .section-label {
+            color: #2563eb;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            margin-bottom: 5px;
         }
 
         .card h2 {
+            font-size: 19px;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .card-subtitle {
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .count-badge {
+            background: #eff6ff;
+            color: #2563eb;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        /* FORMS */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 7px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid #dbe3ee;
+            border-radius: 8px;
+            background: #f8fafc;
+            color: #1e293b;
+            outline: none;
+            font-size: 13px;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #3b82f6;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 82px;
+        }
+
+        .primary-button {
+            width: 100%;
+            border: 0;
+            background: #2563eb;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .primary-button:hover {
+            background: #1d4ed8;
+        }
+
+        /* PROJECT LIST */
+        .project-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 15px 0;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .project-item:last-child {
+            border-bottom: 0;
+        }
+
+        .project-icon {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #eff6ff;
+            color: #2563eb;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 13px;
+        }
+
+        .project-info {
+            flex: 1;
+        }
+
+        .project-info h3 {
+            font-size: 14px;
+            margin-bottom: 4px;
+            color: #1e293b;
+        }
+
+        .project-info p {
+            font-size: 11px;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        .active-status {
+            background: #ecfdf5;
+            color: #15803d;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        /* TASK TABLE */
+        .task-card {
             margin-bottom: 20px;
         }
 
@@ -83,34 +318,123 @@
             border-collapse: collapse;
         }
 
-        th,
-        td {
-            text-align: left;
-            padding: 14px;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
         th {
-            color: #6b7280;
-            font-size: 13px;
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #64748b;
+            font-size: 10px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
 
-        .status {
-            color: #16a34a;
-            font-weight: bold;
+        td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 12px;
+            color: #334155;
+        }
+
+        .task-title {
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .task-status {
+            display: inline-block;
+            background: #eff6ff;
+            color: #2563eb;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
         }
 
         .empty {
-            color: #6b7280;
             text-align: center;
+            color: #94a3b8;
+            padding: 30px;
         }
+
+        .intelligence-note {
+            margin-top: 20px;
+            padding: 14px;
+            border-radius: 10px;
+            background: #f8fbff;
+            border: 1px solid #dbeafe;
+            color: #64748b;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .intelligence-note strong {
+            display: block;
+            color: #2563eb;
+            margin-bottom: 3px;
+        }
+
+        @media (max-width: 900px) {
+            .stats,
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+/* Professional Projects & Tasks workspace polish */
+.workspace-grid {
+    gap: 22px;
+}
+
+.card {
+    border: 1px solid #e8edf5;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+.card-header h2 {
+    color: #172033;
+    font-weight: 750;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    border: 1px solid #dfe5ee;
+    border-radius: 9px;
+    background: #fbfcfe;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #4f7df3;
+    box-shadow: 0 0 0 3px rgba(79, 125, 243, 0.10);
+    background: #ffffff;
+}
+
+button {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+button:hover {
+    transform: translateY(-1px);
+}
     </style>
 </head>
 
 <body>
 
 <aside class="sidebar">
-    <div class="brand">AI&nbsp;&nbsp;WorkAI</div>
+    <div class="brand"><span>AI</span>&nbsp;&nbsp;WorkAI</div>
     <div class="admin-label">ADMIN CONSOLE</div>
 
     <div class="nav-item"
@@ -127,138 +451,286 @@
         Projects & Tasks
     </div>
 
-    <div class="nav-item">Activity Monitoring</div>
-    <div class="nav-item" onclick="window.location.href='/admin/ai-analysis'">AI Analysis</div>
-    <div class="nav-item" onclick="window.location.href='/admin/reports'">Reports</div>
+    <div class="nav-item"
+         onclick="window.location.href='/admin/activity'">
+        Activity Monitoring
+    </div>
+
+    <div class="nav-item"
+         onclick="window.location.href='/admin/ai-analysis'">
+        AI Analysis
+    </div>
+
+    <div class="nav-item"
+         onclick="window.location.href='/admin/reports'">
+        Reports
+    </div>
 </aside>
 
 <main class="main">
 
-    <div class="header">
-        <h1>Projects & Tasks</h1>
-        <p>Manage projects, tasks and employee assignments.</p>
+    <div class="top-header">
+        <div>
+            <div class="eyebrow">WORKFORCE OPERATIONS</div>
+            <h1>Projects & Tasks</h1>
+            <p>
+                Create projects, assign employee tasks and manage
+                workforce responsibilities from one workspace.
+            </p>
+        </div>
+
+        <div class="live-badge">● Workspace Active</div>
     </div>
-<div class="card">
-    <h2>Create New Project</h2>
 
-    <form method="POST" action="/admin/projects">
-        <div style="margin-bottom: 12px;">
-            <label>Project Name</label><br>
-            <input type="text" name="name" placeholder="Enter project name" required
-                   style="width:100%; padding:10px; margin-top:5px;">
+    <section class="stats">
+
+        <div class="stat-card">
+            <div class="stat-label">TOTAL PROJECTS</div>
+            <div class="stat-value">{{ projects|length }}</div>
+            <div class="stat-description">
+                Projects registered in WorkAI
+            </div>
         </div>
 
-        <div style="margin-bottom: 12px;">
-            <label>Description</label><br>
-            <textarea name="description" placeholder="Enter project description"
-                      style="width:100%; padding:10px; margin-top:5px;"></textarea>
+        <div class="stat-card">
+            <div class="stat-label">TOTAL TASKS</div>
+            <div class="stat-value">{{ tasks|length }}</div>
+            <div class="stat-description">
+                Workforce task assignments
+            </div>
         </div>
 
-        <button type="submit" style="padding:10px 18px; cursor:pointer;">
-            Create Project
-        </button>
-    </form>
-</div>
-
-    <div class="card">
-        <h2>Projects</h2>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Project Name</th>
-                    <th>Description</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                {% for project in projects %}
-                <tr>
-                    <td>{{ project.name }}</td>
-                    <td>{{ project.description or "-" }}</td>
-                    <td class="status">{{ project.status }}</td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="3" class="empty">
-                        No projects found.
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-<div class="card">
-    <h2>Create New Task</h2>
-
-    <form method="POST" action="/admin/tasks">
-        <div style="margin-bottom: 12px;">
-            <label>Task Title</label><br>
-            <input type="text" name="title" placeholder="Enter task title" required
-                   style="width:100%; padding:10px; margin-top:5px;">
+        <div class="stat-card">
+            <div class="stat-label">EMPLOYEES AVAILABLE</div>
+            <div class="stat-value">{{ employees|length }}</div>
+            <div class="stat-description">
+                Employees available for assignment
+            </div>
         </div>
 
-        <div style="margin-bottom: 12px;">
-            <label>Project</label><br>
-            <select name="project_id" required
-                    style="width:100%; padding:10px; margin-top:5px;">
-                <option value="">Select Project</option>
-                {% for project in projects %}
-                <option value="{{ project.id }}">{{ project.name }}</option>
-                {% endfor %}
-            </select>
+    </section>
+
+    <section class="workspace-grid">
+
+        <div class="card">
+
+            <div class="card-header">
+                <div>
+                    <div class="section-label">PROJECT DIRECTORY</div>
+                    <h2>Active Projects</h2>
+                    <div class="card-subtitle">
+                        Current projects registered in the WorkAI workspace.
+                    </div>
+                </div>
+
+                <div class="count-badge">
+                    {{ projects|length }} Projects
+                </div>
+            </div>
+
+            {% for project in projects %}
+            <div class="project-item">
+
+                <div class="project-icon">
+                    {{ project.name[0] | upper }}
+                </div>
+
+                <div class="project-info">
+                    <h3>{{ project.name }}</h3>
+                    <p>{{ project.description or "No description provided." }}</p>
+                </div>
+
+                <div class="active-status">
+                    ● {{ project.status }}
+                </div>
+
+            </div>
+
+            {% else %}
+
+            <div class="empty">
+                No projects have been created yet.
+            </div>
+
+            {% endfor %}
+
+            <div class="intelligence-note">
+                <strong>📊 Project Intelligence</strong>
+                Project-linked work sessions allow WorkAI to measure
+                tracked time and workforce activity by project.
+            </div>
+
         </div>
 
-        <div style="margin-bottom: 12px;">
-            <label>Assign Employee</label><br>
-            <select name="employee_id" required
-                    style="width:100%; padding:10px; margin-top:5px;">
-                <option value="">Select Employee</option>
-                {% for employee in employees %}
-                <option value="{{ employee.id }}">{{ employee.name }}</option>
-                {% endfor %}
-            </select>
+        <div class="card">
+
+            <div class="card-header">
+                <div>
+                    <div class="section-label">PROJECT PROVISIONING</div>
+                    <h2>Create New Project</h2>
+                    <div class="card-subtitle">
+                        Add a new project to the workforce workspace.
+                    </div>
+                </div>
+            </div>
+
+            <form method="POST" action="/admin/projects">
+
+                <div class="form-group">
+                    <label>Project Name</label>
+                    <input
+                        type="text"
+                        name="name"
+                        placeholder="Enter project name"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea
+                        name="description"
+                        placeholder="Describe the project objective"
+                    ></textarea>
+                </div>
+
+                <button type="submit" class="primary-button">
+                    + Create Project
+                </button>
+
+            </form>
+
         </div>
 
-        <button type="submit" style="padding:10px 18px; cursor:pointer;">
-            Create Task
-        </button>
-    </form>
-</div>
-    
-    
-    <div class="card">
-        <h2>Tasks</h2>
+    </section>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Task</th>
-                    <th>Project</th>
-                    <th>Employee</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
+    <section class="workspace-grid">
 
-            <tbody>
-                {% for task in tasks %}
-                <tr>
-                    <td>{{ task.title }}</td>
-                    <td>{{ task.project.name if task.project else "-" }}</td>
-                    <td>{{ task.employee.name if task.employee else "Unassigned" }}</td>
-                    <td class="status">{{ task.status }}</td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="4" class="empty">
-                        No tasks found.
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+        <div class="card task-card">
+
+            <div class="card-header">
+                <div>
+                    <div class="section-label">TASK INTELLIGENCE</div>
+                    <h2>Task Assignments</h2>
+                    <div class="card-subtitle">
+                        Current employee responsibilities across projects.
+                    </div>
+                </div>
+
+                <div class="count-badge">
+                    {{ tasks|length }} Tasks
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Task</th>
+                        <th>Project</th>
+                        <th>Employee</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for task in tasks %}
+                    <tr>
+                        <td class="task-title">
+                            {{ task.title }}
+                        </td>
+
+                        <td>
+                            {{ task.project.name if task.project else "-" }}
+                        </td>
+
+                        <td>
+                            {{ task.employee.name if task.employee else "Unassigned" }}
+                        </td>
+
+                        <td>
+                            <span class="task-status">
+                                {{ task.status }}
+                            </span>
+                        </td>
+                    </tr>
+
+                    {% else %}
+
+                    <tr>
+                        <td colspan="4" class="empty">
+                            No task assignments found.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+            </table>
+
+        </div>
+
+        <div class="card">
+
+            <div class="card-header">
+                <div>
+                    <div class="section-label">TASK PROVISIONING</div>
+                    <h2>Create New Task</h2>
+                    <div class="card-subtitle">
+                        Assign a project responsibility to an employee.
+                    </div>
+                </div>
+            </div>
+
+            <form method="POST" action="/admin/tasks">
+
+                <div class="form-group">
+                    <label>Task Title</label>
+                    <input
+                        type="text"
+                        name="title"
+                        placeholder="Enter task title"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Project</label>
+                    <select name="project_id" required>
+                        <option value="">Select Project</option>
+
+                        {% for project in projects %}
+                        <option value="{{ project.id }}">
+                            {{ project.name }}
+                        </option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Assign Employee</label>
+                    <select name="employee_id" required>
+                        <option value="">Select Employee</option>
+
+                        {% for employee in employees %}
+                        <option value="{{ employee.id }}">
+                            {{ employee.name }}
+                        </option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+                <button type="submit" class="primary-button">
+                    + Create & Assign Task
+                </button>
+
+            </form>
+
+        </div>
+
+    </section>
 
 </main>
 
