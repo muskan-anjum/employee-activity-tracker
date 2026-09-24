@@ -2,7 +2,7 @@ from functools import wraps
 
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
-from models import User, db
+from models import User, db, LoginSession
 from models.project import Project
 from models.task import Task
 from models.work_session import WorkSession
@@ -64,6 +64,11 @@ def employee_dashboard():
         work_sessions,
         activity_logs
     )
+
+    active_task = None
+    if active_session and active_session.task_id:
+        active_task = db.session.get(Task, active_session.task_id)
+
     projects = Project.query.all()
     return render_template(
         "employee_dashboard.html",
@@ -71,6 +76,7 @@ def employee_dashboard():
         tasks=tasks,
         active_session=active_session,
         active_break=active_break,
+        active_task=active_task,
         work_summary=work_summary,
         projects=projects
     )
@@ -267,40 +273,102 @@ def admin_dashboard():
 @role_required("admin")
 def admin_employees():
     if request.method == "POST":
-        name = request.form.get("name")         
-        email = request.form.get("email")
-        password = request.form.get("password")
+        name = (request.form.get("name") or "").strip()
+        email = (request.form.get("email") or "").strip().lower()
+        password = request.form.get("password") or ""
+
+        if not name or not email or not password:
+            flash("Name, email and password are required.", "danger")
+            return redirect(url_for("dashboard.admin_employees"))
+
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
-            flash("An account with this email already exists.", "error")
+            flash("An account with this email already exists.", "danger")
         else:
-                employee = User(
-            name=name,
-            email=email,
-            role="employee",
-            is_active_account=True
-        )
-                employee.set_password(password)
+            employee = User(
+                name=name,
+                email=email,
+                role="employee",
+                is_active_account=True
+            )
+            employee.set_password(password)
 
-                db.session.add(employee)
-                db.session.commit()
+            db.session.add(employee)
+            db.session.commit()
 
-                flash("Employee added successfully.", "success")
-                return redirect(url_for("dashboard.admin_employees"))
+            flash("Employee added successfully.", "success")
+            return redirect(url_for("dashboard.admin_employees"))
+
     employees = User.query.filter_by(role="employee").all()
+    active_count = sum(1 for e in employees if e.is_active_account)
+    inactive_count = len(employees) - active_count
 
     return render_template(
         "admin_employees.html",
         user=current_user,
-        employees=employees
+        employees=employees,
+        active_count=active_count,
+        inactive_count=inactive_count
     )
+
+
+@dashboard_bp.route("/admin/employees/<int:user_id>/toggle-status", methods=["POST"])
+@login_required
+@role_required("admin")
+def toggle_employee_status(user_id):
+    employee = db.session.get(User, user_id)
+    if not employee or employee.role == "admin":
+        flash("Employee not found or cannot modify administrator accounts.", "danger")
+        return redirect(url_for("dashboard.admin_employees"))
+
+    employee.is_active_account = not employee.is_active_account
+
+    # If deactivating, terminate any ongoing sessions for security
+    if not employee.is_active_account:
+        from models.work_session import WorkSession, Break
+        from datetime import datetime
+        active_session = WorkSession.query.filter_by(employee_id=employee.id, end_time=None).first()
+        if active_session:
+            active_session.end_time = datetime.utcnow()
+            active_session.status = "Terminated"
+            active_break = Break.query.filter_by(session_id=active_session.id, end_time=None).first()
+            if active_break:
+                active_break.end_time = active_session.end_time
+                active_break.duration_seconds = max(0, int((active_break.end_time - active_break.start_time).total_seconds()))
+
+    db.session.commit()
+    status_str = "activated" if employee.is_active_account else "deactivated"
+    flash(f"Account for {employee.name} has been {status_str}.", "success")
+    return redirect(url_for("dashboard.admin_employees"))
+
+
+@dashboard_bp.route("/admin/employees/<int:user_id>/reset-password", methods=["POST"])
+@login_required
+@role_required("admin")
+def reset_employee_password(user_id):
+    employee = db.session.get(User, user_id)
+    if not employee:
+        flash("Employee not found.", "danger")
+        return redirect(url_for("dashboard.admin_employees"))
+
+    new_password = (request.form.get("new_password") or "").strip()
+    if not new_password or len(new_password) < 6:
+        flash("Password must be at least 6 characters long.", "danger")
+        return redirect(url_for("dashboard.admin_employees"))
+
+    employee.set_password(new_password)
+    db.session.commit()
+    flash(f"Password for {employee.name} updated successfully.", "success")
+    return redirect(url_for("dashboard.admin_employees"))
+
+
 @dashboard_bp.route("/admin/projects", methods=["GET", "POST"])
 @login_required
 @role_required("admin")
 def admin_projects():
     if request.method == "POST":
-        name = request.form.get("name")
-        description = request.form.get("description")
+        name = (request.form.get("name") or "").strip()
+        description = (request.form.get("description") or "").strip()
 
         if name:
             project = Project(
@@ -314,8 +382,8 @@ def admin_projects():
             flash("Project created successfully.", "success")
             return redirect(url_for("dashboard.admin_projects"))
 
-    projects = Project.query.all()
-    tasks = Task.query.all()
+    projects = Project.query.order_by(Project.id.desc()).all()
+    tasks = Task.query.order_by(Task.id.desc()).all()
     employees = User.query.filter_by(role="employee").all()
 
     return render_template(
@@ -326,27 +394,61 @@ def admin_projects():
         employees=employees
     )
 
+
+@dashboard_bp.route("/admin/projects/<int:project_id>/toggle-status", methods=["POST"])
+@login_required
+@role_required("admin")
+def toggle_project_status(project_id):
+    project = db.session.get(Project, project_id)
+    if not project:
+        flash("Project not found.", "danger")
+        return redirect(url_for("dashboard.admin_projects"))
+
+    project.status = "Completed" if project.status == "Active" else "Active"
+    db.session.commit()
+    flash(f"Project '{project.name}' status updated to {project.status}.", "success")
+    return redirect(url_for("dashboard.admin_projects"))
+
+
 @dashboard_bp.route("/admin/tasks", methods=["POST"])
 @login_required
 @role_required("admin")
 def create_task():
-    title = request.form.get("title")
+    title = (request.form.get("title") or "").strip()
+    description = (request.form.get("description") or "").strip()
     project_id = request.form.get("project_id")
     employee_id = request.form.get("employee_id")
 
     if title and project_id and employee_id:
         task = Task(
             title=title,
+            description=description,
             project_id=int(project_id),
             employee_id=int(employee_id),
-            status="Pending"
+            status="Pending",
+            progress=0
         )
 
         db.session.add(task)
         db.session.commit()
 
-        flash("Task created successfully.", "success")
+        flash("Task created and assigned successfully.", "success")
 
+    return redirect(url_for("dashboard.admin_projects"))
+
+
+@dashboard_bp.route("/admin/tasks/<int:task_id>/delete", methods=["POST"])
+@login_required
+@role_required("admin")
+def delete_task(task_id):
+    task = db.session.get(Task, task_id)
+    if not task:
+        flash("Task not found.", "danger")
+        return redirect(url_for("dashboard.admin_projects"))
+
+    db.session.delete(task)
+    db.session.commit()
+    flash(f"Task '{task.title}' deleted successfully.", "success")
     return redirect(url_for("dashboard.admin_projects"))
 
 @dashboard_bp.route("/employee/task/<int:task_id>/update", methods=["POST"])
@@ -410,29 +512,56 @@ def start_work():
 
     data = request.get_json(silent=True) or {}
     project_id = data.get("project_id")
+    task_id = data.get("task_id")
 
+    # Validate project if supplied
     if project_id:
         try:
             project_id = int(project_id)
+            project = db.session.get(Project, project_id)
+            if not project:
+                return jsonify({
+                    "success": False,
+                    "message": "Selected project was not found."
+                }), 404
         except (TypeError, ValueError):
             return jsonify({
                 "success": False,
                 "message": "Invalid project selected."
             }), 400
-
-        project = db.session.get(Project, project_id)
-
-        if not project:
-            return jsonify({
-                "success": False,
-                "message": "Selected project was not found."
-            }), 404
     else:
         project_id = None
+
+    # Validate task if supplied
+    if task_id:
+        try:
+            task_id = int(task_id)
+            task = db.session.get(Task, task_id)
+            if not task:
+                return jsonify({
+                    "success": False,
+                    "message": "Selected task was not found."
+                }), 404
+
+            # Inherit project from task if not explicitly passed
+            if not project_id and task.project_id:
+                project_id = task.project_id
+
+            # Automatically move task to In Progress if it was Pending
+            if str(task.status).strip().lower() == "pending":
+                task.status = "In Progress"
+        except (TypeError, ValueError):
+            return jsonify({
+                "success": False,
+                "message": "Invalid task selected."
+            }), 400
+    else:
+        task_id = None
 
     session = WorkSession(
         employee_id=current_user.id,
         project_id=project_id,
+        task_id=task_id,
         start_time=datetime.utcnow(),
         status="Working"
     )
@@ -444,7 +573,8 @@ def start_work():
         "success": True,
         "message": "Work session started successfully.",
         "session_id": session.id,
-        "project_id": project_id
+        "project_id": project_id,
+        "task_id": task_id
     })
 @dashboard_bp.route("/employee/work/break", methods=["POST"])
 @login_required
@@ -666,13 +796,19 @@ def admin_reports():
             employee,
             tasks,
             sessions,
-            activity_logs
+            activity_logs,
+            filter_today=False,
+            period_label=period_label
         )
 
         reports.append({
             "employee": employee,
             "work_time": summary.get(
                 "total_work_time",
+                "00:00:00"
+            ),
+            "break_time": summary.get(
+                "break_time",
                 "00:00:00"
             ),
             "active_time": summary.get(
@@ -686,7 +822,10 @@ def admin_reports():
             "productivity": summary.get(
                 "productivity_score",
                 0
-            )
+            ),
+            "completed_tasks": summary.get("completed_tasks", 0),
+            "total_tasks": summary.get("total_tasks", 0),
+            "task_progress": summary.get("task_progress", 0),
         })
 
     return render_template(
@@ -696,12 +835,15 @@ def admin_reports():
         selected_period=period,
         period_label=period_label
     )
+
+
 @dashboard_bp.route("/admin/reports/export")
 @login_required
 @role_required("admin")
 def export_admin_reports():
     import csv
     import io
+    from datetime import datetime, timedelta
     from flask import Response
 
     from models.user import User
@@ -710,48 +852,96 @@ def export_admin_reports():
     from models.activity import ActivityLog
     from services.work_summary import generate_work_summary
 
+    period = request.args.get("period", "daily").lower()
+    if period not in ["daily", "weekly", "monthly"]:
+        period = "daily"
+
+    now = datetime.utcnow()
+    if period == "weekly":
+        start_date = now - timedelta(days=7)
+        period_label = "Last 7 Days"
+    elif period == "monthly":
+        start_date = now - timedelta(days=30)
+        period_label = "Last 30 Days"
+    else:
+        start_date = now.replace(
+            hour=0,
+            minute=0,
+            second=0,
+            microsecond=0
+        )
+        period_label = "Today"
+
     employees = User.query.filter_by(role="employee").all()
 
     output = io.StringIO()
     writer = csv.writer(output)
 
-    # CSV headings
+    # Professional CSV headings
     writer.writerow([
         "Employee",
         "Email",
-        "Work Time",
+        "Period",
+        "Net Work Time",
+        "Break Time",
         "Active Time",
         "Idle Time",
-        "Activity Score"
+        "Productivity Score (%)",
+        "Completed Tasks",
+        "Total Tasks"
     ])
 
-    # Real employee report data
+    # Real employee report data for the selected period
     for employee in employees:
+        tasks = Task.query.filter_by(employee_id=employee.id).all()
+        sessions = (
+            WorkSession.query
+            .filter(
+                WorkSession.employee_id == employee.id,
+                WorkSession.start_time >= start_date
+            )
+            .all()
+        )
+        activity_logs = (
+            ActivityLog.query
+            .filter(
+                ActivityLog.employee_id == employee.id,
+                ActivityLog.timestamp >= start_date
+            )
+            .all()
+        )
+
         summary = generate_work_summary(
             employee,
-            Task.query.filter_by(employee_id=employee.id).all(),
-            WorkSession.query.filter_by(employee_id=employee.id).all(),
-            ActivityLog.query.filter_by(employee_id=employee.id).all()
+            tasks,
+            sessions,
+            activity_logs,
+            filter_today=False,
+            period_label=period_label
         )
 
         writer.writerow([
             employee.name,
             employee.email,
+            period_label,
             summary.get("total_work_time", "00:00:00"),
+            summary.get("break_time", "00:00:00"),
             summary.get("active_time", "00:00:00"),
             summary.get("idle_time", "00:00:00"),
-            f'{summary.get("productivity_score", 0)}%'
+            f'{summary.get("productivity_score", 0)}%',
+            summary.get("completed_tasks", 0),
+            summary.get("total_tasks", 0)
         ])
 
     csv_data = output.getvalue()
     output.close()
 
+    filename = f"workai_{period}_report_{now.strftime('%Y%m%d')}.csv"
     return Response(
         csv_data,
         mimetype="text/csv",
         headers={
-            "Content-Disposition":
-            "attachment; filename=workai_employee_report.csv"
+            "Content-Disposition": f"attachment; filename={filename}"
         }
     )
 @dashboard_bp.route("/employee/activity", methods=["POST"])
@@ -886,279 +1076,88 @@ def end_work():
         "total_work_seconds": session.total_work_seconds,
         "break_seconds": total_break_seconds
     })
-@dashboard_bp.route("/admin/assistant", methods=["POST"])
+
+
+@dashboard_bp.route("/admin/login-sessions")
 @login_required
 @role_required("admin")
-def workai_assistant():
-    from models.activity import ActivityLog
-    from models.user import User
-    from models.work_session import WorkSession
-    from services.ml_analyzer import analyze_activity
+def admin_login_sessions():
+    from datetime import datetime
 
-    data = request.get_json(silent=True) or {}
-    question = data.get("question", "").strip().lower()
-
-    if not question:
-        return jsonify({
-            "success": False,
-            "answer": "Please enter a question."
-        }), 400
-
-    recent_logs = (
-        ActivityLog.query
-        .order_by(ActivityLog.timestamp.desc())
-        .limit(100)
+    # Get all employee login sessions, newest first
+    login_sessions = (
+        LoginSession.query
+        .join(User, LoginSession.user_id == User.id)
+        .filter(User.role == "employee")
+        .order_by(LoginSession.login_time.desc())
         .all()
     )
 
-    analysis_results = analyze_activity(recent_logs)
+    # Employees currently logged in
+    currently_online = sum(
+        1 for item in login_sessions
+        if item.is_online and item.logout_time is None
+    )
 
-    unusual_results = [
-        result for result in analysis_results
-        if result.get("status") == "Unusual"
+    # Today's login sessions
+    today = datetime.utcnow().date()
+
+    todays_logins = sum(
+        1 for item in login_sessions
+        if item.login_time and item.login_time.date() == today
+    )
+
+    # Completed sessions for average duration
+    completed_sessions = [
+        item for item in login_sessions
+        if item.logout_time is not None
     ]
 
-    unusual_count = len(unusual_results)
-
-    total_active = sum(
-        log.active_seconds or 0
-        for log in recent_logs
-    )
-
-    total_idle = sum(
-        log.idle_seconds or 0
-        for log in recent_logs
-    )
-
-    total_time = total_active + total_idle
-
-    activity_percentage = (
-        round((total_active / total_time) * 100, 1)
-        if total_time > 0
-        else 0
-    )
-
-    active_sessions = WorkSession.query.filter_by(
-        end_time=None
-    ).all()
-
-    working_count = sum(
-        1 for session in active_sessions
-        if session.status == "Working"
-    )
-
-    break_count = sum(
-        1 for session in active_sessions
-        if session.status == "On Break"
-    )
-
-    # Unusual activity
-    if (
-        "unusual" in question
-        or "anomaly" in question
-        or "alert" in question
-    ):
-        employee_ids = {
-            result["record"].employee_id
-            for result in unusual_results
-            if result.get("record")
-        }
-
-        employee_names = []
-
-        for employee_id in employee_ids:
-            employee = User.query.get(employee_id)
-
-            if employee:
-                name = getattr(employee, "name", None)
-
-                if not name:
-                    name = getattr(
-                        employee,
-                        "email",
-                        f"Employee #{employee_id}"
-                    )
-
-                employee_names.append(name)
-
-        if unusual_count == 0:
-            answer = (
-                f"The Isolation Forest model analyzed "
-                f"{len(recent_logs)} recent activity records "
-                f"and found no model-flagged unusual patterns."
-            )
-
-        elif employee_names:
-            answer = (
-                f"The Isolation Forest model analyzed "
-                f"{len(recent_logs)} recent activity records and "
-                f"flagged {unusual_count} unusual activity record(s). "
-                f"The flagged records belong to: "
-                f"{', '.join(employee_names)}. "
-                f"These are model-flagged patterns and should be "
-                f"reviewed with additional context."
-            )
-
-        else:
-            answer = (
-                f"The Isolation Forest model analyzed "
-                f"{len(recent_logs)} recent activity records and "
-                f"flagged {unusual_count} unusual activity record(s)."
-            )
-
-    # Idle activity
-    elif "idle" in question:
-        employee_idle_data = {}
-
-        for log in recent_logs:
-            employee_id = log.employee_id
-
-            if employee_id not in employee_idle_data:
-                employee_idle_data[employee_id] = {
-                    "active": 0,
-                    "idle": 0
-                }
-
-            employee_idle_data[employee_id]["active"] += (
-                log.active_seconds or 0
-            )
-
-            employee_idle_data[employee_id]["idle"] += (
-                log.idle_seconds or 0
-            )
-
-        high_idle_employees = []
-
-        for employee_id, stats in employee_idle_data.items():
-            if stats["idle"] > stats["active"]:
-                employee = User.query.get(employee_id)
-
-                if employee:
-                    name = getattr(employee, "name", None)
-
-                    if not name:
-                        name = getattr(
-                            employee,
-                            "email",
-                            f"Employee #{employee_id}"
-                        )
-
-                    high_idle_employees.append(name)
-
-        if high_idle_employees:
-            answer = (
-                f"Based on the latest {len(recent_logs)} activity "
-                f"records, employees with more idle time than active "
-                f"time are: {', '.join(high_idle_employees)}. "
-                f"Across all recent records, active time is "
-                f"{total_active} seconds and idle time is "
-                f"{total_idle} seconds."
-            )
-
-        else:
-            answer = (
-                f"Based on the latest {len(recent_logs)} activity "
-                f"records, no employee has more idle time than "
-                f"active time. Total active time is "
-                f"{total_active} seconds and total idle time is "
-                f"{total_idle} seconds."
-            )
-
-    # Working / break status
-    elif "working" in question or "break" in question:
-        answer = (
-            f"There are currently {working_count} employee "
-            f"session(s) working and {break_count} session(s) "
-            f"on break."
+    if completed_sessions:
+        average_duration_seconds = int(
+            sum(
+                item.duration_seconds or 0
+                for item in completed_sessions
+            ) / len(completed_sessions)
         )
-
-    # Activity percentage
-    elif (
-        "productivity" in question
-        or "performance" in question
-        or "activity percentage" in question
-    ):
-        answer = (
-            f"Based on the latest {len(recent_logs)} activity "
-            f"records, the activity percentage is "
-            f"{activity_percentage}%. The Isolation Forest model "
-            f"flagged {unusual_count} unusual activity record(s)."
-        )
-
-    # Workforce summary
-    elif (
-        "summary" in question
-        or "today" in question
-        or "workforce" in question
-    ):
-        answer = (
-            f"WorkAI analyzed {len(recent_logs)} recent activity "
-            f"records. Activity percentage is "
-            f"{activity_percentage}%. {working_count} employee "
-            f"session(s) are currently working, {break_count} "
-            f"are on break, and the Isolation Forest model "
-            f"flagged {unusual_count} unusual activity record(s)."
-        )
-        # Project intelligence
-    elif "project" in question:
-        project_sessions = WorkSession.query.filter(
-            WorkSession.project_id.isnot(None)
-        ).all()
-
-        project_totals = {}
-
-        for session in project_sessions:
-            seconds = session.total_work_seconds or 0
-            project_totals[session.project_id] = (
-                project_totals.get(session.project_id, 0) + seconds
-            )
-
-        if not project_totals:
-            answer = (
-                "No project-linked tracked time is available yet. "
-                "Start a work session with a project selected to build "
-                "project-wise time intelligence."
-            )
-        else:
-            top_project_id = max(
-                project_totals,
-                key=project_totals.get
-            )
-
-            from models.project import Project
-
-            top_project = Project.query.filter_by(
-                id=top_project_id
-            ).first()
-
-            total_seconds = project_totals[top_project_id]
-
-            hours = total_seconds // 3600
-            minutes = (total_seconds % 3600) // 60
-            seconds = total_seconds % 60
-
-            project_name = (
-                top_project.name
-                if top_project
-                else f"Project #{top_project_id}"
-            )
-
-            answer = (
-                f"{project_name} currently has the highest recorded "
-                f"project-linked work time: "
-                f"{hours:02d}:{minutes:02d}:{seconds:02d}."
-            )
-
-    # Help
     else:
-        answer = (
-            "I can answer questions about workforce activity, "
-            "idle time, activity percentage, current working "
-            "sessions, breaks, and unusual activity detected by "
-            "the Isolation Forest model."
-        )
+        average_duration_seconds = 0
 
-    return jsonify({
-        "success": True,
-        "answer": answer
-    })
+    # Prepare display duration for every session
+    session_rows = []
+
+    now = datetime.utcnow()
+
+    for item in login_sessions:
+        if item.logout_time is None:
+            duration_seconds = max(
+                0,
+                int((now - item.login_time).total_seconds())
+            )
+        else:
+            duration_seconds = item.duration_seconds or 0
+
+        hours = duration_seconds // 3600
+        minutes = (duration_seconds % 3600) // 60
+        seconds = duration_seconds % 60
+
+        session_rows.append({
+            "session": item,
+            "duration": f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+        })
+
+    average_hours = average_duration_seconds // 3600
+    average_minutes = (average_duration_seconds % 3600) // 60
+
+    average_duration = (
+        f"{average_hours}h {average_minutes}m"
+    )
+
+    return render_template(
+        "admin_login_sessions.html",
+        user=current_user,
+        session_rows=session_rows,
+        currently_online=currently_online,
+        todays_logins=todays_logins,
+        average_duration=average_duration
+    )

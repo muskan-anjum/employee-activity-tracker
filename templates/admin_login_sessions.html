@@ -1,0 +1,193 @@
+{% extends "base_admin.html" %}
+
+{% block title %}Employee Login Sessions | WorkAI{% endblock %}
+
+{% block page_header %}
+<div class="welcome-label">WORKFORCE ACCESS INTELLIGENCE</div>
+<h1>Employee Login Sessions</h1>
+<p>Audit employee access, verify real-time online presence, and track authentication session durations.</p>
+{% endblock %}
+
+{% block content %}
+<div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 28px;">
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-label">Currently Online</span>
+            <div class="stat-icon" style="background: rgba(16, 185, 129, 0.12); color: #10b981;">
+                <span style="display:inline-block; width: 10px; height: 10px; border-radius: 50%; background: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);"></span>
+            </div>
+        </div>
+        <div class="stat-value" style="color: #059669;">{{ currently_online }}</div>
+        <div class="stat-meta">Active employee browser sessions</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-label">Today's Logins</span>
+            <div class="stat-icon" style="background: rgba(99, 102, 241, 0.12); color: #6366f1;">🔐</div>
+        </div>
+        <div class="stat-value">{{ todays_logins }}</div>
+        <div class="stat-meta">Authentication sessions logged today</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-label">Avg Session Duration</span>
+            <div class="stat-icon" style="background: rgba(14, 165, 233, 0.12); color: #0ea5e9;">⏱️</div>
+        </div>
+        <div class="stat-value" style="font-size: 24px;">{{ average_duration }}</div>
+        <div class="stat-meta">Across completed login sessions</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-label">Security Protocol</span>
+            <div class="stat-icon" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b;">🛡️</div>
+        </div>
+        <div class="stat-value" style="font-size: 20px; color: #1e293b; padding-top: 4px;">Role Enforced</div>
+        <div class="stat-meta">Auto session revocation upon deactivation</div>
+    </div>
+</div>
+
+<div class="panel">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 14px;">
+        <div>
+            <h2 style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 0 0 4px 0;">Authentication Audit Log</h2>
+            <p style="font-size: 13px; color: #64748b; margin: 0;">Comprehensive history of employee access sessions across the WorkAI enterprise platform.</p>
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <input 
+                type="text" 
+                id="sessionSearch" 
+                placeholder="Search employee or email..." 
+                style="padding: 9px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; min-width: 220px; outline: none;"
+                onkeyup="filterSessions()"
+            >
+            <div style="display: flex; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background: #f8fafc;">
+                <button class="filter-btn active" onclick="setSessionFilter('all', this)" style="padding: 8px 14px; border: none; background: #6366f1; color: white; font-size: 12px; font-weight: 600; cursor: pointer;">All</button>
+                <button class="filter-btn" onclick="setSessionFilter('online', this)" style="padding: 8px 14px; border: none; background: transparent; color: #64748b; font-size: 12px; font-weight: 600; cursor: pointer;">Online</button>
+                <button class="filter-btn" onclick="setSessionFilter('offline', this)" style="padding: 8px 14px; border: none; background: transparent; color: #64748b; font-size: 12px; font-weight: 600; cursor: pointer;">Completed</button>
+            </div>
+        </div>
+    </div>
+
+    {% if session_rows %}
+    <div class="table-container">
+        <table class="data-table" id="sessionsTable">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Login Time (UTC)</th>
+                    <th>Logout Time (UTC)</th>
+                    <th>Session Duration</th>
+                    <th>Presence Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in session_rows %}
+                <tr class="session-row" data-status="{% if row.session.is_online and not row.session.logout_time %}online{% else %}offline{% endif %}">
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 34px; height: 34px; border-radius: 8px; background: #e0e7ff; color: #4338ca; display: grid; place-items: center; font-weight: 700; font-size: 13px;">
+                                {{ row.session.user.name[0] | upper }}
+                            </div>
+                            <div>
+                                <strong style="display: block; color: #0f172a; font-size: 13px;" class="user-name">{{ row.session.user.name }}</strong>
+                                <span style="color: #64748b; font-size: 12px;" class="user-email">{{ row.session.user.email }}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="font-size: 13px; color: #1e293b; font-weight: 500;">
+                            {{ row.session.login_time.strftime('%b %d, %Y') }}
+                        </div>
+                        <div style="font-size: 11px; color: #64748b;">
+                            {{ row.session.login_time.strftime('%I:%M:%S %p') }}
+                        </div>
+                    </td>
+                    <td>
+                        {% if row.session.logout_time %}
+                        <div style="font-size: 13px; color: #1e293b; font-weight: 500;">
+                            {{ row.session.logout_time.strftime('%b %d, %Y') }}
+                        </div>
+                        <div style="font-size: 11px; color: #64748b;">
+                            {{ row.session.logout_time.strftime('%I:%M:%S %p') }}
+                        </div>
+                        {% else %}
+                        <span style="color: #059669; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                            <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #10b981;"></span>
+                            Active Session
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span style="font-family: monospace; font-size: 13px; font-weight: 600; color: #334155; background: #f1f5f9; padding: 4px 8px; border-radius: 6px;">
+                            {{ row.duration }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if row.session.is_online and not row.session.logout_time %}
+                        <span style="display: inline-flex; align-items: center; gap: 6px; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700;">
+                            <span style="width: 6px; height: 6px; border-radius: 50%; background: #10b981;"></span>
+                            ONLINE
+                        </span>
+                        {% else %}
+                        <span style="display: inline-flex; align-items: center; gap: 6px; background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 600;">
+                            OFFLINE
+                        </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 48px 20px; color: #64748b;">
+        <div style="font-size: 36px; margin-bottom: 12px;">🔐</div>
+        <h3 style="color: #0f172a; margin-bottom: 6px;">No Login Sessions Recorded</h3>
+        <p style="font-size: 13px; max-width: 440px; margin: 0 auto;">Login sessions will automatically appear here as employees authenticate and access the platform.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let currentFilter = 'all';
+
+    function setSessionFilter(filter, btn) {
+        currentFilter = filter;
+        document.querySelectorAll('.filter-btn').forEach(b => {
+            b.style.background = 'transparent';
+            b.style.color = '#64748b';
+            b.classList.remove('active');
+        });
+        btn.style.background = '#6366f1';
+        btn.style.color = 'white';
+        btn.classList.add('active');
+        filterSessions();
+    }
+
+    function filterSessions() {
+        const query = document.getElementById('sessionSearch').value.toLowerCase().trim();
+        const rows = document.querySelectorAll('.session-row');
+
+        rows.forEach(row => {
+            const name = row.querySelector('.user-name').textContent.toLowerCase();
+            const email = row.querySelector('.user-email').textContent.toLowerCase();
+            const status = row.getAttribute('data-status');
+
+            const matchesSearch = name.includes(query) || email.includes(query);
+            const matchesFilter = (currentFilter === 'all') || (status === currentFilter);
+
+            if (matchesSearch && matchesFilter) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+</script>
+{% endblock %}

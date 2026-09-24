@@ -24,10 +24,12 @@ api.add_middleware(
         "https://employee-activity-tracker.onrender.com",
         "http://127.0.0.1:5000",
         "http://localhost:5000",
+        "http://127.0.0.1:8000",
+        "http://localhost:8000",
     ],
     allow_credentials=True,
-    allow_methods=["GET", "POST"],
-    allow_headers=["Content-Type", "Authorization"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -338,9 +340,25 @@ def get_workforce_overview():
             else 0.0
         )
 
+        task_completion_rate = (
+            round((completed_tasks / total_tasks) * 100, 2)
+            if total_tasks > 0
+            else 0.0
+        )
+
+        if activity_score >= 80:
+            workforce_status = "High Productivity"
+        elif activity_score >= 60:
+            workforce_status = "Stable Productivity"
+        elif activity_score >= 40:
+            workforce_status = "Moderate"
+        else:
+            workforce_status = "Needs Attention"
+
         return {
             "platform": "WorkAI",
             "data_source": "Live WorkAI Database",
+            "workforce_status": workforce_status,
             "employees": {
                 "total": total_employees,
                 "active_accounts": active_accounts,
@@ -352,7 +370,8 @@ def get_workforce_overview():
             },
             "tasks": {
                 "total": total_tasks,
-                "completed": completed_tasks
+                "completed": completed_tasks,
+                "completion_rate": task_completion_rate
             },
             "activity": {
                 "total_work_seconds": int(total_work_seconds),
@@ -582,89 +601,6 @@ def get_employees_overview():
             "employees": employee_results
         }
 
-@api.get(
-    "/api/workforce/overview",
-    tags=["Workforce Intelligence"],
-    summary="Get live workforce intelligence from WorkAI"
-)
-def get_workforce_overview():
-    with flask_app.app_context():
-
-        employees = User.query.filter_by(role="employee").all()
-        sessions = WorkSession.query.all()
-        logs = ActivityLog.query.all()
-        tasks = Task.query.all()
-
-        total_employees = len(employees)
-
-        active_accounts = sum(
-            1 for employee in employees
-            if employee.is_active_account
-        )
-
-        currently_working = sum(
-            1 for session in sessions
-            if session.status in ["Working", "On Break"]
-        )
-
-        total_work_seconds = sum(
-            session.total_work_seconds or 0
-            for session in sessions
-        )
-
-        active_seconds = sum(
-            log.active_seconds or 0
-            for log in logs
-        )
-
-        idle_seconds = sum(
-            log.idle_seconds or 0
-            for log in logs
-        )
-
-        tracked_seconds = active_seconds + idle_seconds
-
-        workforce_activity_score = (
-            round((active_seconds / tracked_seconds) * 100, 2)
-            if tracked_seconds > 0
-            else 0.0
-        )
-
-        total_tasks = len(tasks)
-
-        completed_tasks = sum(
-            1 for task in tasks
-            if task.status.strip().lower() == "completed"
-        )
-
-        task_completion_rate = (
-            round((completed_tasks / total_tasks) * 100, 2)
-            if total_tasks > 0
-            else 0.0
-        )
-
-        if workforce_activity_score >= 80:
-            workforce_status = "High Productivity"
-        elif workforce_activity_score >= 60:
-            workforce_status = "Stable Productivity"
-        else:
-            workforce_status = "Needs Attention"
-
-        return {
-            "platform": "WorkAI",
-            "data_source": "Live WorkAI Database",
-            "workforce_status": workforce_status,
-            "total_employees": total_employees,
-            "active_accounts": active_accounts,
-            "currently_working": currently_working,
-            "total_work_seconds": total_work_seconds,
-            "active_seconds": active_seconds,
-            "idle_seconds": idle_seconds,
-            "workforce_activity_score": workforce_activity_score,
-            "total_tasks": total_tasks,
-            "completed_tasks": completed_tasks,
-            "task_completion_rate": task_completion_rate
-        }
 
 # Serve the existing Flask WorkAI web application through FastAPI.
 # Keep this mount LAST so /api, /docs and /redoc remain handled by FastAPI.

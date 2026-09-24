@@ -1,3 +1,7 @@
+// WorkAI Client-Side Activity Monitoring Engine
+// Captures non-invasive interaction signals (keystroke counts and mouse movements)
+// Does NOT capture key characters, clipboard, screen, or sensitive content.
+
 let keyboardEvents = 0;
 let mouseEvents = 0;
 
@@ -5,52 +9,64 @@ let activeSeconds = 0;
 let idleSeconds = 0;
 
 let lastActivity = Date.now();
+const IDLE_LIMIT = 60 * 1000; // 60 seconds of inactivity triggers idle state
 
-const IDLE_LIMIT = 60 * 1000; // 60 seconds
+function updateLiveTrackerUI(isCurrentlyActive) {
+    const pulseEl = document.getElementById("trackerPulseDot");
+    const labelEl = document.getElementById("trackerPulseText");
+    const countEl = document.getElementById("trackerLiveCounter");
 
+    if (pulseEl && labelEl) {
+        if (isCurrentlyActive) {
+            pulseEl.className = "pulse-dot active";
+            labelEl.textContent = "Live Monitoring Active";
+        } else {
+            pulseEl.className = "pulse-dot idle";
+            labelEl.textContent = "Idle State Detected";
+        }
+    }
+
+    if (countEl) {
+        countEl.textContent = `${activeSeconds}s active · ${idleSeconds}s idle`;
+    }
+}
 
 function registerKeyboardActivity() {
     keyboardEvents += 1;
     lastActivity = Date.now();
+    updateLiveTrackerUI(true);
 }
-
 
 function registerMouseActivity() {
     mouseEvents += 1;
     lastActivity = Date.now();
+    updateLiveTrackerUI(true);
 }
 
-
-// We count activity only.
-// We DO NOT store which keys were pressed.
-document.addEventListener("keydown", registerKeyboardActivity);
-
-document.addEventListener("mousemove", registerMouseActivity);
-
-document.addEventListener("click", registerMouseActivity);
-
+// Global DOM interaction event listeners
+document.addEventListener("keydown", registerKeyboardActivity, { passive: true });
+document.addEventListener("mousemove", registerMouseActivity, { passive: true });
+document.addEventListener("click", registerMouseActivity, { passive: true });
 document.addEventListener("scroll", function () {
     lastActivity = Date.now();
-});
+    updateLiveTrackerUI(true);
+}, { passive: true });
 
-
-// Check activity every second.
+// Check activity state every second
 setInterval(function () {
-
     const inactiveFor = Date.now() - lastActivity;
 
     if (inactiveFor < IDLE_LIMIT) {
         activeSeconds += 1;
+        updateLiveTrackerUI(true);
     } else {
         idleSeconds += 1;
+        updateLiveTrackerUI(false);
     }
-
 }, 1000);
 
-
-// Send accumulated activity to Flask every 30 seconds.
+// Transmit accumulated interaction metrics to WorkAI backend every 30 seconds
 async function sendActivityData() {
-
     if (activeSeconds === 0 &&
         idleSeconds === 0 &&
         keyboardEvents === 0 &&
@@ -79,18 +95,22 @@ async function sendActivityData() {
             idleSeconds = 0;
             keyboardEvents = 0;
             mouseEvents = 0;
-        }
 
+            const syncEl = document.getElementById("trackerSyncNote");
+            if (syncEl) {
+                const now = new Date();
+                syncEl.textContent = `Synced: ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+            }
+        }
     } catch (error) {
-        console.error("Activity tracking error:", error);
+        console.warn("WorkAI activity tracking network note:", error);
     }
 }
+
 setInterval(sendActivityData, 30000);
 
-
-// Try to save remaining activity before the employee leaves.
+// Transmit remaining metrics via Beacon API before navigation/unload
 window.addEventListener("beforeunload", function () {
-
     if (activeSeconds === 0 &&
         idleSeconds === 0 &&
         keyboardEvents === 0 &&
@@ -107,10 +127,6 @@ window.addEventListener("beforeunload", function () {
 
     navigator.sendBeacon(
         "/employee/activity",
-        new Blob(
-            [payload],
-            { type: "application/json" }
-        )
+        new Blob([payload], { type: "application/json" })
     );
-
-});
+});

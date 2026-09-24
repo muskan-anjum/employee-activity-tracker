@@ -59,6 +59,11 @@ class ActivityLog(db.Model):
         nullable=True
     )
 
+    anomaly_reason = db.Column(
+        db.String(255),
+        nullable=True
+    )
+
     employee = db.relationship(
         "User",
         backref=db.backref("activity_logs", lazy=True)

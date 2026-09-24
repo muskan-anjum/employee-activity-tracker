@@ -33,9 +33,23 @@ def create_app():
         return redirect(url_for("auth.login"))
         
 
-    # Create database tables
+    # Create database tables and apply lightweight migrations
     with app.app_context():
         db.create_all()
+        try:
+            from sqlalchemy import text
+            with db.engine.connect() as conn:
+                cols = [r[1] for r in conn.execute(text("PRAGMA table_info(work_sessions)")).fetchall()]
+                if "task_id" not in cols:
+                    conn.execute(text("ALTER TABLE work_sessions ADD COLUMN task_id INTEGER REFERENCES tasks(id)"))
+                    conn.commit()
+
+                act_cols = [r[1] for r in conn.execute(text("PRAGMA table_info(activity_logs)")).fetchall()]
+                if "anomaly_reason" not in act_cols:
+                    conn.execute(text("ALTER TABLE activity_logs ADD COLUMN anomaly_reason VARCHAR(255)"))
+                    conn.commit()
+        except Exception as e:
+            app.logger.warning(f"Schema migration note: {e}")
 
     return app
 

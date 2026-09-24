@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Console | WorkAI{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/workai.css') }}">
+
+    <style>
+        .system-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #ffffff;
+            border: 1px solid var(--border, #e2e8f0);
+            padding: 8px 14px;
+            border-radius: 999px;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+            font-size: 12px;
+        }
+
+        .system-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+        }
+
+        .flash-container {
+            margin-bottom: 24px;
+        }
+
+        .flash-alert {
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .flash-alert.danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .flash-alert.success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .flash-alert.warning { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+        .flash-alert.info { background: #e0f2fe; color: #075985; border: 1px solid #bae6fd; }
+
+        .api-link-badge {
+            margin-top: 18px;
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #94a3b8;
+            font-size: 12px;
+            text-decoration: none;
+            transition: 0.2s ease;
+        }
+
+        .api-link-badge:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+
+<aside class="sidebar">
+    <div class="brand">
+        <div class="brand-icon">AI</div>
+        WorkAI
+    </div>
+
+    <div class="admin-label" style="margin: -26px 0 24px 6px;">ADMIN INTELLIGENCE CONSOLE</div>
+
+    <a href="{{ url_for('dashboard.admin_dashboard') }}" class="nav-item {% if request.endpoint == 'dashboard.admin_dashboard' %}active{% endif %}" style="text-decoration: none;">
+        <span>📊 &nbsp; Dashboard</span>
+    </a>
+
+    <a href="{{ url_for('dashboard.admin_employees') }}" class="nav-item {% if request.endpoint == 'dashboard.admin_employees' %}active{% endif %}" style="text-decoration: none;">
+        <span>👥 &nbsp; Employees</span>
+    </a>
+
+    <a href="{{ url_for('dashboard.admin_projects') }}" class="nav-item {% if request.endpoint == 'dashboard.admin_projects' %}active{% endif %}" style="text-decoration: none;">
+        <span>📁 &nbsp; Projects & Tasks</span>
+    </a>
+
+    <a href="{{ url_for('dashboard.admin_activity') }}" class="nav-item {% if request.endpoint == 'dashboard.admin_activity' %}active{% endif %}" style="text-decoration: none;">
+        <span>⚡ &nbsp; Activity Monitoring</span>
+    </a>
+
+    <a href="{{ url_for('dashboard.admin_ai_analysis') }}" class="nav-item {% if request.endpoint == 'dashboard.admin_ai_analysis' %}active{% endif %}" style="text-decoration: none;">
+        <span>🤖 &nbsp; AI Analysis</span>
+    </a>
+
+    <a href="{{ url_for('dashboard.admin_reports') }}" class="nav-item {% if request.endpoint == 'dashboard.admin_reports' %}active{% endif %}" style="text-decoration: none;">
+        <span>📈 &nbsp; Reports & Analytics</span>
+    </a>
+
+    <a href="{{ url_for('dashboard.admin_login_sessions') }}" class="nav-item {% if request.endpoint == 'dashboard.admin_login_sessions' %}active{% endif %}" style="text-decoration: none;">
+        <span>🔐 &nbsp; Login Sessions</span>
+    </a>
+
+    <a href="/docs" target="_blank" class="api-link-badge">
+        <span>⚡ FastAPI OpenAPI Docs</span>
+        <span style="font-size: 10px; background: #6366f1; color: white; padding: 2px 6px; border-radius: 4px;">v1.0</span>
+    </a>
+</aside>
+
+<main class="main">
+
+    <header class="topbar">
+        <div>
+            {% block page_header %}
+            <div class="welcome-label">WORKFORCE INTELLIGENCE CONSOLE</div>
+            <h1>Admin Dashboard</h1>
+            <p>Real-time workforce activity, project intelligence and productivity analytics.</p>
+            {% endblock %}
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <div class="system-status-pill">
+                <span class="system-dot"></span>
+                <span style="font-weight: 600; color: #1e293b;">Engine Operational</span>
+                <span style="color: #cbd5e1;">|</span>
+                <span style="color: #64748b; font-size: 11px;">Flask + FastAPI + ML</span>
+            </div>
+
+            <div class="user-box" style="display: flex; align-items: center; gap: 12px; background: white; padding: 6px 14px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                <div class="avatar" style="width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #6366f1, #4338ca); color: white; display: grid; place-items: center; font-weight: 700;">
+                    {{ current_user.name[0] | upper }}
+                </div>
+
+                <div>
+                    <strong style="display: block; font-size: 13px; color: #0f172a;">{{ current_user.name }}</strong>
+                    <span style="font-size: 11px; color: #64748b;">Administrator</span>
+                </div>
+
+                <a class="logout" href="{{ url_for('auth.logout') }}" style="margin-left: 8px; font-size: 12px; color: #ef4444; text-decoration: none; font-weight: 600; padding: 5px 10px; border-radius: 6px; background: #fee2e2;">
+                    Logout
+                </a>
+            </div>
+        </div>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-container">
+            {% for category, message in messages %}
+            <div class="flash-alert {{ category }}">
+                <span>{{ message }}</span>
+                <span style="cursor: pointer;" onclick="this.parentElement.remove()">✕</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+
+</main>
+
+{% block modals %}{% endblock %}
+{% block scripts %}{% endblock %}
+</body>
+</html>

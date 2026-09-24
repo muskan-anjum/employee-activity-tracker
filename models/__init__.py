@@ -7,3 +7,4 @@ from models.project import Project
 from models.task import Task
 from models.work_session import WorkSession, Break
 from models.activity import ActivityLog
+from models.login_session import LoginSession

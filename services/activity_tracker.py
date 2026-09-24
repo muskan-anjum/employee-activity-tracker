@@ -2,6 +2,7 @@ from datetime import datetime
 
 from models import db
 from models.activity import ActivityLog
+from services.ml_analyzer import evaluate_single_heuristic
 
 
 def save_activity(
@@ -18,17 +19,31 @@ def save_activity(
     Only activity counts are stored.
     Actual keys pressed or mouse positions are never stored.
     """
+    act_sec = max(0, int(active_seconds))
+    idle_sec = max(0, int(idle_seconds))
+    kb_ev = max(0, int(keyboard_events))
+    ms_ev = max(0, int(mouse_events))
+
+    # Evaluate heuristic anomaly indicators for the interval
+    temp_obj = type("TempActivity", (), {
+        "active_seconds": act_sec,
+        "idle_seconds": idle_sec,
+        "keyboard_events": kb_ev,
+        "mouse_events": ms_ev,
+    })()
+    eval_result = evaluate_single_heuristic(temp_obj)
 
     activity = ActivityLog(
         employee_id=employee_id,
         session_id=session_id,
         timestamp=datetime.utcnow(),
-        active_seconds=max(0, int(active_seconds)),
-        idle_seconds=max(0, int(idle_seconds)),
-        keyboard_events=max(0, int(keyboard_events)),
-        mouse_events=max(0, int(mouse_events)),
-        is_anomaly=False,
-        anomaly_score=0.0
+        active_seconds=act_sec,
+        idle_seconds=idle_sec,
+        keyboard_events=kb_ev,
+        mouse_events=ms_ev,
+        is_anomaly=eval_result.get("is_anomaly", False),
+        anomaly_score=eval_result.get("anomaly_score", 0.0),
+        anomaly_reason=eval_result.get("reason", "Standard workforce interaction.")
     )
 
     db.session.add(activity)

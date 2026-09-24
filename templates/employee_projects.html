@@ -1,625 +1,99 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Projects | WorkAI</title>
-
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f4f7fb;
-            color: #1e293b;
-        }
-
-        .layout {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* SIDEBAR */
-        .sidebar {
-            width: 230px;
-            background: #111827;
-            color: white;
-            padding: 28px 18px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 42px;
-        }
-
-        .brand-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #2563eb, #38bdf8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-        }
-
-        .nav-link {
-            display: block;
-            color: #cbd5e1;
-            text-decoration: none;
-            padding: 13px 15px;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-
-        .nav-link:hover {
-            background: #1f2937;
-            color: white;
-        }
-
-        .nav-link.active {
-            background: #2563eb;
-            color: white;
-        }
-
-        /* MAIN CONTENT */
-        .main {
-            margin-left: 230px;
-            width: calc(100% - 230px);
-            padding: 35px 42px 60px;
-        }
-
-        .eyebrow {
-            color: #2563eb;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            margin-bottom: 8px;
-        }
-
-        .page-header h1 {
-            font-size: 30px;
-            margin-bottom: 8px;
-        }
-
-        .page-header p {
-            color: #64748b;
-            font-size: 14px;
-        }
-
-        /* SUMMARY */
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 18px;
-            margin: 28px 0;
-        }
-
-        .summary-card {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 20px;
-            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
-        }
-
-        .summary-label {
-            color: #64748b;
-            font-size: 13px;
-            margin-bottom: 9px;
-        }
-
-        .summary-value {
-            font-size: 27px;
-            font-weight: 700;
-            color: #0f172a;
-        }
-
-        /* PROJECT SECTION */
-        .section-title {
-            margin: 30px 0 16px;
-        }
-
-        .section-title h2 {
-            font-size: 20px;
-            margin-bottom: 5px;
-        }
-
-        .section-title p {
-            color: #64748b;
-            font-size: 13px;
-        }
-
-        .projects-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 22px;
-        }
-
-        .project-card {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 23px;
-            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .project-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.09);
-        }
-
-        .project-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 15px;
-        }
-
-        .project-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            background: #eff6ff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 21px;
-            margin-bottom: 15px;
-        }
-
-        .status-badge {
-            background: #dcfce7;
-            color: #15803d;
-            border-radius: 20px;
-            padding: 6px 11px;
-            font-size: 11px;
-            font-weight: 700;
-        }
-
-        .project-name {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .project-description {
-            color: #64748b;
-            font-size: 13px;
-            line-height: 1.6;
-            min-height: 42px;
-        }
-
-        .metric-box {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 11px;
-            padding: 15px;
-            margin-top: 18px;
-        }
-
-        .metric-label {
-            color: #64748b;
-            font-size: 12px;
-            margin-bottom: 7px;
-        }
-
-        .metric-value {
-            color: #2563eb;
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        .intelligence {
-            margin-top: 17px;
-            padding: 14px 15px;
-            border-left: 3px solid #2563eb;
-            background: #f8fbff;
-            border-radius: 8px;
-        }
-
-        .intelligence-title {
-            font-size: 13px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .intelligence-text {
-            color: #64748b;
-            font-size: 12px;
-            line-height: 1.5;
-        }
-
-        .empty-state {
-            grid-column: 1 / -1;
-            background: white;
-            border: 1px dashed #cbd5e1;
-            border-radius: 16px;
-            padding: 50px;
-            text-align: center;
-            color: #64748b;
-        }
-
-        @media (max-width: 900px) {
-            .summary-grid,
-            .projects-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .sidebar {
-                width: 190px;
-            }
-
-            .main {
-                margin-left: 190px;
-                width: calc(100% - 190px);
-                padding: 25px;
-            }
-        }
-/* ===== WorkAI Premium My Projects Upgrade ===== */
-
-.main {
-    background: #f6f8fc;
-}
-
-.page-header {
-    margin-bottom: 28px;
-}
-
-.page-header h1 {
-    font-size: 30px;
-    font-weight: 800;
-    color: #172033;
-    letter-spacing: -0.5px;
-}
-
-.stats-grid {
-    gap: 18px;
-    margin-bottom: 32px;
-}
-
-.stat-card {
-    background: #ffffff;
-    border: 1px solid #e7ebf3;
-    border-radius: 16px;
-    padding: 22px;
-    box-shadow: 0 8px 25px rgba(15, 23, 42, 0.05);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.stat-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.09);
-}
-
-.project-card {
-    background: #ffffff;
-    border: 1px solid #e5eaf2;
-    border-radius: 18px;
-    padding: 24px;
-    box-shadow: 0 8px 28px rgba(15, 23, 42, 0.06);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.project-card::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 4px;
-    height: 100%;
-    background: linear-gradient(180deg, #3b82f6, #6366f1);
-}
-
-.project-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.10);
-}
-
-.project-card h3 {
-    color: #172033;
-    font-size: 18px;
-    font-weight: 750;
-    margin-bottom: 8px;
-}
-
-.project-card p {
-    color: #64748b;
-    line-height: 1.6;
-}
-
-.status-badge {
-    border-radius: 999px;
-    padding: 6px 11px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.4px;
-}
-
-.project-time {
-    margin-top: 22px;
-    padding-top: 18px;
-    border-top: 1px solid #edf0f5;
-}
-
-.project-time strong {
-    color: #2563eb;
-    font-size: 18px;
-}
-
-.project-intelligence {
-    margin-top: 18px;
-    padding: 14px 16px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #f5f9ff, #f8f7ff);
-    border: 1px solid #dfe8fb;
-    color: #475569;
-}
-
-.project-intelligence strong {
-    color: #334155;
-}
-
-@media (max-width: 800px) {
-    .projects-grid,
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .main {
-        padding: 24px;
-    }
-}
-
-/* ===== WorkAI Premium My Projects ===== */
-
-.projects-page {
-    padding: 32px;
-}
-
-.projects-page .page-header {
-    margin-bottom: 26px;
-}
-
-.projects-page .page-header h1 {
-    font-size: 28px;
-    font-weight: 800;
-    color: #0f172a;
-    margin-bottom: 7px;
-}
-
-.projects-page .page-header p {
-    color: #64748b;
-    font-size: 14px;
-}
-
-.projects-page .project-card {
-    background: #ffffff;
-    border: 1px solid #e8edf5;
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 18px;
-    box-shadow: 0 8px 28px rgba(15, 23, 42, 0.05);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.projects-page .project-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 34px rgba(15, 23, 42, 0.08);
-}
-
-.projects-page .project-card h3 {
-    color: #0f172a;
-    font-size: 18px;
-    margin-bottom: 8px;
-}
-
-.projects-page .project-card p {
-    color: #64748b;
-    line-height: 1.6;
-}
-
-.projects-page .status,
-.projects-page .status-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 6px 10px;
-    border-radius: 999px;
-    font-size: 11px;
-    font-weight: 700;
-}
-
-@media (max-width: 800px) {
-    .projects-page {
-        padding: 22px;
-    }
-}
-
-@media (max-width: 600px) {
-    .projects-page {
-        padding: 16px;
-    }
-}
-    </style>
-</head>
-
-<body>
-
-<div class="layout">
-
-    <aside class="sidebar">
-
-        <div class="brand">
-            <div class="brand-icon">AI</div>
-            <span>WorkAI</span>
+{% extends "base_employee.html" %}
+
+{% block title %}My Projects | WorkAI{% endblock %}
+
+{% block page_header %}
+<div class="welcome-label">PROJECT INTELLIGENCE</div>
+<h1>My Assigned Projects</h1>
+<p>Monitor your project assignments, tasks, and project-linked work hours.</p>
+{% endblock %}
+
+{% block content %}
+<section class="stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 24px;">
+
+    <div class="card stat-card" style="padding: 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">ASSIGNED PROJECTS</div>
+            <span style="font-size: 18px;">📁</span>
         </div>
+        <div class="stat-value blue" style="font-size: 28px; font-weight: 800; color: #3b82f6; margin: 10px 0 4px;">{{ projects|length }}</div>
+        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Active workspace initiatives</div>
+    </div>
 
-        <a class="nav-link"
-           href="{{ url_for('dashboard.employee_dashboard') }}">
-            Dashboard
-        </a>
-
-        <a class="nav-link active"
-           href="{{ url_for('dashboard.employee_projects') }}">
-            My Projects
-        </a>
-
-        <a class="nav-link"
-           href="{{ url_for('dashboard.employee_activity_history') }}">
-            Activity History
-        </a>
-
-        <a class="nav-link"
-           href="{{ url_for('dashboard.employee_work_summary') }}">
-            Work Summary
-        </a>
-
-    </aside>
-
-    <main class="main projects-page">
-
-        <div class="page-header">
-            <div class="eyebrow">PROJECT INTELLIGENCE</div>
-            <h1>My Projects</h1>
-            <p>
-                Monitor your assigned projects and project-linked work time.
-            </p>
+    <div class="card stat-card" style="padding: 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">TOTAL PROJECT TIME</div>
+            <span style="font-size: 18px;">⏱️</span>
         </div>
+        {% set total_sec_all = project_times.values() | sum %}
+        {% set all_h = total_sec_all // 3600 %}
+        {% set all_m = (total_sec_all % 3600) // 60 %}
+        <div class="stat-value green" style="font-size: 28px; font-weight: 800; color: #10b981; margin: 10px 0 4px;">{{ "%02d:%02d"|format(all_h, all_m) }}</div>
+        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Aggregated tracked hours</div>
+    </div>
 
-        <div class="summary-grid">
-
-            <div class="summary-card">
-                <div class="summary-label">Assigned Projects</div>
-                <div class="summary-value">
-                    {{ projects|length }}
-                </div>
-            </div>
-
-            <div class="summary-card">
-                <div class="summary-label">Active Projects</div>
-                <div class="summary-value">
-                    {{ projects|length }}
-                </div>
-            </div>
-
-            <div class="summary-card">
-                <div class="summary-label">WorkAI Tracking</div>
-                <div class="summary-value" style="font-size:19px;">
-                    Live Intelligence
-                </div>
-            </div>
-
+    <div class="card stat-card" style="padding: 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">WORKAI STATUS</div>
+            <span style="font-size: 18px;">⚡</span>
         </div>
+        <div class="stat-value purple" style="font-size: 20px; font-weight: 800; color: #8b5cf6; margin: 14px 0 4px;">Live Logging</div>
+        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Automatic session linking</div>
+    </div>
 
-        <div class="section-title">
-            <h2>Assigned Project Workspace</h2>
-            <p>
-                Project-specific tracking generated from your WorkAI sessions.
-            </p>
-        </div>
+</section>
 
-        <div class="projects-grid">
+<div class="card" style="padding: 26px; margin-bottom: 28px;">
+    <div style="margin-bottom: 20px;">
+        <h3 style="margin: 0 0 4px; font-size: 18px; font-weight: 700;">Project Workspaces</h3>
+        <p style="margin: 0; color: #64748b; font-size: 13px;">Verified time logs and assigned responsibilities per project.</p>
+    </div>
 
-            {% for project in projects %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+        {% for project in projects %}
+            {% set total_seconds = project_times.get(project.id, 0) %}
+            {% set hours = total_seconds // 3600 %}
+            {% set minutes = (total_seconds % 3600) // 60 %}
+            {% set seconds = total_seconds % 60 %}
 
-                {% set total_seconds = project_times.get(project.id, 0) %}
-                {% set hours = total_seconds // 3600 %}
-                {% set minutes = (total_seconds % 3600) // 60 %}
-                {% set seconds = total_seconds % 60 %}
-
-                <div class="project-card">
-
-                    <div class="project-top">
-
-                        <div>
-                            <div class="project-icon">📁</div>
+            <div style="border: 1px solid #e2e8f0; border-radius: 14px; padding: 22px; background: #ffffff; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                        <div style="width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #3b82f6, #06b6d4); color: white; display: grid; place-items: center; font-size: 18px;">
+                            📁
                         </div>
-
-                        <span class="status-badge">
-                            ACTIVE
+                        <span style="font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;">
+                            ● {{ project.status }}
                         </span>
-
                     </div>
 
-                    <div class="project-name">
-                        {{ project.name }}
-                    </div>
+                    <h4 style="margin: 0 0 6px; font-size: 17px; font-weight: 700; color: #0f172a;">{{ project.name }}</h4>
+                    <p style="margin: 0 0 16px; color: #64748b; font-size: 13px; line-height: 1.5;">
+                        {{ project.description or "No description provided for this project workspace." }}
+                    </p>
+                </div>
 
-                    <div class="project-description">
-                        {{ project.description or "Project workspace assigned through WorkAI." }}
-                    </div>
-
-                    <div class="metric-box">
-                        <div class="metric-label">
-                            PROJECT-LINKED WORK TIME
-                        </div>
-
-                        <div class="metric-value">
+                <div>
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; margin-bottom: 14px;">
+                        <div style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 0.8px; text-transform: uppercase;">TRACKED PROJECT WORK TIME</div>
+                        <div style="font-size: 22px; font-weight: 800; font-family: monospace; color: #2563eb; margin-top: 4px;">
                             {{ "%02d:%02d:%02d"|format(hours, minutes, seconds) }}
                         </div>
                     </div>
 
-                    <div class="intelligence">
-
-                        <div class="intelligence-title">
-                            ✦ WorkAI Project Intelligence
-                        </div>
-
-                        <div class="intelligence-text">
-
-                            {% if total_seconds > 0 %}
-
-                                WorkAI has recorded
-                                <strong>
-                                    {{ "%02d:%02d:%02d"|format(hours, minutes, seconds) }}
-                                </strong>
-                                of verified project-linked work activity.
-
-                            {% else %}
-
-                                No project-linked work session has been
-                                recorded for this project yet.
-
-                            {% endif %}
-
-                        </div>
-
+                    <div style="font-size: 12px; color: #475569; display: flex; align-items: center; gap: 6px;">
+                        <span>✦</span>
+                        <span>Linked with WorkAI employee session controller</span>
                     </div>
-
                 </div>
-
-            {% else %}
-
-                <div class="empty-state">
-                    <h3>No assigned projects</h3>
-                    <p>
-                        Projects assigned to you will appear here.
-                    </p>
-                </div>
-
-            {% endfor %}
-
-        </div>
-
-    </main>
-
+            </div>
+        {% else %}
+            <div style="grid-column: 1 / -1; text-align: center; padding: 50px 20px; color: #94a3b8;">
+                <span style="font-size: 36px; display: block; margin-bottom: 8px;">📂</span>
+                <strong style="color: #475569;">No assigned projects found</strong>
+                <p style="margin: 4px 0 0; font-size: 13px;">Projects assigned to you by administrators will appear here.</p>
+            </div>
+        {% endfor %}
+    </div>
 </div>
-
-</body>
-</html>
+{% endblock %}

@@ -18,6 +18,12 @@ class WorkSession(db.Model):
         nullable=True
     )
 
+    task_id = db.Column(
+        db.Integer,
+        db.ForeignKey("tasks.id"),
+        nullable=True
+    )
+
     start_time = db.Column(
         db.DateTime,
         nullable=False,
@@ -45,6 +51,11 @@ class WorkSession(db.Model):
 
     project = db.relationship(
         "Project",
+        backref=db.backref("work_sessions", lazy=True)
+    )
+
+    task = db.relationship(
+        "Task",
         backref=db.backref("work_sessions", lazy=True)
     )
 

@@ -1,738 +1,245 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projects & Tasks | WorkAI</title>
+{% extends "base_admin.html" %}
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-        }
+{% block title %}Projects & Tasks | WorkAI{% endblock %}
 
-        body {
-            background: #f5f7fb;
-            color: #172033;
-        }
+{% block page_header %}
+<div class="welcome-label">PROJECT PORTFOLIO &amp; TASK ASSIGNMENTS</div>
+<h1>Projects &amp; Tasks</h1>
+<p>Create project workspaces, provision employee tasks, and manage project lifecycles.</p>
+{% endblock %}
 
-        /* SIDEBAR */
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 220px;
-            height: 100vh;
-            background: #172033;
-            color: white;
-            padding: 25px 20px;
-        }
+{% block content %}
+<section class="stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 24px;">
 
-        .brand {
-            font-size: 22px;
-            font-weight: 800;
-            margin-bottom: 35px;
-        }
-
-        .brand span {
-            color: #3b82f6;
-        }
-
-        .admin-label {
-            font-size: 11px;
-            color: #94a3b8;
-            letter-spacing: 1px;
-            margin-bottom: 20px;
-        }
-
-        .nav-item {
-            padding: 12px;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            cursor: pointer;
-            color: #d1d5db;
-            font-size: 14px;
-            transition: 0.2s;
-        }
-
-        .nav-item:hover,
-        .nav-item.active {
-            background: #26334d;
-            color: white;
-        }
-
-        .nav-item.active {
-            border-left: 3px solid #3b82f6;
-        }
-
-        /* MAIN */
-        .main {
-            margin-left: 220px;
-            padding: 34px 40px 50px;
-        }
-
-        .top-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 26px;
-        }
-
-        .eyebrow {
-            color: #2563eb;
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 1.3px;
-            margin-bottom: 7px;
-        }
-
-        .top-header h1 {
-            font-size: 29px;
-            margin-bottom: 6px;
-            color: #0f172a;
-        }
-
-        .top-header p {
-            color: #64748b;
-            font-size: 14px;
-        }
-
-        .live-badge {
-            background: #ecfdf5;
-            color: #15803d;
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 800;
-            white-space: nowrap;
-        }
-
-        /* STATS */
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 18px;
-            margin-bottom: 24px;
-        }
-
-        .stat-card {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 20px;
-            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
-        }
-
-        .stat-label {
-            color: #64748b;
-            font-size: 10px;
-            font-weight: 800;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-        }
-
-        .stat-value {
-            color: #0f172a;
-            font-size: 27px;
-            font-weight: 800;
-        }
-
-        .stat-description {
-            color: #94a3b8;
-            font-size: 11px;
-            margin-top: 5px;
-        }
-
-        /* GRID */
-        .workspace-grid {
-            display: grid;
-            grid-template-columns: 1.55fr 1fr;
-            gap: 22px;
-            margin-bottom: 24px;
-        }
-
-        .card {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 15px;
-            padding: 24px;
-            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .section-label {
-            color: #2563eb;
-            font-size: 10px;
-            font-weight: 800;
-            letter-spacing: 1.2px;
-            margin-bottom: 5px;
-        }
-
-        .card h2 {
-            font-size: 19px;
-            color: #0f172a;
-            margin-bottom: 4px;
-        }
-
-        .card-subtitle {
-            color: #64748b;
-            font-size: 12px;
-            line-height: 1.5;
-        }
-
-        .count-badge {
-            background: #eff6ff;
-            color: #2563eb;
-            padding: 6px 10px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-
-        /* FORMS */
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            font-size: 11px;
-            font-weight: 700;
-            color: #475569;
-            margin-bottom: 7px;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-        }
-
-        input,
-        textarea,
-        select {
-            width: 100%;
-            padding: 11px 12px;
-            border: 1px solid #dbe3ee;
-            border-radius: 8px;
-            background: #f8fafc;
-            color: #1e293b;
-            outline: none;
-            font-size: 13px;
-        }
-
-        input:focus,
-        textarea:focus,
-        select:focus {
-            border-color: #3b82f6;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 82px;
-        }
-
-        .primary-button {
-            width: 100%;
-            border: 0;
-            background: #2563eb;
-            color: white;
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            font-size: 13px;
-        }
-
-        .primary-button:hover {
-            background: #1d4ed8;
-        }
-
-        /* PROJECT LIST */
-        .project-item {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 15px 0;
-            border-bottom: 1px solid #edf2f7;
-        }
-
-        .project-item:last-child {
-            border-bottom: 0;
-        }
-
-        .project-icon {
-            width: 42px;
-            height: 42px;
-            min-width: 42px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #eff6ff;
-            color: #2563eb;
-            border-radius: 10px;
-            font-weight: 800;
-            font-size: 13px;
-        }
-
-        .project-info {
-            flex: 1;
-        }
-
-        .project-info h3 {
-            font-size: 14px;
-            margin-bottom: 4px;
-            color: #1e293b;
-        }
-
-        .project-info p {
-            font-size: 11px;
-            color: #64748b;
-            line-height: 1.5;
-        }
-
-        .active-status {
-            background: #ecfdf5;
-            color: #15803d;
-            padding: 5px 9px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 700;
-        }
-
-        /* TASK TABLE */
-        .task-card {
-            margin-bottom: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            text-align: left;
-            padding: 12px;
-            border-bottom: 1px solid #e2e8f0;
-            color: #64748b;
-            font-size: 10px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-
-        td {
-            padding: 14px 12px;
-            border-bottom: 1px solid #f1f5f9;
-            font-size: 12px;
-            color: #334155;
-        }
-
-        .task-title {
-            font-weight: 700;
-            color: #1e293b;
-        }
-
-        .task-status {
-            display: inline-block;
-            background: #eff6ff;
-            color: #2563eb;
-            padding: 5px 9px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 700;
-        }
-
-        .empty {
-            text-align: center;
-            color: #94a3b8;
-            padding: 30px;
-        }
-
-        .intelligence-note {
-            margin-top: 20px;
-            padding: 14px;
-            border-radius: 10px;
-            background: #f8fbff;
-            border: 1px solid #dbeafe;
-            color: #64748b;
-            font-size: 11px;
-            line-height: 1.6;
-        }
-
-        .intelligence-note strong {
-            display: block;
-            color: #2563eb;
-            margin-bottom: 3px;
-        }
-
-        @media (max-width: 900px) {
-            .stats,
-            .workspace-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-/* Professional Projects & Tasks workspace polish */
-.workspace-grid {
-    gap: 22px;
-}
-
-.card {
-    border: 1px solid #e8edf5;
-    border-radius: 14px;
-    background: #ffffff;
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
-}
-
-.card-header h2 {
-    color: #172033;
-    font-weight: 750;
-}
-
-input,
-select,
-textarea {
-    width: 100%;
-    border: 1px solid #dfe5ee;
-    border-radius: 9px;
-    background: #fbfcfe;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-input:focus,
-select:focus,
-textarea:focus {
-    outline: none;
-    border-color: #4f7df3;
-    box-shadow: 0 0 0 3px rgba(79, 125, 243, 0.10);
-    background: #ffffff;
-}
-
-button {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-button:hover {
-    transform: translateY(-1px);
-}
-    </style>
-</head>
-
-<body>
-
-<aside class="sidebar">
-    <div class="brand"><span>AI</span>&nbsp;&nbsp;WorkAI</div>
-    <div class="admin-label">ADMIN CONSOLE</div>
-
-    <div class="nav-item"
-         onclick="window.location.href='/admin/dashboard'">
-        Dashboard
+    <div class="card stat-card" style="padding: 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">TOTAL PROJECTS</div>
+            <span style="font-size: 18px;">📁</span>
+        </div>
+        <div class="stat-value blue" style="font-size: 28px; font-weight: 800; color: #3b82f6; margin: 10px 0 4px;">{{ projects|length }}</div>
+        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Registered project workspaces</div>
     </div>
 
-    <div class="nav-item"
-         onclick="window.location.href='/admin/employees'">
-        Employees
+    <div class="card stat-card" style="padding: 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">TOTAL TASKS</div>
+            <span style="font-size: 18px;">📋</span>
+        </div>
+        <div class="stat-value green" style="font-size: 28px; font-weight: 800; color: #10b981; margin: 10px 0 4px;">{{ tasks|length }}</div>
+        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Assigned employee tasks</div>
     </div>
 
-    <div class="nav-item active">
-        Projects & Tasks
+    <div class="card stat-card" style="padding: 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">EMPLOYEES AVAILABLE</div>
+            <span style="font-size: 18px;">👥</span>
+        </div>
+        <div class="stat-value purple" style="font-size: 28px; font-weight: 800; color: #8b5cf6; margin: 10px 0 4px;">{{ employees|length }}</div>
+        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Workforce talent pool</div>
     </div>
 
-    <div class="nav-item"
-         onclick="window.location.href='/admin/activity'">
-        Activity Monitoring
-    </div>
+</section>
 
-    <div class="nav-item"
-         onclick="window.location.href='/admin/ai-analysis'">
-        AI Analysis
-    </div>
+<!-- Projects Management Row -->
+<section style="display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 20px; margin-bottom: 28px;">
 
-    <div class="nav-item"
-         onclick="window.location.href='/admin/reports'">
-        Reports
-    </div>
-</aside>
-
-<main class="main">
-
-    <div class="top-header">
-        <div>
-            <div class="eyebrow">WORKFORCE OPERATIONS</div>
-            <h1>Projects & Tasks</h1>
-            <p>
-                Create projects, assign employee tasks and manage
-                workforce responsibilities from one workspace.
-            </p>
+    <!-- Active Projects Directory -->
+    <div class="card" style="padding: 26px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+                <h3 style="margin: 0 0 4px; font-size: 18px; font-weight: 700;">Project Directory</h3>
+                <p style="margin: 0; color: #64748b; font-size: 13px;">Manage active projects and lifecycle statuses.</p>
+            </div>
+            <span style="font-size: 12px; font-weight: 700; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 20px;">
+                {{ projects|length }} Projects
+            </span>
         </div>
 
-        <div class="live-badge">● Workspace Active</div>
-    </div>
-
-    <section class="stats">
-
-        <div class="stat-card">
-            <div class="stat-label">TOTAL PROJECTS</div>
-            <div class="stat-value">{{ projects|length }}</div>
-            <div class="stat-description">
-                Projects registered in WorkAI
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-label">TOTAL TASKS</div>
-            <div class="stat-value">{{ tasks|length }}</div>
-            <div class="stat-description">
-                Workforce task assignments
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-label">EMPLOYEES AVAILABLE</div>
-            <div class="stat-value">{{ employees|length }}</div>
-            <div class="stat-description">
-                Employees available for assignment
-            </div>
-        </div>
-
-    </section>
-
-    <section class="workspace-grid">
-
-        <div class="card">
-
-            <div class="card-header">
-                <div>
-                    <div class="section-label">PROJECT DIRECTORY</div>
-                    <h2>Active Projects</h2>
-                    <div class="card-subtitle">
-                        Current projects registered in the WorkAI workspace.
-                    </div>
-                </div>
-
-                <div class="count-badge">
-                    {{ projects|length }} Projects
-                </div>
-            </div>
-
+        {% if projects %}
+        <div style="display: flex; flex-direction: column; gap: 12px;">
             {% for project in projects %}
-            <div class="project-item">
-
-                <div class="project-icon">
-                    {{ project.name[0] | upper }}
+            <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; background: white; display: flex; justify-content: space-between; align-items: center; gap: 16px;">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <div style="width: 42px; height: 42px; border-radius: 10px; background: linear-gradient(135deg, #3b82f6, #06b6d4); color: white; display: grid; place-items: center; font-size: 18px;">
+                        📁
+                    </div>
+                    <div>
+                        <h4 style="margin: 0 0 4px; font-size: 15px; font-weight: 700; color: #0f172a;">{{ project.name }}</h4>
+                        <p style="margin: 0; font-size: 12px; color: #64748b;">{{ project.description or "No description provided." }}</p>
+                    </div>
                 </div>
 
-                <div class="project-info">
-                    <h3>{{ project.name }}</h3>
-                    <p>{{ project.description or "No description provided." }}</p>
-                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px;
+                        {% if project.status == 'Active' %}background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;
+                        {% else %}background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0;{% endif %}">
+                        ● {{ project.status }}
+                    </span>
 
-                <div class="active-status">
-                    ● {{ project.status }}
+                    <form method="POST" action="{{ url_for('dashboard.toggle_project_status', project_id=project.id) }}" style="display: inline;">
+                        <button type="submit" style="padding: 6px 10px; font-size: 11px; font-weight: 600; border-radius: 6px; cursor: pointer; border: 1px solid #cbd5e1; background: #f8fafc; color: #334155;">
+                            {% if project.status == 'Active' %}Mark Complete{% else %}Re-activate{% endif %}
+                        </button>
+                    </form>
                 </div>
-
             </div>
-
-            {% else %}
-
-            <div class="empty">
-                No projects have been created yet.
-            </div>
-
             {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 35px 20px; color: #94a3b8;">
+            No projects registered yet.
+        </div>
+        {% endif %}
+    </div>
 
-            <div class="intelligence-note">
-                <strong>📊 Project Intelligence</strong>
-                Project-linked work sessions allow WorkAI to measure
-                tracked time and workforce activity by project.
-            </div>
-
+    <!-- Create Project Card -->
+    <div class="card" style="padding: 26px;">
+        <div style="margin-bottom: 20px;">
+            <h3 style="margin: 0 0 4px; font-size: 18px; font-weight: 700;">Create New Project</h3>
+            <p style="margin: 0; color: #64748b; font-size: 13px;">Add a new project initiative to WorkAI.</p>
         </div>
 
-        <div class="card">
-
-            <div class="card-header">
-                <div>
-                    <div class="section-label">PROJECT PROVISIONING</div>
-                    <h2>Create New Project</h2>
-                    <div class="card-subtitle">
-                        Add a new project to the workforce workspace.
-                    </div>
-                </div>
+        <form method="POST" action="{{ url_for('dashboard.admin_projects') }}">
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 6px;">
+                    Project Name
+                </label>
+                <input type="text" name="name" placeholder="e.g. Mobile Application v2" required style="width: 100%; padding: 11px 13px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px;">
             </div>
 
-            <form method="POST" action="/admin/projects">
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 6px;">
+                    Description
+                </label>
+                <textarea name="description" placeholder="Project objectives, scope, or client..." rows="3" style="width: 100%; padding: 11px 13px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; resize: vertical;"></textarea>
+            </div>
 
-                <div class="form-group">
-                    <label>Project Name</label>
-                    <input
-                        type="text"
-                        name="name"
-                        placeholder="Enter project name"
-                        required
-                    >
-                </div>
+            <button type="submit" style="width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer;">
+                + Create Project Workspace
+            </button>
+        </form>
+    </div>
 
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea
-                        name="description"
-                        placeholder="Describe the project objective"
-                    ></textarea>
-                </div>
+</section>
 
-                <button type="submit" class="primary-button">
-                    + Create Project
-                </button>
+<!-- Tasks Management Row -->
+<section style="display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 20px; margin-bottom: 28px;">
 
-            </form>
-
+    <!-- Task Assignments Table Card -->
+    <div class="card" style="padding: 26px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+                <h3 style="margin: 0 0 4px; font-size: 18px; font-weight: 700;">Task Assignments</h3>
+                <p style="margin: 0; color: #64748b; font-size: 13px;">View and track responsibilities assigned to employees.</p>
+            </div>
+            <span style="font-size: 12px; font-weight: 700; background: #e0f2fe; color: #0284c7; padding: 4px 12px; border-radius: 20px;">
+                {{ tasks|length }} Tasks
+            </span>
         </div>
 
-    </section>
-
-    <section class="workspace-grid">
-
-        <div class="card task-card">
-
-            <div class="card-header">
-                <div>
-                    <div class="section-label">TASK INTELLIGENCE</div>
-                    <h2>Task Assignments</h2>
-                    <div class="card-subtitle">
-                        Current employee responsibilities across projects.
-                    </div>
-                </div>
-
-                <div class="count-badge">
-                    {{ tasks|length }} Tasks
-                </div>
-            </div>
-
-            <table>
+        {% if tasks %}
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
                 <thead>
-                    <tr>
-                        <th>Task</th>
-                        <th>Project</th>
-                        <th>Employee</th>
-                        <th>Status</th>
+                    <tr style="background: #f8fafc; text-align: left; font-size: 11px; text-transform: uppercase; color: #64748b; letter-spacing: 0.8px;">
+                        <th style="padding: 12px 14px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0; border-radius: 8px 0 0 8px;">Task</th>
+                        <th style="padding: 12px 14px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0;">Project</th>
+                        <th style="padding: 12px 14px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0;">Assignee</th>
+                        <th style="padding: 12px 14px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0;">Status</th>
+                        <th style="padding: 12px 14px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0; border-radius: 0 8px 8px 0; text-align: right;">Action</th>
                     </tr>
                 </thead>
-
                 <tbody>
-
                     {% for task in tasks %}
-                    <tr>
-                        <td class="task-title">
+                    <tr style="border-bottom: 1px solid #f1f5f9;">
+                        <td style="padding: 14px; font-weight: 600; color: #0f172a;">
                             {{ task.title }}
+                            <div style="font-size: 11px; color: #64748b; font-weight: 400;">Progress: {{ task.progress | default(0) }}%</div>
                         </td>
-
-                        <td>
+                        <td style="padding: 14px; font-size: 13px; color: #475569;">
                             {{ task.project.name if task.project else "-" }}
                         </td>
-
-                        <td>
+                        <td style="padding: 14px; font-size: 13px; color: #334155; font-weight: 500;">
                             {{ task.employee.name if task.employee else "Unassigned" }}
                         </td>
-
-                        <td>
-                            <span class="task-status">
+                        <td style="padding: 14px;">
+                            <span style="font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px;
+                                {% if task.status == 'Completed' %}background: #dcfce7; color: #15803d;
+                                {% elif task.status == 'In Progress' %}background: #dbeafe; color: #1d4ed8;
+                                {% else %}background: #f1f5f9; color: #475569;{% endif %}">
                                 {{ task.status }}
                             </span>
                         </td>
-                    </tr>
-
-                    {% else %}
-
-                    <tr>
-                        <td colspan="4" class="empty">
-                            No task assignments found.
+                        <td style="padding: 14px; text-align: right;">
+                            <form method="POST" action="{{ url_for('dashboard.delete_task', task_id=task.id) }}" onsubmit="return confirm('Delete this task?');" style="display: inline;">
+                                <button type="submit" style="padding: 5px 9px; font-size: 11px; font-weight: 600; border-radius: 6px; cursor: pointer; border: 1px solid #fecaca; background: #fee2e2; color: #b91c1c;">
+                                    ✕ Delete
+                                </button>
+                            </form>
                         </td>
                     </tr>
-
                     {% endfor %}
-
                 </tbody>
             </table>
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 35px 20px; color: #94a3b8;">
+            No tasks created yet.
+        </div>
+        {% endif %}
+    </div>
 
+    <!-- Create Task Card -->
+    <div class="card" style="padding: 26px;">
+        <div style="margin-bottom: 20px;">
+            <h3 style="margin: 0 0 4px; font-size: 18px; font-weight: 700;">Assign New Task</h3>
+            <p style="margin: 0; color: #64748b; font-size: 13px;">Delegate project responsibilities to workforce members.</p>
         </div>
 
-        <div class="card">
-
-            <div class="card-header">
-                <div>
-                    <div class="section-label">TASK PROVISIONING</div>
-                    <h2>Create New Task</h2>
-                    <div class="card-subtitle">
-                        Assign a project responsibility to an employee.
-                    </div>
-                </div>
+        <form method="POST" action="{{ url_for('dashboard.create_task') }}">
+            <div style="margin-bottom: 14px;">
+                <label style="display: block; font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 6px;">
+                    Task Title
+                </label>
+                <input type="text" name="title" placeholder="e.g. Implement OAuth Flow" required style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px;">
             </div>
 
-            <form method="POST" action="/admin/tasks">
+            <div style="margin-bottom: 14px;">
+                <label style="display: block; font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 6px;">
+                    Description
+                </label>
+                <textarea name="description" placeholder="Deliverable details..." rows="2" style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px;"></textarea>
+            </div>
 
-                <div class="form-group">
-                    <label>Task Title</label>
-                    <input
-                        type="text"
-                        name="title"
-                        placeholder="Enter task title"
-                        required
-                    >
-                </div>
+            <div style="margin-bottom: 14px;">
+                <label style="display: block; font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 6px;">
+                    Select Project
+                </label>
+                <select name="project_id" required style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; background: white;">
+                    <option value="">Select Project</option>
+                    {% for p in projects %}
+                        <option value="{{ p.id }}">{{ p.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-                <div class="form-group">
-                    <label>Project</label>
-                    <select name="project_id" required>
-                        <option value="">Select Project</option>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 6px;">
+                    Assign Employee
+                </label>
+                <select name="employee_id" required style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; background: white;">
+                    <option value="">Select Employee</option>
+                    {% for e in employees %}
+                        <option value="{{ e.id }}">{{ e.name }} ({{ e.email }})</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-                        {% for project in projects %}
-                        <option value="{{ project.id }}">
-                            {{ project.name }}
-                        </option>
-                        {% endfor %}
+            <button type="submit" style="width: 100%; padding: 12px; background: #4f46e5; color: white; border: none; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer;">
+                + Create &amp; Assign Task
+            </button>
+        </form>
+    </div>
 
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Assign Employee</label>
-                    <select name="employee_id" required>
-                        <option value="">Select Employee</option>
-
-                        {% for employee in employees %}
-                        <option value="{{ employee.id }}">
-                            {{ employee.name }}
-                        </option>
-                        {% endfor %}
-
-                    </select>
-                </div>
-
-                <button type="submit" class="primary-button">
-                    + Create & Assign Task
-                </button>
-
-            </form>
-
-        </div>
-
-    </section>
-
-</main>
-
-</body>
-</html>
+</section>
+{% endblock %}
