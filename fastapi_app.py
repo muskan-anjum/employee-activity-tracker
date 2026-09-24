@@ -4,6 +4,7 @@ from app import app as flask_app
 from models import db, User, Project, Task, WorkSession, ActivityLog
 from sqlalchemy import func
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.wsgi import WSGIMiddleware
 
 
 api = FastAPI(
@@ -660,3 +661,7 @@ def get_workforce_overview():
             "completed_tasks": completed_tasks,
             "task_completion_rate": task_completion_rate
         }
+
+# Serve the existing Flask WorkAI web application through FastAPI.
+# Keep this mount LAST so /api, /docs and /redoc remain handled by FastAPI.
+api.mount("/", WSGIMiddleware(flask_app))
