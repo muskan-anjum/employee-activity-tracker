@@ -10,17 +10,17 @@
 
 {% block content %}
 <!-- Period Selector & CSV Export Header Bar -->
-<div class="card" style="padding: 16px 20px; margin-bottom: 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
-    <div>
+<div class="card report-toolbar">
+    <div class="report-toolbar-meta">
         <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.8px; text-transform: uppercase;">ACTIVE REPORT PERIOD</div>
         <div style="font-size: 16px; font-weight: 800; color: var(--text); margin-top: 2px;">
             Currently Viewing: <span style="color: var(--primary);">{{ period_label }}</span>
         </div>
     </div>
 
-    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+    <div class="report-toolbar-controls">
         <!-- Period Toggle Pills -->
-        <div style="display: flex; gap: 6px; background: var(--surface-subtle); padding: 4px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+        <div class="report-period-group">
             <a href="{{ url_for('dashboard.admin_reports', period='daily') }}" class="btn btn-sm {% if selected_period == 'daily' %}btn-primary{% else %}btn-secondary{% endif %}" style="border: none;">
                 Daily
             </a>
@@ -35,7 +35,7 @@
         </div>
 
         <!-- Export CSV Button (Dynamic with period) -->
-        <a href="{{ url_for('dashboard.export_admin_reports', period=selected_period) }}" class="btn btn-primary btn-sm">
+        <a href="{{ url_for('dashboard.export_admin_reports', period=selected_period) }}" class="btn btn-primary btn-sm report-export-btn">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2 2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>
             </svg>

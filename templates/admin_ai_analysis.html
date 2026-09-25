@@ -80,11 +80,11 @@
     </div>
 
     <p style="margin: 0 0 14px; font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
-        The WorkAI ML engine trains an <strong>Isolation Forest</strong> algorithm over normalized high-dimensional interaction features: <em>active/idle ratio</em>, <em>interaction frequency (events per active second)</em>, and <em>keyboard-to-mouse density</em>. Outliers are isolated with shorter average path lengths in recursive tree partitioning.
+        The WorkAI ML engine trains an <strong>Isolation Forest</strong> algorithm over normalized session time features: <em>active/idle ratio</em>, <em>interval continuity</em>, and <em>session work rhythm</em>. Outliers and erratic time allocations are isolated with shorter average path lengths in recursive tree partitioning.
     </p>
 
     <div style="display: flex; gap: 24px; flex-wrap: wrap; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 12px;">
-        <div><strong>Privacy First:</strong> Keystroke content is never captured.</div>
+        <div><strong>Time-Focused &amp; Privacy-Preserving:</strong> Zero raw keystroke or character logging.</div>
         <div><strong>Explainable Output:</strong> Every flagged record includes human-readable rationale.</div>
         <div><strong>Decision Support:</strong> Model flags are statistical outliers for review, not disciplinary proof.</div>
     </div>
@@ -114,8 +114,8 @@
             <thead>
                 <tr>
                     <th>Employee</th>
-                    <th>Active / Idle</th>
-                    <th>Keystrokes / Clicks</th>
+                    <th>Active / Idle Duration</th>
+                    <th>Focus Ratio</th>
                     <th>Anomaly Score</th>
                     <th>Status</th>
                     <th>Explainable AI Rationale</th>
@@ -124,6 +124,8 @@
             <tbody>
                 {% for item in analysis_results %}
                 {% set rec = item.record %}
+                {% set rec_tot = (rec.active_seconds or 0) + (rec.idle_seconds or 0) if rec else 0 %}
+                {% set rec_pct = (((rec.active_seconds or 0) * 100) / rec_tot) | round(0) | int if rec_tot > 0 else 0 %}
                 <tr data-status="{{ item.status }}">
                     <td style="font-weight: 600; color: var(--text);">
                         {{ rec.employee.name if rec and rec.employee else "Employee #" ~ (rec.employee_id if rec else "-") }}
@@ -138,11 +140,13 @@
                         <span style="color: var(--warning); font-weight: 700;">{{ rec.idle_seconds or 0 }}s</span> idle
                     </td>
 
-                    <td style="color: var(--text-secondary);">
-                        {{ rec.keyboard_events or 0 }} keys · {{ rec.mouse_events or 0 }} clicks
+                    <td>
+                        <span class="badge {% if rec_pct >= 70 %}badge-success{% elif rec_pct >= 40 %}badge-warning{% else %}badge-neutral{% endif %}">
+                            {{ rec_pct }}% Focus
+                        </span>
                     </td>
 
-                    <td style="font-family: monospace; font-weight: 700; color: {% if item.anomaly_score < 0 %}var(--danger){% else %}var(--success){% endif %};">
+                    <td style="font-family: var(--font-mono, monospace); font-weight: 700; color: {% if item.anomaly_score < 0 %}var(--danger){% else %}var(--success){% endif %};">
                         {{ item.anomaly_score }}
                     </td>
 

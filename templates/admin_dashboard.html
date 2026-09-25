@@ -11,7 +11,8 @@
 {% block content %}
 <!-- Live Workforce Presence & Streaming Feed -->
 <section class="card" style="margin-bottom: 24px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+    <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
         <div style="display: flex; align-items: center; gap: 10px;">
             <span class="system-dot"></span>
             <h3 style="margin: 0;">Live Workforce Telemetry</h3>
@@ -23,15 +24,21 @@
 
     <div class="layout-split" style="margin-bottom: 0;">
         <div>
-            <h4 style="margin: 0 0 10px; font-size: 13px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Active Work Sessions</h4>
+            <h4
+                style="margin: 0 0 10px; font-size: 13px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">
+                Active Work Sessions</h4>
             <div id="live-presence"></div>
 
-            <h4 style="margin: 18px 0 10px; font-size: 13px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Latest Interaction Intervals</h4>
+            <h4
+                style="margin: 18px 0 10px; font-size: 13px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">
+                Latest Interaction Intervals</h4>
             <div id="live-events"></div>
         </div>
 
         <div>
-            <h4 style="margin: 0 0 10px; font-size: 13px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Project Task Velocity</h4>
+            <h4
+                style="margin: 0 0 10px; font-size: 13px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">
+                Project Task Velocity</h4>
             <div id="live-projects"></div>
         </div>
     </div>
@@ -44,8 +51,12 @@
         <div class="stat-header">
             <span class="stat-title">TOTAL EMPLOYEES</span>
             <div class="stat-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                 </svg>
             </div>
         </div>
@@ -57,8 +68,10 @@
         <div class="stat-header">
             <span class="stat-title">CURRENTLY WORKING</span>
             <div class="stat-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
                 </svg>
             </div>
         </div>
@@ -70,8 +83,11 @@
         <div class="stat-header">
             <span class="stat-title">ON BREAK</span>
             <div class="stat-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect width="18" height="18" x="3" y="3" rx="2"/><line x1="9" x2="9" y1="9" y2="15"/><line x1="15" x2="15" y1="9" y2="15"/>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="18" height="18" x="3" y="3" rx="2" />
+                    <line x1="9" x2="9" y1="9" y2="15" />
+                    <line x1="15" x2="15" y1="9" y2="15" />
                 </svg>
             </div>
         </div>
@@ -83,8 +99,10 @@
         <div class="stat-header">
             <span class="stat-title">ACTIVE PROJECTS</span>
             <div class="stat-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 8 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                        d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 8 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" />
                 </svg>
             </div>
         </div>
@@ -96,8 +114,12 @@
         <div class="stat-header">
             <span class="stat-title">UNUSUAL PATTERNS</span>
             <div class="stat-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{% if unusual_count > 0 %}var(--danger){% else %}var(--success){% endif %}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 9v4"/><path d="M12 17h.01"/><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="{% if unusual_count > 0 %}var(--danger){% else %}var(--success){% endif %}" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 9v4" />
+                    <path d="M12 17h.01" />
+                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
                 </svg>
             </div>
         </div>
@@ -109,8 +131,11 @@
         <div class="stat-header">
             <span class="stat-title">AVG PRODUCTIVITY</span>
             <div class="stat-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <circle cx="12" cy="12" r="6" />
+                    <circle cx="12" cy="12" r="2" />
                 </svg>
             </div>
         </div>
@@ -125,15 +150,17 @@
 
     <!-- Weekly Trend Chart -->
     <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 8px;">
+        <div
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 8px;">
             <div>
                 <h3 style="margin: 0 0 4px;">Workforce Productivity Trend</h3>
-                <p style="margin: 0; color: var(--text-secondary); font-size: 13px;">7-day historical activity percentage across all employees.</p>
+                <p style="margin: 0; color: var(--text-secondary); font-size: 13px;">7-day historical activity
+                    percentage across all employees.</p>
             </div>
             <span class="badge badge-info">7-DAY ANALYTICS</span>
         </div>
 
-        <div style="position: relative; height: 260px;">
+        <div style="position: relative; height: 260px; width: 100%; max-width: 100%; min-width: 0;">
             <canvas id="weeklyActivityChart"></canvas>
         </div>
     </div>
@@ -146,7 +173,8 @@
                 <span class="badge badge-success">REAL-TIME</span>
             </div>
 
-            <div style="background: var(--surface-subtle); border-radius: var(--radius-md); padding: 16px; border: 1px solid var(--border); margin-bottom: 16px;">
+            <div
+                style="background: var(--surface-subtle); border-radius: var(--radius-md); padding: 16px; border: 1px solid var(--border); margin-bottom: 16px;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px;">
                     <span style="color: var(--text-secondary);">Currently Working:</span>
                     <strong style="color: var(--success);">{{ currently_working }} employee(s)</strong>
@@ -157,20 +185,25 @@
                 </div>
                 <div style="display: flex; justify-content: space-between; font-size: 13px;">
                     <span style="color: var(--text-secondary);">Not Clocked In:</span>
-                    <strong style="color: var(--text-muted);">{{ total_employees - currently_working - on_break }} employee(s)</strong>
+                    <strong style="color: var(--text-muted);">{{ total_employees - currently_working - on_break }}
+                        employee(s)</strong>
                 </div>
             </div>
         </div>
 
-        <div style="background: var(--surface-subtle); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px;">
-            <div style="font-size: 12px; font-weight: 700; color: var(--primary); margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+        <div
+            style="background: var(--surface-subtle); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px;">
+            <div
+                style="font-size: 12px; font-weight: 700; color: var(--primary); margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
                 </svg>
                 AI Engine Operational
             </div>
             <p style="margin: 0; font-size: 12px; color: var(--text-secondary); line-height: 1.5;">
-                Isolation Forest continuously evaluates interval density and active/idle ratios without recording private key characters or screen contents.
+                Isolation Forest continuously evaluates interval density and active/idle ratios without recording
+                private key characters or screen contents.
             </p>
         </div>
     </div>
@@ -179,16 +212,21 @@
 
 <!-- Interactive WorkAI Insights Assistant -->
 <section class="card" style="margin-bottom: 24px; border-color: rgba(37, 99, 235, 0.25);">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+    <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
         <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="width: 36px; height: 36px; border-radius: var(--radius-md); background: var(--primary); color: white; display: grid; place-items: center; flex-shrink: 0;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+            <div
+                style="width: 36px; height: 36px; border-radius: var(--radius-md); background: var(--primary); color: white; display: grid; place-items: center; flex-shrink: 0;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                        d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
                 </svg>
             </div>
             <div>
                 <h3 style="margin: 0;">WorkAI Insights Assistant</h3>
-                <p style="margin: 0; color: var(--text-secondary); font-size: 13px;">Ask questions or click prompt chips to query workforce analytics in real time.</p>
+                <p style="margin: 0; color: var(--text-secondary); font-size: 13px;">Ask questions or click prompt chips
+                    to query workforce analytics in real time.</p>
             </div>
         </div>
         <span class="badge badge-info">NATURAL LANGUAGE ENGINE</span>
@@ -211,25 +249,30 @@
     </div>
 
     <!-- Query Input Row -->
-    <div style="display: flex; gap: 10px; margin-bottom: 14px;">
-        <input type="text" id="assistantQuestion" class="form-input" placeholder="Ask about workforce performance, anomalies, or project work hours..." onkeydown="if(event.key==='Enter') askWorkAI()">
+    <div class="assistant-query-row" style="margin-bottom: 14px;">
+        <input type="text" id="assistantQuestion" class="form-input" style="flex: 1 1 220px; min-width: 0;"
+            placeholder="Ask about workforce performance, anomalies, or project work hours..."
+            onkeydown="if(event.key==='Enter') askWorkAI()">
         <button type="button" class="btn btn-primary" onclick="askWorkAI()" style="white-space: nowrap;">
             Ask Assistant &rarr;
         </button>
     </div>
 
     <!-- Dynamic Response Box -->
-    <div id="assistantResponse" style="background: var(--surface-subtle); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px 18px; font-size: 13.5px; line-height: 1.6; color: var(--text);">
+    <div id="assistantResponse"
+        style="background: var(--surface-subtle); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px 18px; font-size: 13.5px; line-height: 1.6; color: var(--text);">
         Ready to analyze your workforce data. Select one of the quick queries above or type a specific question.
     </div>
 </section>
 
 <!-- Recent Monitored Activity Feed -->
 <section class="card" style="margin-bottom: 24px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+    <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
         <div>
             <h3 style="margin: 0 0 4px;">Recent Activity Stream</h3>
-            <p style="margin: 0; color: var(--text-secondary); font-size: 13px;">Latest interaction intervals transmitted by active workforce sessions.</p>
+            <p style="margin: 0; color: var(--text-secondary); font-size: 13px;">Latest interaction intervals
+                transmitted by active workforce sessions.</p>
         </div>
         <a href="{{ url_for('dashboard.admin_activity') }}" class="btn btn-secondary btn-sm">
             View All Activity &rarr;
@@ -243,20 +286,23 @@
                 <tr>
                     <th>Employee</th>
                     <th>Timestamp</th>
-                    <th>Active</th>
-                    <th>Idle</th>
-                    <th>Keystrokes</th>
-                    <th>Mouse Events</th>
+                    <th>Active Duration</th>
+                    <th>Idle Duration</th>
+                    <th>Focus Ratio</th>
+                    <th>Work Pacing</th>
                     <th>ML Status</th>
                 </tr>
             </thead>
             <tbody>
                 {% for log in recent_logs[:15] %}
+                {% set total_sec = (log.active_seconds or 0) + (log.idle_seconds or 0) %}
+                {% set focus_pct = (((log.active_seconds or 0) * 100) / total_sec) | round(0) | int if total_sec > 0
+                else 0 %}
                 <tr>
                     <td style="font-weight: 600; color: var(--text);">
                         {{ log.employee.name if log.employee else "Employee #" ~ log.employee_id }}
                     </td>
-                    <td style="color: var(--text-muted); font-size: 12px;">
+                    <td style="color: var(--text-muted); font-size: 12px; font-family: var(--font-mono, monospace);">
                         {{ log.timestamp.strftime('%H:%M:%S') if log.timestamp else "-" }}
                     </td>
                     <td style="font-weight: 700; color: var(--success);">
@@ -265,21 +311,32 @@
                     <td style="font-weight: 700; color: var(--warning);">
                         {{ log.idle_seconds or 0 }}s
                     </td>
-                    <td style="color: var(--text-secondary);">
-                        {{ log.keyboard_events or 0 }}
+                    <td>
+                        <span
+                            class="badge {% if focus_pct >= 70 %}badge-success{% elif focus_pct >= 40 %}badge-warning{% else %}badge-neutral{% endif %}">
+                            {{ focus_pct }}% Focus
+                        </span>
                     </td>
-                    <td style="color: var(--text-secondary);">
-                        {{ log.mouse_events or 0 }}
+                    <td>
+                        <span style="font-size: 12px; font-weight: 500; color: var(--text-secondary);">
+                            {% if focus_pct >= 80 %}
+                            <span style="color: var(--success); font-weight: 600;">Deep Focus</span>
+                            {% elif focus_pct >= 40 %}
+                            <span style="color: var(--warning); font-weight: 600;">Standard Pace</span>
+                            {% else %}
+                            <span style="color: var(--text-muted); font-weight: 600;">Idle Pacing</span>
+                            {% endif %}
+                        </span>
                     </td>
                     <td>
                         {% if log.is_anomaly %}
-                            <span class="badge badge-danger" title="{{ log.anomaly_reason or 'Model flagged' }}">
-                                Unusual
-                            </span>
+                        <span class="badge badge-danger" title="{{ log.anomaly_reason or 'Model flagged' }}">
+                            Unusual
+                        </span>
                         {% else %}
-                            <span class="badge badge-neutral">
-                                Normal
-                            </span>
+                        <span class="badge badge-neutral">
+                            Normal
+                        </span>
                         {% endif %}
                     </td>
                 </tr>
@@ -298,9 +355,17 @@
 {% block scripts %}
 <script src="{{ url_for('static', filename='admin_live.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script id="weeklyChartData" type="application/json">
+{
+    "labels": {{ weekly_labels | tojson }},
+    "activity": {{ weekly_activity | tojson }}
+}
+</script>
 <script>
-    const weeklyLabels = {{ weekly_labels | tojson }};
-    const weeklyActivity = {{ weekly_activity | tojson }};
+    const chartDataEl = document.getElementById("weeklyChartData");
+    const chartData = chartDataEl ? JSON.parse(chartDataEl.textContent || "{}") : {};
+    const weeklyLabels = chartData.labels || [];
+    const weeklyActivity = chartData.activity || [];
 
     const canvas = document.getElementById("weeklyActivityChart");
     if (canvas) {

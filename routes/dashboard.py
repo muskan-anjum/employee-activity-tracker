@@ -429,6 +429,14 @@ def create_task():
     description = (request.form.get("description") or "").strip()
     project_id = request.form.get("project_id", type=int)
     employee_id = request.form.get("employee_id", type=int)
+    priority = (request.form.get("priority") or "Medium").strip().capitalize()
+    if priority not in ["Urgent", "High", "Medium", "Low"]:
+        priority = "Medium"
+    try:
+        estimated_hours = max(0.0, float(request.form.get("estimated_hours") or 0.0))
+    except (ValueError, TypeError):
+        estimated_hours = 0.0
+
     project = db.session.get(Project, project_id) if project_id else None
     employee = db.session.get(User, employee_id) if employee_id else None
     if not project or project.status != "Active" or not employee or employee.role != "employee" or not employee.is_active_account:
@@ -442,7 +450,9 @@ def create_task():
             project_id=int(project_id),
             employee_id=int(employee_id),
             status="Pending",
-            progress=0
+            progress=0,
+            priority=priority,
+            estimated_hours=estimated_hours
         )
 
         db.session.add(task)

@@ -68,16 +68,15 @@
             <p style="margin: 0; color: var(--text-secondary); font-size: 13px;">Comprehensive history of employee access sessions across the WorkAI enterprise platform.</p>
         </div>
 
-        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <div class="session-filter-controls" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
             <input 
                 type="text" 
                 id="sessionSearch" 
-                class="form-input"
+                class="form-input session-search-input"
                 placeholder="Search employee or email..." 
-                style="max-width: 240px; padding: 7px 12px;"
                 onkeyup="filterSessions()"
             >
-            <div style="display: flex; gap: 4px; background: var(--surface-subtle); padding: 4px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+            <div class="session-pill-group" style="display: flex; gap: 4px; background: var(--surface-subtle); padding: 4px; border-radius: var(--radius-md); border: 1px solid var(--border);">
                 <button type="button" class="btn btn-sm btn-primary filter-btn active" onclick="setSessionFilter('all', this)" style="border: none;">All</button>
                 <button type="button" class="btn btn-sm btn-secondary filter-btn" onclick="setSessionFilter('online', this)" style="border: none;">Online</button>
                 <button type="button" class="btn btn-sm btn-secondary filter-btn" onclick="setSessionFilter('offline', this)" style="border: none;">Completed</button>

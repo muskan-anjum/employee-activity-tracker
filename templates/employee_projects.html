@@ -61,7 +61,7 @@
         <p style="margin: 0; color: var(--text-secondary); font-size: 13px;">Verified time logs and assigned responsibilities per project.</p>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px;">
+    <div class="project-cards-grid">
         {% for project in projects %}
             {% set total_seconds = project_times.get(project.id, 0) %}
             {% set hours = total_seconds // 3600 %}
@@ -87,15 +87,28 @@
                     </p>
 
                     <div style="border-top: 1px solid var(--border); padding-top: 12px; margin-bottom: 14px;">
-                        <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Assigned Tasks:</span>
-                        <ul style="margin: 0; padding-left: 18px; font-size: 12.5px; color: var(--text-secondary); line-height: 1.6;">
+                        <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">Assigned Tasks:</span>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
                         {% for task in project.tasks if task.employee_id == current_user.id %}
                             {% set duration = task_times.get(task.id, 0) %}
-                            <li>{{ task.title }} — {{ task.progress }}% — {{ '%02d:%02d:%02d'|format(duration // 3600, (duration % 3600) // 60, duration % 60) }} net work</li>
+                            <div style="background: var(--surface-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-weight: 600; font-size: 13px; color: var(--text);">{{ task.title }}</span>
+                                    <span class="badge {% if task.priority == 'Urgent' %}badge-danger{% elif task.priority == 'High' %}badge-warning{% elif task.priority == 'Medium' %}badge-primary{% else %}badge-neutral{% endif %}" style="font-size: 10px; padding: 2px 7px;">
+                                        {{ task.priority or "Medium" }}
+                                    </span>
+                                </div>
+                                <div style="font-size: 11.5px; color: var(--text-secondary); font-family: var(--font-mono, monospace); display: flex; align-items: center; gap: 8px;">
+                                    <span>{{ '%02d:%02d:%02d'|format(duration // 3600, (duration % 3600) // 60, duration % 60) }} / {{ "%.1f"|format(task.estimated_hours | default(0.0)) }}h</span>
+                                    <span class="badge {% if task.status == 'Completed' %}badge-success{% elif task.status == 'In Progress' %}badge-info{% else %}badge-neutral{% endif %}" style="font-size: 10px; padding: 2px 6px;">
+                                        {{ task.progress }}%
+                                    </span>
+                                </div>
+                            </div>
                         {% else %}
-                            <li style="list-style-type: none; margin-left: -18px; color: var(--text-muted);">No individual tasks assigned in this project.</li>
+                            <div style="font-size: 12.5px; color: var(--text-muted); padding: 4px 0;">No individual tasks assigned in this project.</div>
                         {% endfor %}
-                        </ul>
+                        </div>
                     </div>
                 </div>
 

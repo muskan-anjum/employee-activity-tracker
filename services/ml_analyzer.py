@@ -43,21 +43,21 @@ def generate_anomaly_explanation(record, score):
     total_events = kb_events + mouse_events
 
     if total_sec > 0 and (idle_sec / total_sec) >= 0.85 and total_events == 0:
-        return "Extended idle duration with zero recorded input events."
+        return "Extended idle duration with zero active work session engagement."
 
     if active_sec > 15 and total_events == 0:
-        return "Active window reported without corresponding keyboard or mouse inputs."
+        return "Active window reported without interactive session focus."
 
     if active_sec > 0 and (total_events / active_sec) > 18:
-        return "Unusually high input frequency (>18 events/sec), potential macro or automated tool."
+        return "Unusually high activity frequency (>18 events/sec), potential automation pattern."
 
     if kb_events > 150 and mouse_events == 0:
-        return "Single-mode interaction: unusually high keystroke volume with zero mouse engagement."
+        return "Unusual activity pacing: continuous typing burst without navigation."
 
     if mouse_events > 200 and kb_events == 0:
-        return "High click/scroll frequency with complete absence of keyboard interaction."
+        return "Unusual activity pacing: rapid navigation bursts without typing engagement."
 
-    return "Statistical outlier identified across multi-dimensional interaction patterns by Isolation Forest."
+    return "Statistical outlier identified across multi-dimensional session patterns by Isolation Forest."
 
 
 def evaluate_single_heuristic(record):
@@ -78,15 +78,15 @@ def evaluate_single_heuristic(record):
     if total_sec > 0 and (idle_sec / total_sec) >= 0.90 and total_events == 0:
         is_unusual = True
         score = -0.25
-        reason = "Extended idle duration with zero recorded input events."
+        reason = "Extended idle duration with zero active work session engagement."
     elif active_sec >= 20 and total_events == 0:
         is_unusual = True
         score = -0.30
-        reason = "Active status reported with zero registered input events."
+        reason = "Active status reported without interactive session focus."
     elif active_sec > 0 and (total_events / active_sec) > 18:
         is_unusual = True
         score = -0.28
-        reason = "High input frequency (>18 events/sec), possible automation pattern."
+        reason = "High interaction frequency (>18 events/sec), possible automation pattern."
 
     return {
         "record": record,

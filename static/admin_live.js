@@ -62,15 +62,15 @@
 
                     item.innerHTML = `
                         <div class="live-item-content">
-                            <div class="avatar" style="width: 32px; height: 32px; font-size: 12px;">${initial}</div>
-                            <div>
-                                <div style="font-weight: 600; color: var(--text);">${escapeHtml(e.name)}</div>
-                                <div class="stat-note">${escapeHtml(e.project || 'General Workspace')} &bull; ${mins}m net work</div>
+                            <div class="avatar" style="width: 32px; height: 32px; font-size: 12px; flex-shrink: 0;">${initial}</div>
+                            <div style="min-width: 0;">
+                                <div style="font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(e.name)}</div>
+                                <div class="stat-note" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(e.project || 'General Workspace')} &bull; ${mins}m net work</div>
                             </div>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span class="badge ${e.status === 'Working' ? 'badge-success' : 'badge-warning'}">${escapeHtml(e.status)}</span>
-                            <span class="badge ${e.online ? 'badge-info' : 'badge-neutral'}">
+                        <div class="live-item-actions" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <span class="badge ${e.status === 'Working' ? 'badge-success' : 'badge-warning'}" style="white-space: nowrap;">${escapeHtml(e.status)}</span>
+                            <span class="badge ${e.online ? 'badge-info' : 'badge-neutral'}" style="white-space: nowrap;">
                                 <span class="live-dot ${e.online ? 'online' : 'offline'}"></span>
                                 ${e.online ? 'Active' : 'No heartbeat'}
                             </span>
@@ -96,16 +96,22 @@
                 data.events.forEach(ev => {
                     const item = document.createElement("div");
                     item.className = "live-item";
-                    const timeStr = ev.timestamp ? new Date(ev.timestamp).toLocaleTimeString() : "";
+                    const timeStr = ev.timestamp ? new Date(ev.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }) : "";
+                    const activeSec = Number(ev.active_seconds || 0);
+                    const idleSec = Number(ev.idle_seconds || 0);
+                    const totalSec = activeSec + idleSec;
+                    const focusPct = totalSec > 0 ? Math.round((activeSec / totalSec) * 100) : 0;
+                    const focusClass = focusPct >= 70 ? 'badge-success' : (focusPct >= 40 ? 'badge-warning' : 'badge-neutral');
 
                     item.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <span style="font-family: monospace; font-size: 11px; background: var(--surface); padding: 2px 6px; border: 1px solid var(--border); border-radius: 4px; color: var(--text-muted);">${timeStr}</span>
-                            <strong style="color: var(--text);">${escapeHtml(ev.employee)}</strong>
+                        <div class="live-item-header">
+                            <span class="live-item-time">${timeStr}</span>
+                            <strong class="live-item-name">${escapeHtml(ev.employee)}</strong>
                         </div>
-                        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                            <span class="badge badge-info">${ev.active_seconds}s active</span>
-                            <span class="badge badge-neutral">${ev.keyboard_events} keys / ${ev.mouse_events} mouse</span>
+                        <div class="live-item-metrics">
+                            <span class="badge badge-info" style="white-space: nowrap;">${activeSec}s active</span>
+                            <span class="badge badge-neutral" style="white-space: nowrap;">${idleSec}s idle</span>
+                            <span class="badge ${focusClass}" style="white-space: nowrap;">${focusPct}% Focus</span>
                         </div>
                     `;
                     list.appendChild(item);

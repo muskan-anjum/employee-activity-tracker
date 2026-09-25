@@ -10,9 +10,9 @@
 
 {% block content %}
 <!-- Employee Filter Toolbar -->
-<div class="card" style="padding: 16px 20px; margin-bottom: 20px;">
-    <form method="get" style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
-        <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 240px;">
+<div class="card filter-toolbar">
+    <form method="get" class="filter-form">
+        <div class="filter-group">
             <label for="history-employee" style="font-size: 13px; font-weight: 600; color: var(--text-secondary); white-space: nowrap;">
                 Filter Employee:
             </label>
@@ -109,18 +109,18 @@
                 <tr>
                     <th>Employee</th>
                     <th>Timestamp</th>
-                    <th>Active</th>
-                    <th>Idle</th>
-                    <th>Keyboard Signals</th>
-                    <th>Mouse Signals</th>
-                    <th>Engagement Ratio</th>
+                    <th>Active Duration</th>
+                    <th>Idle Duration</th>
+                    <th>Focus Ratio</th>
+                    <th>Work Mode</th>
+                    <th>Session Rhythm</th>
                     <th>ML Analysis</th>
                 </tr>
             </thead>
             <tbody>
                 {% for log in recent_logs %}
                 {% set interval_tot = (log.active_seconds or 0) + (log.idle_seconds or 0) %}
-                {% set act_percent = (((log.active_seconds or 0) / interval_tot) * 100) | round(0) if interval_tot > 0 else 0 %}
+                {% set act_percent = (((log.active_seconds or 0) / interval_tot) * 100) | round(0) | int if interval_tot > 0 else 0 %}
                 <tr>
                     <td>
                         <div style="display: flex; align-items: center; gap: 10px;">
@@ -134,7 +134,7 @@
                         </div>
                     </td>
 
-                    <td style="color: var(--text-muted); font-size: 12px;">
+                    <td style="color: var(--text-muted); font-size: 12px; font-family: var(--font-mono, monospace);">
                         {{ log.timestamp.strftime('%H:%M:%S') if log.timestamp else "-" }}
                     </td>
 
@@ -146,20 +146,36 @@
                         {{ log.idle_seconds or 0 }}s
                     </td>
 
-                    <td style="color: var(--text-secondary);">
-                        {{ log.keyboard_events or 0 }}
-                    </td>
-
-                    <td style="color: var(--text-secondary);">
-                        {{ log.mouse_events or 0 }}
-                    </td>
-
                     <td>
                         <span class="badge
                             {% if act_percent >= 70 %}badge-success
                             {% elif act_percent >= 40 %}badge-warning
-                            {% else %}badge-danger{% endif %}">
-                            {{ act_percent }}% Active
+                            {% else %}badge-neutral{% endif %}">
+                            {{ act_percent }}% Focus
+                        </span>
+                    </td>
+
+                    <td>
+                        <span style="font-size: 12.5px; font-weight: 600; color: var(--text);">
+                            {% if act_percent >= 80 %}
+                                <span style="color: var(--success);">Active Work</span>
+                            {% elif act_percent >= 40 %}
+                                <span style="color: var(--warning);">Mixed Task</span>
+                            {% else %}
+                                <span style="color: var(--text-muted);">Idle Window</span>
+                            {% endif %}
+                        </span>
+                    </td>
+
+                    <td>
+                        <span style="font-size: 12px; color: var(--text-secondary);">
+                            {% if log.active_seconds and log.active_seconds >= 25 %}
+                                Continuous Focus
+                            {% elif log.idle_seconds and log.idle_seconds >= 25 %}
+                                Paused / Inactive
+                            {% else %}
+                                Balanced Rhythm
+                            {% endif %}
                         </span>
                     </td>
 

@@ -80,7 +80,7 @@
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
         <div>
             <h3 style="margin: 0 0 4px;">Activity Logs Table</h3>
-            <p style="margin: 0; color: var(--text-secondary); font-size: 13px;">Granular record of keyboard &amp; mouse interaction frequencies per interval.</p>
+            <p style="margin: 0; color: var(--text-secondary); font-size: 13px;">Granular record of active work intervals and focus pacing over time.</p>
         </div>
 
         <input type="text" id="logSearchInput" class="form-input" placeholder="Filter by date or time..." onkeyup="filterLogTable()" style="max-width: 240px; padding: 7px 12px;">
@@ -92,10 +92,10 @@
             <thead>
                 <tr>
                     <th>Timestamp</th>
-                    <th>Active Time</th>
-                    <th>Idle Time</th>
-                    <th>Keyboard Events</th>
-                    <th>Mouse Events</th>
+                    <th>Active Duration</th>
+                    <th>Idle Duration</th>
+                    <th>Focus Ratio</th>
+                    <th>Work Pacing</th>
                     <th>Activity State</th>
                     <th>ML Analysis</th>
                 </tr>
@@ -103,9 +103,9 @@
             <tbody>
                 {% for log in activities | reverse %}
                 {% set interval_total = (log.active_seconds or 0) + (log.idle_seconds or 0) %}
-                {% set interval_pct = (((log.active_seconds or 0) / interval_total) * 100) | round(0) if interval_total > 0 else 0 %}
+                {% set interval_pct = (((log.active_seconds or 0) / interval_total) * 100) | round(0) | int if interval_total > 0 else 0 %}
                 <tr>
-                    <td style="font-weight: 600; color: var(--text);">
+                    <td style="font-weight: 600; color: var(--text); font-family: var(--font-mono, monospace); font-size: 12.5px;">
                         {{ log.timestamp.strftime('%d-%m-%Y %H:%M:%S') if log.timestamp else "-" }}
                     </td>
                     <td style="color: var(--success); font-weight: 700;">
@@ -114,18 +114,31 @@
                     <td style="color: var(--warning); font-weight: 700;">
                         {{ log.idle_seconds or 0 }}s
                     </td>
-                    <td style="color: var(--text-secondary);">
-                        {{ log.keyboard_events or 0 }}
+                    <td>
+                        <span class="badge
+                            {% if interval_pct >= 70 %}badge-success
+                            {% elif interval_pct >= 40 %}badge-warning
+                            {% else %}badge-neutral{% endif %}">
+                            {{ interval_pct }}% Focus
+                        </span>
                     </td>
-                    <td style="color: var(--text-secondary);">
-                        {{ log.mouse_events or 0 }}
+                    <td>
+                        <span style="font-size: 12px; font-weight: 500; color: var(--text-secondary);">
+                            {% if interval_pct >= 80 %}
+                                <span style="color: var(--success); font-weight: 600;">Deep Focus</span>
+                            {% elif interval_pct >= 40 %}
+                                <span style="color: var(--warning); font-weight: 600;">Balanced Pace</span>
+                            {% else %}
+                                <span style="color: var(--text-muted); font-weight: 600;">Idle Gap</span>
+                            {% endif %}
+                        </span>
                     </td>
                     <td>
                         <span class="badge
                             {% if interval_pct >= 70 %}badge-success
                             {% elif interval_pct >= 40 %}badge-warning
-                            {% else %}badge-danger{% endif %}">
-                            {{ interval_pct }}% Active
+                            {% else %}badge-neutral{% endif %}">
+                            {{ "Active Session" if interval_pct >= 50 else "Idle Window" }}
                         </span>
                     </td>
                     <td>
