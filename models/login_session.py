@@ -24,6 +24,12 @@ class LoginSession(db.Model):
         db.DateTime,
         nullable=True
     )
+    last_seen = db.Column(db.DateTime, nullable=True, default=datetime.utcnow)
+
+    @property
+    def recently_online(self):
+        return bool(self.is_online and self.logout_time is None and self.last_seen
+                    and (datetime.utcnow() - self.last_seen).total_seconds() < 90)
 
     duration_seconds = db.Column(
         db.Integer,

@@ -1,34 +1,32 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
-def calculate_session_work_seconds(session):
+def calculate_session_work_seconds(session, start=None, end=None):
     """
     Accurately calculate net work seconds for a session by subtracting breaks.
     """
     if not session.start_time:
         return 0, 0
 
-    end_time = session.end_time or datetime.utcnow()
-    raw_duration = max(0, int((end_time - session.start_time).total_seconds()))
+    end_time = min(session.end_time or datetime.utcnow(), end or datetime.max)
+    start_time = max(session.start_time, start or datetime.min)
+    raw_duration = max(0, int((end_time - start_time).total_seconds()))
 
     # Calculate break seconds
     break_seconds = 0
     breaks = getattr(session, "breaks", None) or []
     for b in breaks:
         if b.start_time:
-            b_end = b.end_time or (datetime.utcnow() if session.end_time is None else session.end_time)
-            b_dur = b.duration_seconds if (b.duration_seconds and b.duration_seconds > 0) else max(0, int((b_end - b.start_time).total_seconds()))
+            b_end = min(b.end_time or end_time, end_time)
+            b_dur = max(0, int((b_end - max(b.start_time, start_time)).total_seconds()))
             break_seconds += b_dur
 
-    if session.status == "Completed" and session.total_work_seconds and session.total_work_seconds > 0:
-        net_work = session.total_work_seconds
-    else:
-        net_work = max(0, raw_duration - break_seconds)
+    net_work = max(0, raw_duration - break_seconds)
 
     return net_work, break_seconds
 
 
-def generate_work_summary(user, tasks, work_sessions, activity_logs, filter_today=True, period_label="Today"):
+def generate_work_summary(user, tasks, work_sessions, activity_logs, filter_today=True, period_label="Today", start=None, end=None):
     """
     Generate an employee work summary using task updates,
     work sessions, and activity logs.
@@ -37,14 +35,18 @@ def generate_work_summary(user, tasks, work_sessions, activity_logs, filter_toda
 
     today = datetime.utcnow().date()
 
-    if filter_today:
+    if filter_today and start is None:
+        start = datetime.combine(today, datetime.min.time())
+        end = start + timedelta(days=1)
+    if start is not None:
         target_sessions = [
             s for s in work_sessions
-            if s.start_time and s.start_time.date() == today
+            if s.start_time and s.start_time < (end or datetime.max)
+            and (s.end_time is None or s.end_time > start)
         ]
         target_activity = [
             a for a in activity_logs
-            if a.timestamp and a.timestamp.date() == today
+            if a.timestamp and start <= a.timestamp < (end or datetime.max)
         ]
     else:
         target_sessions = list(work_sessions)
@@ -55,7 +57,7 @@ def generate_work_summary(user, tasks, work_sessions, activity_logs, filter_toda
     total_break_seconds = 0
 
     for session in target_sessions:
-        net_work, break_sec = calculate_session_work_seconds(session)
+        net_work, break_sec = calculate_session_work_seconds(session, start, end)
         total_work_seconds += net_work
         total_break_seconds += break_sec
 
@@ -109,6 +111,13 @@ def generate_work_summary(user, tasks, work_sessions, activity_logs, filter_toda
         productivity = 0.0
 
     user_name = getattr(user, "name", "Employee")
+    updated_tasks = [t for t in tasks if getattr(t, "updated_at", None)
+                     and (start is None or t.updated_at >= start)
+                     and (end is None or t.updated_at < end)]
+    completed_in_period = sum(t.status == "Completed" for t in updated_tasks)
+    updates = [u for u in getattr(user, "task_updates", [])
+               if (start is None or u.timestamp >= start) and (end is None or u.timestamp < end)]
+    milestones = [f"{u.title}: {u.status} ({u.progress}%)" for u in updates]
 
     # Generate insightful summary text
     if not target_sessions and not target_activity:
@@ -121,6 +130,7 @@ def generate_work_summary(user, tasks, work_sessions, activity_logs, filter_toda
             f"during {period_label.lower()}. Activity monitoring logged {round(active_seconds / 60, 1)} active minute(s) "
             f"yielding a {productivity}% activity score. "
             f"{completed_tasks} of {total_tasks} assigned task(s) are completed ({task_progress}% progress)."
+            f" {len(updated_tasks)} task(s) last updated in this period; {completed_in_period} of those are now completed."
         )
 
     def format_time(seconds):
@@ -130,8 +140,11 @@ def generate_work_summary(user, tasks, work_sessions, activity_logs, filter_toda
         secs = seconds % 60
         return f"{hours:02d}:{minutes:02d}:{secs:02d}"
 
+    if milestones:
+        summary_text += " Recorded updates: " + "; ".join(milestones) + "."
+
     return {
-        "date": today.strftime("%d-%m-%Y"),
+        "date": (start.date() if start else today).strftime("%d-%m-%Y"),
         "period_label": period_label,
         "total_work_time": format_time(total_work_seconds),
         "break_time": format_time(total_break_seconds),
@@ -142,6 +155,7 @@ def generate_work_summary(user, tasks, work_sessions, activity_logs, filter_toda
         "task_progress": task_progress,
         "productivity_score": productivity,
         "summary": summary_text,
+        "milestones": milestones,
         "work_hours": work_hours,
         "work_minutes": work_minutes,
         "total_work_seconds": total_work_seconds,
@@ -151,4 +165,4 @@ def generate_work_summary(user, tasks, work_sessions, activity_logs, filter_toda
         "total_keyboard_events": total_keyboard_events,
         "total_mouse_events": total_mouse_events,
         "productivity": productivity,
-    }
+    }

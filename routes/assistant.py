@@ -24,6 +24,8 @@ def admin_assistant():
         }), 403
 
     data = request.get_json(silent=True) or {}
+    if not isinstance(data, dict) or not isinstance(data.get("question", ""), str):
+        return jsonify(success=False, answer="Please provide a text question."), 400
     question = (data.get("question") or "").strip().lower()
 
     if not question:
@@ -163,7 +165,8 @@ def admin_assistant():
         project_totals = {}
 
         for session in sessions:
-            seconds = session.total_work_seconds or 0
+            from services.work_summary import calculate_session_work_seconds
+            seconds = calculate_session_work_seconds(session)[0]
             project_totals[session.project_id] = (
                 project_totals.get(session.project_id, 0) + seconds
             )
@@ -202,7 +205,7 @@ def admin_assistant():
     # WORKFORCE SUMMARY QUESTION
     # -------------------------------------------------
     elif any(word in question for word in [
-        "summary", "workforce", "performance", "today"
+        "summary", "workforce", "performance", "today", "working", "break"
     ]):
 
         employee_count = (

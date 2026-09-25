@@ -86,7 +86,7 @@
             </thead>
             <tbody>
                 {% for row in session_rows %}
-                <tr class="session-row" data-status="{% if row.session.is_online and not row.session.logout_time %}online{% else %}offline{% endif %}">
+                <tr class="session-row" data-status="{% if row.session.recently_online %}online{% else %}offline{% endif %}">
                     <td>
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <div style="width: 34px; height: 34px; border-radius: 8px; background: #e0e7ff; color: #4338ca; display: grid; place-items: center; font-weight: 700; font-size: 13px;">
@@ -127,7 +127,7 @@
                         </span>
                     </td>
                     <td>
-                        {% if row.session.is_online and not row.session.logout_time %}
+                        {% if row.session.recently_online %}
                         <span style="display: inline-flex; align-items: center; gap: 6px; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 700;">
                             <span style="width: 6px; height: 6px; border-radius: 50%; background: #10b981;"></span>
                             ONLINE

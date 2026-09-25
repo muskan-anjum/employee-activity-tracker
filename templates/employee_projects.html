@@ -68,6 +68,12 @@
                     </div>
 
                     <h4 style="margin: 0 0 6px; font-size: 17px; font-weight: 700; color: #0f172a;">{{ project.name }}</h4>
+                    <ul>
+                    {% for task in project.tasks if task.employee_id == current_user.id %}
+                        {% set duration = task_times.get(task.id, 0) %}
+                        <li>{{ task.title }} — {{ task.progress }}% — {{ '%02d:%02d:%02d'|format(duration // 3600, (duration % 3600) // 60, duration % 60) }} net work</li>
+                    {% endfor %}
+                    </ul>
                     <p style="margin: 0 0 16px; color: #64748b; font-size: 13px; line-height: 1.5;">
                         {{ project.description or "No description provided for this project workspace." }}
                     </p>

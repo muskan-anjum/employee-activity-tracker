@@ -1,132 +1,109 @@
-// WorkAI Client-Side Activity Monitoring Engine
-// Captures non-invasive interaction signals (keystroke counts and mouse movements)
-// Does NOT capture key characters, clipboard, screen, or sensitive content.
-
-let keyboardEvents = 0;
-let mouseEvents = 0;
-
-let activeSeconds = 0;
-let idleSeconds = 0;
-
-let lastActivity = Date.now();
-const IDLE_LIMIT = 60 * 1000; // 60 seconds of inactivity triggers idle state
-
-function updateLiveTrackerUI(isCurrentlyActive) {
-    const pulseEl = document.getElementById("trackerPulseDot");
-    const labelEl = document.getElementById("trackerPulseText");
-    const countEl = document.getElementById("trackerLiveCounter");
-
-    if (pulseEl && labelEl) {
-        if (isCurrentlyActive) {
-            pulseEl.className = "pulse-dot active";
-            labelEl.textContent = "Live Monitoring Active";
-        } else {
-            pulseEl.className = "pulse-dot idle";
-            labelEl.textContent = "Idle State Detected";
+// Counts only: no key values, coordinates, clipboard or external application data.
+(() => {
+    let state = { session_id: null, status: "Stopped" };
+    let counts = empty();
+    let lastInput = 0;
+    let lastTick = Date.now();
+    let inFlight = null;
+    let leader = false;
+    const channel = typeof BroadcastChannel === "function" ? new BroadcastChannel("workai-input-counts") : null;
+    if (channel) channel.onmessage = event => {
+        if (working() && ["keyboard_events", "mouse_events"].includes(event.data)) {
+            counts[event.data] += 1;
+            lastInput = Date.now();
         }
-    }
-
-    if (countEl) {
-        countEl.textContent = `${activeSeconds}s active · ${idleSeconds}s idle`;
-    }
-}
-
-function registerKeyboardActivity() {
-    keyboardEvents += 1;
-    lastActivity = Date.now();
-    updateLiveTrackerUI(true);
-}
-
-function registerMouseActivity() {
-    mouseEvents += 1;
-    lastActivity = Date.now();
-    updateLiveTrackerUI(true);
-}
-
-// Global DOM interaction event listeners
-document.addEventListener("keydown", registerKeyboardActivity, { passive: true });
-document.addEventListener("mousemove", registerMouseActivity, { passive: true });
-document.addEventListener("click", registerMouseActivity, { passive: true });
-document.addEventListener("scroll", function () {
-    lastActivity = Date.now();
-    updateLiveTrackerUI(true);
-}, { passive: true });
-
-// Check activity state every second
-setInterval(function () {
-    const inactiveFor = Date.now() - lastActivity;
-
-    if (inactiveFor < IDLE_LIMIT) {
-        activeSeconds += 1;
-        updateLiveTrackerUI(true);
-    } else {
-        idleSeconds += 1;
-        updateLiveTrackerUI(false);
-    }
-}, 1000);
-
-// Transmit accumulated interaction metrics to WorkAI backend every 30 seconds
-async function sendActivityData() {
-    if (activeSeconds === 0 &&
-        idleSeconds === 0 &&
-        keyboardEvents === 0 &&
-        mouseEvents === 0) {
-        return;
-    }
-
-    const payload = {
-        active_seconds: activeSeconds,
-        idle_seconds: idleSeconds,
-        keyboard_events: keyboardEvents,
-        mouse_events: mouseEvents
     };
-
-    try {
-        const response = await fetch("/employee/activity", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(payload)
-        });
-
-        if (response.ok || response.status === 400) {
-            activeSeconds = 0;
-            idleSeconds = 0;
-            keyboardEvents = 0;
-            mouseEvents = 0;
-
-            const syncEl = document.getElementById("trackerSyncNote");
-            if (syncEl) {
-                const now = new Date();
-                syncEl.textContent = `Synced: ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
-            }
+    function empty() {
+        return { active_seconds: 0, idle_seconds: 0, keyboard_events: 0, mouse_events: 0 };
+    }
+    const working = () => leader && state.status === "Working";
+    function input(kind) {
+        if (!leader && channel) { channel.postMessage(kind); return; }
+        if (!working()) return;
+        counts[kind] += 1;
+        lastInput = Date.now();
+    }
+    document.addEventListener("keydown", () => input("keyboard_events"), { passive: true });
+    for (const event of ["mousemove", "click", "scroll", "touchstart"]) {
+        document.addEventListener(event, () => input("mouse_events"), { passive: true });
+    }
+    function tick() {
+        const now = Date.now();
+        const elapsed = Math.floor((now - lastTick) / 1000);
+        if (elapsed <= 0) return;
+        if (working()) {
+            const active = Math.min(elapsed, Math.max(0, Math.floor((lastInput + 60000 - lastTick) / 1000)));
+            counts.active_seconds += active;
+            counts.idle_seconds += elapsed - active;
         }
-    } catch (error) {
-        console.warn("WorkAI activity tracking network note:", error);
+        lastTick += elapsed * 1000;
+        const label = document.getElementById("trackerPulseText");
+        if (label) label.textContent = !leader ? "Monitoring in another tab" : state.status !== "Working" ? "Monitoring paused" : now - lastInput < 60000 ? "Live Monitoring Active" : "Idle State Detected";
+        const counter = document.getElementById("trackerLiveCounter");
+        if (counter) counter.textContent = `${counts.active_seconds}s active · ${counts.idle_seconds}s idle`;
     }
-}
-
-setInterval(sendActivityData, 30000);
-
-// Transmit remaining metrics via Beacon API before navigation/unload
-window.addEventListener("beforeunload", function () {
-    if (activeSeconds === 0 &&
-        idleSeconds === 0 &&
-        keyboardEvents === 0 &&
-        mouseEvents === 0) {
-        return;
+    async function syncState() {
+        try {
+            const response = await fetch("/employee/work/state");
+            if (!response.ok) { state.status = "Stopped"; counts = empty(); return; }
+            const next = await response.json();
+            if (next.session_id !== state.session_id || next.status !== state.status) {
+                counts = empty(); lastTick = Date.now(); lastInput = 0;
+            }
+            state = next;
+        } catch (_) { /* Retry on next poll. */ }
     }
-
-    const payload = JSON.stringify({
-        active_seconds: activeSeconds,
-        idle_seconds: idleSeconds,
-        keyboard_events: keyboardEvents,
-        mouse_events: mouseEvents
+    async function flush() {
+        if (inFlight) return inFlight;
+        tick();
+        if (!working() || counts.active_seconds + counts.idle_seconds === 0) return;
+        const batch = counts;
+        counts = empty();
+        if (batch.active_seconds + batch.idle_seconds > 300) {
+            await syncState(); return;
+        }
+        inFlight = (async () => {
+            try {
+                const response = await fetch("/employee/activity", {
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ ...batch, session_id: state.session_id })
+                });
+                if (!response.ok) await syncState();
+                const note = document.getElementById("trackerSyncNote");
+                if (note) note.textContent = response.ok ? `Synced: ${new Date().toLocaleTimeString()}` : "Sync rejected; state refreshed";
+            } catch (_) {
+                // Do not retry an ambiguous write and double-count its interval.
+                const note = document.getElementById("trackerSyncNote");
+                if (note) note.textContent = "Connection lost; this interval may be missing";
+            } finally { inFlight = null; }
+        })();
+        return inFlight;
+    }
+    window.workaiTracker = { flush };
+    // Web Locks serializes monitoring across tabs for this browser/origin.
+    if (navigator.locks) {
+        navigator.locks.request("workai-activity", async () => {
+            leader = true;
+            await syncState();
+            await new Promise(() => {});
+        });
+    } else {
+        leader = true;
+        syncState();
+    }
+    setInterval(tick, 1000);
+    setInterval(syncState, 5000);
+    setInterval(flush, 30000);
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") flush();
     });
-
-    navigator.sendBeacon(
-        "/employee/activity",
-        new Blob([payload], { type: "application/json" })
-    );
-});
+    window.addEventListener("pagehide", () => {
+        tick();
+        if (!working() || counts.active_seconds + counts.idle_seconds === 0 || counts.active_seconds + counts.idle_seconds > 300) return;
+        navigator.sendBeacon("/employee/activity", new Blob([JSON.stringify({
+            ...counts, session_id: state.session_id,
+            csrf_token: document.querySelector('meta[name="csrf-token"]')?.content
+        })], { type: "application/json" }));
+        counts = empty();
+    });
+})();

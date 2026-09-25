@@ -73,6 +73,8 @@
         }
     </style>
     {% block extra_head %}{% endblock %}
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<script src="{{ url_for('static', filename='security.js') }}"></script>
 </head>
 
 <body>

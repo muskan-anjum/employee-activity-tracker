@@ -369,6 +369,8 @@
             }
         }
     </style>
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<script src="{{ url_for('static', filename='security.js') }}"></script>
 </head>
 <body>
 
@@ -444,6 +446,7 @@
         {% endwith %}
 
         <form method="POST" action="{{ url_for('auth.login') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="form-group">
                 <label for="email">Work Email</label>
                 <input 

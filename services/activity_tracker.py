@@ -19,10 +19,12 @@ def save_activity(
     Only activity counts are stored.
     Actual keys pressed or mouse positions are never stored.
     """
-    act_sec = max(0, int(active_seconds))
-    idle_sec = max(0, int(idle_seconds))
-    kb_ev = max(0, int(keyboard_events))
-    ms_ev = max(0, int(mouse_events))
+    values = (active_seconds, idle_seconds, keyboard_events, mouse_events)
+    if any(type(value) is not int or value < 0 or value > 1000000 for value in values):
+        raise ValueError("Activity values must be bounded nonnegative integers")
+    act_sec, idle_sec, kb_ev, ms_ev = values
+    if act_sec + idle_sec > 300 or act_sec + idle_sec == 0:
+        raise ValueError("Activity interval must be between 1 and 300 seconds")
 
     # Evaluate heuristic anomaly indicators for the interval
     temp_obj = type("TempActivity", (), {
@@ -47,6 +49,14 @@ def save_activity(
     )
 
     db.session.add(activity)
+    db.session.flush()
+    from services.ml_analyzer import analyze_activity
+    recent = ActivityLog.query.filter_by(employee_id=employee_id).order_by(ActivityLog.id.desc()).limit(100).all()
+    for result in analyze_activity(recent):
+        record = result["record"]
+        record.is_anomaly = result["is_anomaly"]
+        record.anomaly_score = result["anomaly_score"]
+        record.anomaly_reason = result["reason"]
     db.session.commit()
 
     return activity

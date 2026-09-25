@@ -9,6 +9,13 @@
 {% endblock %}
 
 {% block content %}
+<section class="card" style="padding: 24px; margin-bottom: 24px;">
+    <h3>Live workforce presence</h3>
+    <p id="live-status" aria-live="polite">Loading current work sessions…</p>
+    <div id="live-presence"></div>
+    <h4>Project progress</h4><div id="live-projects"></div>
+    <h4>Latest interaction intervals</h4><div id="live-events"></div>
+</section>
 <!-- Executive KPI Grid -->
 <section class="stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin-bottom: 26px;">
 
@@ -241,6 +248,7 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='admin_live.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const weeklyLabels = {{ weekly_labels | tojson }};

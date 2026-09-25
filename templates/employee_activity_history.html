@@ -9,6 +9,7 @@
 {% endblock %}
 
 {% block content %}
+{% include '_session_history.html' %}
 {% set total_active = activities | sum(attribute='active_seconds') | default(0) %}
 {% set total_idle = activities | sum(attribute='idle_seconds') | default(0) %}
 {% set total_monitored = total_active + total_idle %}

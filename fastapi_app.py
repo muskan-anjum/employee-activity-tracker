@@ -1,13 +1,28 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException, Request, Query
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel, Field
 from app import app as flask_app
 from models import db, User, Project, Task, WorkSession, ActivityLog
 from sqlalchemy import func
+from services.work_summary import calculate_session_work_seconds
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.wsgi import WSGIMiddleware
 
 
+basic_auth = HTTPBasic(auto_error=False)
+
+
+def require_admin(request: Request, credentials: HTTPBasicCredentials = Depends(basic_auth)):
+    if request.url.path in {"/", "/health"}:
+        return
+    with flask_app.app_context():
+        user = User.query.filter_by(email=credentials.username.lower()).first() if credentials else None
+        if not user or not user.is_active_account or user.role != "admin" or not user.check_password(credentials.password):
+            raise HTTPException(status_code=401, detail="Active administrator credentials required", headers={"WWW-Authenticate": "Basic"})
+
+
 api = FastAPI(
+    dependencies=[Depends(require_admin)],
     title="WorkAI Intelligence API",
     description=(
         "Professional analytics and AI service layer for the WorkAI "
@@ -311,12 +326,7 @@ def get_workforce_overview():
             status="Completed"
         ).count()
 
-        total_work_seconds = (
-            db.session.query(
-                func.coalesce(func.sum(WorkSession.total_work_seconds), 0)
-            ).scalar()
-            or 0
-        )
+        total_work_seconds = sum(calculate_session_work_seconds(work)[0] for work in WorkSession.query.all())
 
         total_active_seconds = (
             db.session.query(
@@ -413,7 +423,7 @@ def get_projects_overview():
             session_ids = [session.id for session in sessions]
 
             total_work_seconds = sum(
-                session.total_work_seconds or 0
+                calculate_session_work_seconds(session)[0]
                 for session in sessions
             )
 
@@ -475,7 +485,7 @@ def get_projects_overview():
     tags=["AI & Machine Learning"],
     summary="Analyze recent WorkAI activity using the ML engine"
 )
-def analyze_recent_activity(limit: int = 100):
+def analyze_recent_activity(limit: int = Query(default=100, ge=1, le=1000)):
     from services.ml_analyzer import analyze_activity
 
     safe_limit = max(5, min(limit, 500))
@@ -540,7 +550,7 @@ def get_employees_overview():
             ).all()
 
             total_work_seconds = sum(
-                session.total_work_seconds or 0
+                calculate_session_work_seconds(session)[0]
                 for session in sessions
             )
 

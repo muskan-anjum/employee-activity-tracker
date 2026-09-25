@@ -1,10 +1,10 @@
 from functools import wraps
 
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, abort
 from flask_login import login_required, current_user
 from models import User, db, LoginSession
 from models.project import Project
-from models.task import Task
+from models.task import Task, TaskUpdate
 from models.work_session import WorkSession
 from models.activity import ActivityLog
 from services.ml_analyzer import analyze_activity
@@ -18,8 +18,7 @@ def role_required(role):
         @wraps(function)
         def wrapped_function(*args, **kwargs):
             if current_user.role != role:
-                flash("You are not authorized to access this page.", "danger")
-                return redirect(url_for("dashboard.employee_dashboard"))
+                abort(403)
 
             return function(*args, **kwargs)
 
@@ -69,7 +68,8 @@ def employee_dashboard():
     if active_session and active_session.task_id:
         active_task = db.session.get(Task, active_session.task_id)
 
-    projects = Project.query.all()
+    projects = Project.query.join(Task).filter(Task.employee_id == current_user.id, Project.status == "Active").distinct().all()
+    from services.work_summary import calculate_session_work_seconds
     return render_template(
         "employee_dashboard.html",
         user=current_user,
@@ -78,12 +78,18 @@ def employee_dashboard():
         active_break=active_break,
         active_task=active_task,
         work_summary=work_summary,
-        projects=projects
+        projects=projects,
+        session_work_seconds=calculate_session_work_seconds(active_session)[0] if active_session else 0
     )
 @dashboard_bp.route("/employee/projects")
 @login_required
 @role_required("employee")
 def employee_projects():
+    from services.work_summary import calculate_session_work_seconds
+    task_times = {}
+    for work in WorkSession.query.filter_by(employee_id=current_user.id).all():
+        if work.task_id:
+            task_times[work.task_id] = task_times.get(work.task_id, 0) + calculate_session_work_seconds(work)[0]
     projects = (
     Project.query
     .join(Task, Task.project_id == Project.id)
@@ -99,15 +105,17 @@ def employee_projects():
             project_id=project.id
         ).all()
 
+        from services.work_summary import calculate_session_work_seconds
         project_times[project.id] = sum(
-            session.total_work_seconds or 0
+            calculate_session_work_seconds(session)[0]
             for session in sessions
         )
 
     return render_template(
         "employee_projects.html",
         projects=projects,
-        project_times=project_times
+        project_times=project_times,
+        task_times=task_times
     )
 
 
@@ -123,7 +131,8 @@ def employee_activity_history():
 
     return render_template(
         "employee_activity_history.html",
-        activities=activities
+        activities=activities,
+        work_sessions=WorkSession.query.filter_by(employee_id=current_user.id).order_by(WorkSession.start_time.desc()).all()
     )
 @dashboard_bp.route("/employee/work-summary")
 @login_required
@@ -143,17 +152,27 @@ def employee_work_summary():
         employee_id=current_user.id
     ).all()
 
+    from datetime import datetime, timedelta
+    selected_date = request.args.get("date", datetime.utcnow().date().isoformat())
+    try:
+        start = datetime.strptime(selected_date, "%Y-%m-%d")
+    except ValueError:
+        abort(400, "Date must use YYYY-MM-DD")
     work_summary = generate_work_summary(
         current_user,
         tasks,
         work_sessions,
-        activity_logs
+        activity_logs,
+        start=start,
+        end=start + timedelta(days=1),
+        period_label=selected_date
     )
 
     return render_template(
         "employee_work_summary.html",
         user=current_user,
-        work_summary=work_summary
+        work_summary=work_summary,
+        selected_date=selected_date
     )
 @dashboard_bp.route("/admin/dashboard")
 @login_required
@@ -224,12 +243,13 @@ def admin_dashboard():
     weekly_activity = []
 
     today = datetime.utcnow().date()
+    trend_logs = ActivityLog.query.filter(ActivityLog.timestamp >= datetime.combine(today - timedelta(days=6), datetime.min.time())).all()
 
     for days_ago in range(6, -1, -1):
         day = today - timedelta(days=days_ago)
 
         day_logs = [
-            log for log in recent_logs
+            log for log in trend_logs
             if log.timestamp and log.timestamp.date() == day
         ]
 
@@ -325,16 +345,8 @@ def toggle_employee_status(user_id):
 
     # If deactivating, terminate any ongoing sessions for security
     if not employee.is_active_account:
-        from models.work_session import WorkSession, Break
-        from datetime import datetime
-        active_session = WorkSession.query.filter_by(employee_id=employee.id, end_time=None).first()
-        if active_session:
-            active_session.end_time = datetime.utcnow()
-            active_session.status = "Terminated"
-            active_break = Break.query.filter_by(session_id=active_session.id, end_time=None).first()
-            if active_break:
-                active_break.end_time = active_session.end_time
-                active_break.duration_seconds = max(0, int((active_break.end_time - active_break.start_time).total_seconds()))
+        from services.session_lifecycle import revoke_employee_sessions
+        revoke_employee_sessions(employee.id, stop_work=True)
 
     db.session.commit()
     status_str = "activated" if employee.is_active_account else "deactivated"
@@ -347,7 +359,7 @@ def toggle_employee_status(user_id):
 @role_required("admin")
 def reset_employee_password(user_id):
     employee = db.session.get(User, user_id)
-    if not employee:
+    if not employee or employee.role != "employee":
         flash("Employee not found.", "danger")
         return redirect(url_for("dashboard.admin_employees"))
 
@@ -357,6 +369,8 @@ def reset_employee_password(user_id):
         return redirect(url_for("dashboard.admin_employees"))
 
     employee.set_password(new_password)
+    from services.session_lifecycle import revoke_employee_sessions
+    revoke_employee_sessions(employee.id, stop_work=True)
     db.session.commit()
     flash(f"Password for {employee.name} updated successfully.", "success")
     return redirect(url_for("dashboard.admin_employees"))
@@ -416,8 +430,13 @@ def toggle_project_status(project_id):
 def create_task():
     title = (request.form.get("title") or "").strip()
     description = (request.form.get("description") or "").strip()
-    project_id = request.form.get("project_id")
-    employee_id = request.form.get("employee_id")
+    project_id = request.form.get("project_id", type=int)
+    employee_id = request.form.get("employee_id", type=int)
+    project = db.session.get(Project, project_id) if project_id else None
+    employee = db.session.get(User, employee_id) if employee_id else None
+    if not project or project.status != "Active" or not employee or employee.role != "employee" or not employee.is_active_account:
+        flash("Select an active project and employee.", "danger")
+        return redirect(url_for("dashboard.admin_projects"))
 
     if title and project_id and employee_id:
         task = Task(
@@ -455,7 +474,7 @@ def delete_task(task_id):
 @login_required
 @role_required("employee")
 def update_task(task_id):
-    task = Task.query.get_or_404(task_id)
+    task = db.get_or_404(Task, task_id)
 
     if task.employee_id != current_user.id:
         flash("You are not authorized to update this task.", "danger")
@@ -464,6 +483,8 @@ def update_task(task_id):
     status = request.form.get("status")
     progress = request.form.get("progress")
 
+    if status and status not in {"Pending", "In Progress", "Completed"}:
+        abort(400, "Invalid task status")
     if status:
         task.status = status
 
@@ -476,8 +497,8 @@ def update_task(task_id):
 
                 if progress_value == 100:
                     task.status = "Completed"
-                elif progress_value > 0 and task.status == "Completed":
-                    task.status = "In Progress"
+                elif task.status == "Completed":
+                    task.status = "In Progress" if progress_value else "Pending"
             else:
                 flash("Progress must be between 0 and 100.", "danger")
                 return redirect(url_for("dashboard.employee_dashboard"))
@@ -486,6 +507,10 @@ def update_task(task_id):
             flash("Progress must be a valid number.", "danger")
             return redirect(url_for("dashboard.employee_dashboard"))
 
+    if status == "Completed" and progress is None:
+        task.progress = 100
+    db.session.add(TaskUpdate(task_id=task.id, employee_id=task.employee_id,
+                              title=task.title, status=task.status, progress=task.progress))
     db.session.commit()
     flash("Task updated successfully.", "success")
 
@@ -511,6 +536,8 @@ def start_work():
         }), 400
 
     data = request.get_json(silent=True) or {}
+    if not isinstance(data, dict):
+        return jsonify(success=False, message="Expected a JSON object."), 400
     project_id = data.get("project_id")
     task_id = data.get("task_id")
 
@@ -543,6 +570,11 @@ def start_work():
                     "message": "Selected task was not found."
                 }), 404
 
+            if task.employee_id != current_user.id:
+                return jsonify(success=False, message="This task is not assigned to you."), 403
+            if project_id and project_id != task.project_id:
+                return jsonify(success=False, message="Task does not belong to the selected project."), 400
+
             # Inherit project from task if not explicitly passed
             if not project_id and task.project_id:
                 project_id = task.project_id
@@ -557,6 +589,13 @@ def start_work():
             }), 400
     else:
         task_id = None
+
+    if project_id:
+        project = db.session.get(Project, project_id)
+        if not project or project.status != "Active":
+            return jsonify(success=False, message="Project is not active."), 400
+        if not Task.query.filter_by(employee_id=current_user.id, project_id=project_id).first():
+            return jsonify(success=False, message="Project is not assigned to you."), 403
 
     session = WorkSession(
         employee_id=current_user.id,
@@ -654,6 +693,12 @@ def end_break():
 @login_required
 @role_required("admin")
 def admin_activity():
+    selected_employee = request.args.get("employee_id", type=int)
+    history_query = WorkSession.query
+    activity_query = ActivityLog.query
+    if selected_employee:
+        history_query = history_query.filter_by(employee_id=selected_employee)
+        activity_query = activity_query.filter_by(employee_id=selected_employee)
     # Get all currently open work sessions
     active_sessions = WorkSession.query.filter_by(end_time=None).all()
 
@@ -671,9 +716,8 @@ def admin_activity():
 
     # Get recent activity records
     recent_logs = (
-        ActivityLog.query
+        activity_query
         .order_by(ActivityLog.timestamp.desc())
-        .limit(50)
         .all()
     )
 
@@ -701,7 +745,10 @@ def admin_activity():
         on_break=on_break,
         idle_employees=idle_employees,
         activity_alerts=activity_alerts,
-        recent_logs=recent_logs
+        recent_logs=recent_logs,
+        employees=User.query.filter_by(role="employee").all(),
+        selected_employee=selected_employee,
+        work_sessions=history_query.order_by(WorkSession.start_time.desc()).all()
     )
 @dashboard_bp.route("/admin/ai-analysis")
 @login_required
@@ -778,7 +825,8 @@ def admin_reports():
             WorkSession.query
             .filter(
                 WorkSession.employee_id == employee.id,
-                WorkSession.start_time >= start_date
+                WorkSession.start_time < now,
+                db.or_(WorkSession.end_time.is_(None), WorkSession.end_time > start_date)
             )
             .all()
         )
@@ -798,7 +846,8 @@ def admin_reports():
             sessions,
             activity_logs,
             filter_today=False,
-            period_label=period_label
+            period_label=period_label,
+            start=start_date, end=now
         )
 
         reports.append({
@@ -898,7 +947,8 @@ def export_admin_reports():
             WorkSession.query
             .filter(
                 WorkSession.employee_id == employee.id,
-                WorkSession.start_time >= start_date
+                WorkSession.start_time < now,
+                db.or_(WorkSession.end_time.is_(None), WorkSession.end_time > start_date)
             )
             .all()
         )
@@ -917,12 +967,13 @@ def export_admin_reports():
             sessions,
             activity_logs,
             filter_today=False,
-            period_label=period_label
+            period_label=period_label,
+            start=start_date, end=now
         )
 
         writer.writerow([
-            employee.name,
-            employee.email,
+            ("'" + employee.name) if employee.name.lstrip().startswith(("=", "+", "-", "@")) else employee.name,
+            ("'" + employee.email) if employee.email.lstrip().startswith(("=", "+", "-", "@")) else employee.email,
             period_label,
             summary.get("total_work_time", "00:00:00"),
             summary.get("break_time", "00:00:00"),
@@ -971,6 +1022,10 @@ def record_employee_activity():
         }), 200
 
     data = request.get_json(silent=True) or {}
+    if not isinstance(data, dict):
+        return jsonify(success=False, message="Expected a JSON object."), 400
+    if data.get("session_id") != session.id:
+        return jsonify(success=False, message="Work session changed. Refresh the tracker."), 409
 
     try:
         activity = save_activity(
@@ -987,11 +1042,47 @@ def record_employee_activity():
             "activity_id": activity.id
         }), 201
 
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):
         return jsonify({
             "success": False,
             "message": "Invalid activity data"
         }), 400
+
+
+@dashboard_bp.route("/employee/work/state")
+@login_required
+@role_required("employee")
+def work_state():
+    from services.work_summary import calculate_session_work_seconds
+    from flask import session as browser_session
+    from datetime import datetime
+    login_record = db.session.get(LoginSession, browser_session.get("login_session_id"))
+    if login_record:
+        login_record.last_seen = datetime.utcnow()
+        db.session.commit()
+    work = WorkSession.query.filter_by(employee_id=current_user.id, end_time=None).first()
+    return jsonify(session_id=work.id if work else None,
+                   status=work.status if work else "Stopped",
+                   net_seconds=calculate_session_work_seconds(work)[0] if work else 0)
+
+
+@dashboard_bp.route("/admin/live")
+@login_required
+@role_required("admin")
+def admin_live():
+    from services.work_summary import calculate_session_work_seconds
+    sessions = WorkSession.query.filter_by(end_time=None).all()
+    logs = ActivityLog.query.order_by(ActivityLog.timestamp.desc()).limit(20).all()
+    projects = Project.query.all()
+    online_ids = {record.user_id for record in LoginSession.query.filter_by(logout_time=None).all() if record.recently_online}
+    return jsonify(
+        projects=[dict(name=p.name, status=p.status, progress=round(sum(t.progress for t in p.tasks) / len(p.tasks), 1) if p.tasks else 0) for p in projects],
+        employees=[dict(name=s.employee.name, status=s.status, online=s.employee_id in online_ids,
+                        project=s.project.name if s.project else "General work",
+                        net_seconds=calculate_session_work_seconds(s)[0]) for s in sessions],
+        events=[dict(employee=log.employee.name, timestamp=log.timestamp.isoformat() + "Z",
+                     active_seconds=log.active_seconds, idle_seconds=log.idle_seconds,
+                     keyboard_events=log.keyboard_events, mouse_events=log.mouse_events) for log in logs])
 @dashboard_bp.route("/employee/end-work", methods=["POST"])
 @login_required
 @role_required("employee")
@@ -1094,10 +1185,7 @@ def admin_login_sessions():
     )
 
     # Employees currently logged in
-    currently_online = sum(
-        1 for item in login_sessions
-        if item.is_online and item.logout_time is None
-    )
+    currently_online = len({item.user_id for item in login_sessions if item.recently_online})
 
     # Today's login sessions
     today = datetime.utcnow().date()

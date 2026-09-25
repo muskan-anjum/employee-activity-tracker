@@ -9,6 +9,14 @@
 {% endblock %}
 
 {% block content %}
+<form method="get" style="margin-bottom: 20px;">
+    <label for="history-employee">Employee history</label>
+    <select id="history-employee" name="employee_id">
+        <option value="">All employees</option>
+        {% for employee in employees %}<option value="{{ employee.id }}" {% if employee.id == selected_employee %}selected{% endif %}>{{ employee.name }}</option>{% endfor %}
+    </select><button type="submit">View history</button>
+</form>
+{% include '_session_history.html' %}
 <section class="stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 24px;">
 
     <div class="card stat-card" style="padding: 20px;">
@@ -52,8 +60,8 @@
 <div class="card" style="padding: 26px; margin-bottom: 28px;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
         <div>
-            <h3 style="margin: 0 0 4px; font-size: 18px; font-weight: 700;">Live Interaction Stream</h3>
-            <p style="margin: 0; color: #64748b; font-size: 13px;">Latest 30-second interaction intervals across all workforce sessions.</p>
+            <h3 style="margin: 0 0 4px; font-size: 18px; font-weight: 700;">Interaction history</h3>
+            <p style="margin: 0; color: #64748b; font-size: 13px;">Recorded interaction intervals for the selected employee. Live updates are available on the dashboard.</p>
         </div>
 
         <input type="text" id="streamSearchInput" placeholder="Search employee or time..." onkeyup="filterStreamTable()" style="padding: 8px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; width: 220px;">

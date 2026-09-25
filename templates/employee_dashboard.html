@@ -259,6 +259,7 @@
                     </td>
                     <td style="padding: 14px 16px;">
                         <form method="POST" action="{{ url_for('dashboard.update_task', task_id=task.id) }}" style="display: flex; align-items: center; gap: 8px;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <input type="number" name="progress" min="0" max="100" value="{{ task.progress | default(0) }}" style="width: 60px; padding: 6px; font-size: 12px; border: 1px solid #cbd5e1; border-radius: 6px;">
                             <select name="status" style="padding: 6px 8px; font-size: 12px; border: 1px solid #cbd5e1; border-radius: 6px; background: white;">
                                 <option value="Pending" {% if task.status == 'Pending' %}selected{% endif %}>Pending</option>
@@ -321,13 +322,13 @@
 
     // Work Session Live Timer Logic
     {% if active_session and active_session.start_time %}
-    const sessionStartTime = new Date("{{ active_session.start_time.strftime('%Y-%m-%dT%H:%M:%SZ') }}").getTime();
+    const timerLoadedAt = Date.now();
+    const initialWorkSeconds = {{ session_work_seconds }};
     const isPausedBreak = {{ 'true' if active_break else 'false' }};
 
     function updateSessionTimer() {
-        if (isPausedBreak) return;
         const now = Date.now();
-        const elapsedSeconds = Math.max(0, Math.floor((now - sessionStartTime) / 1000));
+        const elapsedSeconds = initialWorkSeconds + (isPausedBreak ? 0 : Math.max(0, Math.floor((now - timerLoadedAt) / 1000)));
         const hours = String(Math.floor(elapsedSeconds / 3600)).padStart(2, '0');
         const minutes = String(Math.floor((elapsedSeconds % 3600) / 60)).padStart(2, '0');
         const seconds = String(elapsedSeconds % 60).padStart(2, '0');
@@ -378,6 +379,7 @@
             const isEndingBreak = {{ 'true' if active_break else 'false' }};
             const endpoint = isEndingBreak ? "/employee/work/end-break" : "/employee/work/break";
             try {
+                await window.workaiTracker.flush();
                 const res = await fetch(endpoint, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" }
@@ -401,6 +403,7 @@
         endBtn.addEventListener("click", async function() {
             if (!confirm("Are you sure you want to end your current work session?")) return;
             try {
+                await window.workaiTracker.flush();
                 const res = await fetch("/employee/end-work", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" }

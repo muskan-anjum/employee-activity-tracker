@@ -1,10 +1,11 @@
 import os
+import secrets
 
 
 class Config:
     SECRET_KEY = os.environ.get(
         "SECRET_KEY",
-        "dev-secret-key-change-in-production"
+        secrets.token_hex(32)
     )
 
     SQLALCHEMY_DATABASE_URI = os.environ.get(
@@ -13,3 +14,7 @@ class Config:
     )
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = "Lax"
+    SESSION_COOKIE_SECURE = os.environ.get("COOKIE_SECURE") == "1"
+    MAX_CONTENT_LENGTH = 1024 * 1024

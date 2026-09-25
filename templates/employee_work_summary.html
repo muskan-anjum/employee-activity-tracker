@@ -9,6 +9,11 @@
 {% endblock %}
 
 {% block content %}
+<form method="get" style="margin-bottom: 24px;">
+    <label for="summary-date">Summary date (UTC)</label>
+    <input id="summary-date" type="date" name="date" value="{{ selected_date }}" required>
+    <button type="submit">View summary</button>
+</form>
 <section class="stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 24px;">
 
     <div class="card stat-card" style="padding: 20px;">
@@ -17,7 +22,7 @@
             <span style="font-size: 18px;">⏱️</span>
         </div>
         <div class="stat-value blue" style="font-size: 28px; font-weight: 800; color: #3b82f6; margin: 10px 0 4px;">{{ work_summary.total_work_time }}</div>
-        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Recorded work today</div>
+        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Recorded work for {{ selected_date }}</div>
     </div>
 
     <div class="card stat-card" style="padding: 20px;">
