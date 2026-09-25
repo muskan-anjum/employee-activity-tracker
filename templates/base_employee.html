@@ -10,141 +10,91 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/workai.css') }}">
 
-    <style>
-        .tracker-status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: #ffffff;
-            border: 1px solid var(--border, #e2e8f0);
-            padding: 8px 14px;
-            border-radius: 999px;
-            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
-            font-size: 12px;
-        }
-
-        .pulse-dot {
-            width: 9px;
-            height: 9px;
-            border-radius: 50%;
-            background: #10b981;
-            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-            animation: pulse-green 2s infinite;
-        }
-
-        .pulse-dot.idle {
-            background: #f59e0b;
-            box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
-            animation: pulse-orange 2s infinite;
-        }
-
-        @keyframes pulse-green {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(16, 185, 129, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-        }
-
-        @keyframes pulse-orange {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(245, 158, 11, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
-        }
-
-        .flash-container {
-            margin-bottom: 24px;
-        }
-
-        .flash-alert {
-            padding: 12px 18px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 500;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .flash-alert.danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
-        .flash-alert.success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
-        .flash-alert.warning { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
-        .flash-alert.info { background: #e0f2fe; color: #075985; border: 1px solid #bae6fd; }
-
-        .privacy-banner {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 12px 16px;
-            margin-top: 32px;
-            font-size: 12px;
-            color: #64748b;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-    </style>
     {% block extra_head %}{% endblock %}
-<meta name="csrf-token" content="{{ csrf_token() }}">
-<script src="{{ url_for('static', filename='security.js') }}"></script>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="{{ url_for('static', filename='security.js') }}"></script>
 </head>
 
 <body>
 
+<div id="mobileBackdrop" class="mobile-backdrop" onclick="toggleSidebar()"></div>
+
 <aside class="sidebar">
     <div class="brand">
-        <div class="brand-icon">AI</div>
+        <div class="brand-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+        </div>
         WorkAI
     </div>
 
-    <div class="admin-label" style="margin: -26px 0 24px 6px;">EMPLOYEE WORKSPACE</div>
+    <div class="admin-label">EMPLOYEE WORKSPACE</div>
 
-    <a href="{{ url_for('dashboard.employee_dashboard') }}" class="nav-item {% if request.endpoint == 'dashboard.employee_dashboard' %}active{% endif %}" style="text-decoration: none;">
-        <span>📊 &nbsp; Dashboard</span>
+    <a href="{{ url_for('dashboard.employee_dashboard') }}" class="nav-item {% if request.endpoint == 'dashboard.employee_dashboard' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/>
+        </svg>
+        <span>Dashboard</span>
     </a>
 
-    <a href="{{ url_for('dashboard.employee_projects') }}" class="nav-item {% if request.endpoint == 'dashboard.employee_projects' %}active{% endif %}" style="text-decoration: none;">
-        <span>📁 &nbsp; My Projects</span>
+    <a href="{{ url_for('dashboard.employee_projects') }}" class="nav-item {% if request.endpoint == 'dashboard.employee_projects' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 8 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>
+        </svg>
+        <span>My Projects</span>
     </a>
 
-    <a href="{{ url_for('dashboard.employee_activity_history') }}" class="nav-item {% if request.endpoint == 'dashboard.employee_activity_history' %}active{% endif %}" style="text-decoration: none;">
-        <span>⏱️ &nbsp; Activity History</span>
+    <a href="{{ url_for('dashboard.employee_activity_history') }}" class="nav-item {% if request.endpoint == 'dashboard.employee_activity_history' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <span>Activity History</span>
     </a>
 
-    <a href="{{ url_for('dashboard.employee_work_summary') }}" class="nav-item {% if request.endpoint == 'dashboard.employee_work_summary' %}active{% endif %}" style="text-decoration: none;">
-        <span>📝 &nbsp; Work Summary</span>
+    <a href="{{ url_for('dashboard.employee_work_summary') }}" class="nav-item {% if request.endpoint == 'dashboard.employee_work_summary' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><polyline points="10 9 9 9 8 9"/>
+        </svg>
+        <span>Work Summary</span>
     </a>
 </aside>
 
 <main class="main">
 
     <header class="topbar">
-        <div>
-            {% block page_header %}
-            <div class="welcome-label">EMPLOYEE INTELLIGENCE WORKSPACE</div>
-            <h1>Dashboard</h1>
-            <p>Track your work, understand your productivity and view intelligent analytics.</p>
-            {% endblock %}
+        <div style="display: flex; align-items: center; gap: 14px;">
+            <button type="button" class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Toggle navigation">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>
+                </svg>
+            </button>
+            <div>
+                {% block page_header %}
+                <div class="welcome-label">EMPLOYEE INTELLIGENCE WORKSPACE</div>
+                <h1>Dashboard</h1>
+                <p>Track your work, understand your productivity and view intelligent analytics.</p>
+                {% endblock %}
+            </div>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 16px;">
+        <div class="topbar-actions">
             <div class="tracker-status-pill">
                 <span id="trackerPulseDot" class="pulse-dot"></span>
-                <span id="trackerPulseText" style="font-weight: 600; color: #1e293b;">Live Monitoring Active</span>
-                <span style="color: #cbd5e1;">|</span>
-                <span id="trackerLiveCounter" style="color: #64748b;">0s active · 0s idle</span>
+                <span id="trackerPulseText" style="font-weight: 600; color: var(--text);">Live Monitoring Active</span>
+                <span style="color: var(--border-strong);">|</span>
+                <span id="trackerLiveCounter" style="color: var(--text-secondary); font-variant-numeric: tabular-nums;">0s active · 0s idle</span>
             </div>
 
-            <div class="user-box" style="display: flex; align-items: center; gap: 12px; background: white; padding: 6px 14px; border-radius: 12px; border: 1px solid #e2e8f0;">
-                <div class="avatar" style="width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; display: grid; place-items: center; font-weight: 700;">
+            <div class="user-box">
+                <div class="avatar">
                     {{ current_user.name[0] | upper }}
                 </div>
-
                 <div>
-                    <strong style="display: block; font-size: 13px; color: #0f172a;">{{ current_user.name }}</strong>
-                    <span style="font-size: 11px; color: #64748b;">Employee</span>
+                    <strong>{{ current_user.name }}</strong>
+                    <span class="employee-role">Employee</span>
                 </div>
-
-                <a class="logout" href="{{ url_for('auth.logout') }}" style="margin-left: 8px; font-size: 12px; color: #ef4444; text-decoration: none; font-weight: 600; padding: 5px 10px; border-radius: 6px; background: #fee2e2;">
+                <a class="logout" href="{{ url_for('auth.logout') }}">
                     Logout
                 </a>
             </div>
@@ -157,7 +107,7 @@
             {% for category, message in messages %}
             <div class="flash-alert {{ category }}">
                 <span>{{ message }}</span>
-                <span style="cursor: pointer;" onclick="this.parentElement.remove()">✕</span>
+                <button type="button" style="background: none; border: none; font-size: 14px; cursor: pointer; color: inherit;" onclick="this.parentElement.remove()" aria-label="Dismiss alert">✕</button>
             </div>
             {% endfor %}
         </div>
@@ -167,13 +117,26 @@
     {% block content %}{% endblock %}
 
     <div class="privacy-banner">
-        <span style="font-size: 18px;">🛡️</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
         <div>
-            <strong>WorkAI Privacy Protection:</strong> Activity signals are strictly non-invasive interaction counts (keystroke counts and mouse movements) measured within this platform session. Keystroke characters, clipboard, screen captures, and external browsing are never monitored.
+            <strong>WorkAI Privacy Protection:</strong> Activity signals are strictly non-invasive interaction counts (keystroke counts and mouse movements) measured within this platform session. Keystroke characters, clipboard, screen captures, and external applications are never monitored.
         </div>
     </div>
 
 </main>
+
+<script>
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const backdrop = document.getElementById('mobileBackdrop');
+    if (sidebar && backdrop) {
+        sidebar.classList.toggle('open');
+        backdrop.classList.toggle('show');
+    }
+}
+</script>
 
 <script src="{{ url_for('static', filename='activity_tracker.js') }}"></script>
 {% block scripts %}{% endblock %}

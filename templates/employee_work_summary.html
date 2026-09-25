@@ -9,78 +9,104 @@
 {% endblock %}
 
 {% block content %}
-<form method="get" style="margin-bottom: 24px;">
-    <label for="summary-date">Summary date (UTC)</label>
-    <input id="summary-date" type="date" name="date" value="{{ selected_date }}" required>
-    <button type="submit">View summary</button>
-</form>
-<section class="stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 24px;">
-
-    <div class="card stat-card" style="padding: 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">TOTAL NET WORK</div>
-            <span style="font-size: 18px;">⏱️</span>
+<!-- Date Selection Toolbar -->
+<div class="card" style="padding: 16px 20px; margin-bottom: 24px;">
+    <form method="get" style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 240px;">
+            <label for="summary-date" style="font-size: 13px; font-weight: 600; color: var(--text-secondary); white-space: nowrap;">
+                Summary Date (UTC):
+            </label>
+            <input id="summary-date" type="date" name="date" value="{{ selected_date }}" class="form-input" style="max-width: 200px;" required>
         </div>
-        <div class="stat-value blue" style="font-size: 28px; font-weight: 800; color: #3b82f6; margin: 10px 0 4px;">{{ work_summary.total_work_time }}</div>
-        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Recorded work for {{ selected_date }}</div>
+        <button type="submit" class="btn btn-primary btn-sm">
+            View Summary
+        </button>
+    </form>
+</div>
+
+<section class="stats">
+
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-title">TOTAL NET WORK</span>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
+            </div>
+        </div>
+        <div class="stat-value blue">{{ work_summary.total_work_time }}</div>
+        <div class="stat-note">Recorded work for {{ selected_date }}</div>
     </div>
 
-    <div class="card stat-card" style="padding: 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">BREAK DURATION</div>
-            <span style="font-size: 18px;">☕</span>
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-title">BREAK DURATION</span>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="18" height="18" x="3" y="3" rx="2"/><line x1="9" x2="9" y1="9" y2="15"/><line x1="15" x2="15" y1="9" y2="15"/>
+                </svg>
+            </div>
         </div>
-        <div class="stat-value purple" style="font-size: 28px; font-weight: 800; color: #8b5cf6; margin: 10px 0 4px;">{{ work_summary.break_time }}</div>
-        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Pause intervals taken</div>
+        <div class="stat-value purple">{{ work_summary.break_time }}</div>
+        <div class="stat-note">Pause intervals taken</div>
     </div>
 
-    <div class="card stat-card" style="padding: 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">ACTIVE INTERACTIONS</div>
-            <span style="font-size: 18px;">⚡</span>
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-title">ACTIVE INTERACTIONS</span>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+            </div>
         </div>
-        <div class="stat-value green" style="font-size: 28px; font-weight: 800; color: #10b981; margin: 10px 0 4px;">{{ work_summary.active_time }}</div>
-        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Active engagement duration</div>
+        <div class="stat-value green">{{ work_summary.active_time }}</div>
+        <div class="stat-note">Active engagement duration</div>
     </div>
 
-    <div class="card stat-card" style="padding: 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">TASK COMPLETION</div>
-            <span style="font-size: 18px;">✓</span>
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-title">TASK COMPLETION</span>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--info)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+            </div>
         </div>
-        <div class="stat-value" style="font-size: 28px; font-weight: 800; color: #0284c7; margin: 10px 0 4px;">{{ work_summary.completed_tasks }} / {{ work_summary.total_tasks }}</div>
-        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">{{ work_summary.task_progress }}% progress rate</div>
+        <div class="stat-value" style="color: var(--primary);">{{ work_summary.completed_tasks }} / {{ work_summary.total_tasks }}</div>
+        <div class="stat-note">{{ work_summary.task_progress }}% progress rate</div>
     </div>
 
 </section>
 
 <!-- AI Summary Card -->
-<div class="card" style="padding: 28px; margin-bottom: 28px; background: linear-gradient(135deg, rgba(79, 70, 229, 0.04), rgba(56, 189, 248, 0.04)); border: 1px solid rgba(99, 102, 241, 0.2);">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+<div class="card" style="margin-bottom: 24px; border-left: 4px solid var(--primary);">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
         <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #4f46e5, #06b6d4); color: white; display: grid; place-items: center; font-size: 20px; font-weight: 800;">
+            <div style="width: 36px; height: 36px; border-radius: var(--radius-md); background: var(--primary-subtle); color: var(--primary); display: grid; place-items: center; font-size: 16px; font-weight: 800;">
                 ✦
             </div>
             <div>
-                <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #0f172a;">WorkAI Intelligent Summary</h3>
-                <span style="font-size: 12px; color: #64748b;">Generated for: <strong>{{ work_summary.date }}</strong></span>
+                <h3 style="margin: 0;">WorkAI Intelligent Summary</h3>
+                <span style="font-size: 12.5px; color: var(--text-muted);">Generated for: <strong style="color: var(--text);">{{ work_summary.date }}</strong></span>
             </div>
         </div>
 
-        <span style="font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 999px; background: #e0f2fe; color: #0369a1;">
-            ● AUTOMATED INSIGHT
+        <span class="badge badge-info">
+            AUTOMATED INSIGHT
         </span>
     </div>
 
-    <div style="font-size: 15px; line-height: 1.7; color: #1e293b; background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 22px; margin-top: 14px; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);">
+    <div style="font-size: 14.5px; line-height: 1.7; color: var(--text); background: var(--surface-subtle); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 18px 22px;">
         {{ work_summary.summary }}
     </div>
 
-    <div style="margin-top: 20px; display: flex; gap: 24px; flex-wrap: wrap; font-size: 13px; color: #475569;">
-        <div>⚡ Overall Productivity Index: <strong style="color: #4f46e5;">{{ work_summary.productivity_score }}%</strong></div>
-        <div>💤 Idle Time Recorded: <strong>{{ work_summary.idle_time }}</strong></div>
-        <div>⌨️ Total Keyboard Signals: <strong>{{ work_summary.total_keyboard_events }}</strong></div>
-        <div>🖱️ Total Mouse Signals: <strong>{{ work_summary.total_mouse_events }}</strong></div>
+    <div style="margin-top: 18px; display: flex; gap: 20px; flex-wrap: wrap; font-size: 12.5px; color: var(--text-secondary); border-top: 1px solid var(--border); padding-top: 14px;">
+        <div>Productivity Index: <strong style="color: var(--primary);">{{ work_summary.productivity_score }}%</strong></div>
+        <div>Idle Duration: <strong>{{ work_summary.idle_time }}</strong></div>
+        <div>Keyboard Events: <strong>{{ work_summary.total_keyboard_events }}</strong></div>
+        <div>Mouse Events: <strong>{{ work_summary.total_mouse_events }}</strong></div>
     </div>
 </div>
 {% endblock %}

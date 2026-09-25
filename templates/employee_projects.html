@@ -9,95 +9,109 @@
 {% endblock %}
 
 {% block content %}
-<section class="stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 24px;">
+<section class="stats">
 
-    <div class="card stat-card" style="padding: 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">ASSIGNED PROJECTS</div>
-            <span style="font-size: 18px;">📁</span>
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-title">ASSIGNED PROJECTS</span>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 8 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>
+                </svg>
+            </div>
         </div>
-        <div class="stat-value blue" style="font-size: 28px; font-weight: 800; color: #3b82f6; margin: 10px 0 4px;">{{ projects|length }}</div>
-        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Active workspace initiatives</div>
+        <div class="stat-value blue">{{ projects|length }}</div>
+        <div class="stat-note">Active workspace initiatives</div>
     </div>
 
-    <div class="card stat-card" style="padding: 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">TOTAL PROJECT TIME</div>
-            <span style="font-size: 18px;">⏱️</span>
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-title">TOTAL PROJECT TIME</span>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
+            </div>
         </div>
         {% set total_sec_all = project_times.values() | sum %}
         {% set all_h = total_sec_all // 3600 %}
         {% set all_m = (total_sec_all % 3600) // 60 %}
-        <div class="stat-value green" style="font-size: 28px; font-weight: 800; color: #10b981; margin: 10px 0 4px;">{{ "%02d:%02d"|format(all_h, all_m) }}</div>
-        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Aggregated tracked hours</div>
+        <div class="stat-value green">{{ "%02d:%02d"|format(all_h, all_m) }}</div>
+        <div class="stat-note">Aggregated tracked hours</div>
     </div>
 
-    <div class="card stat-card" style="padding: 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">WORKAI STATUS</div>
-            <span style="font-size: 18px;">⚡</span>
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-title">WORKAI STATUS</span>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                </svg>
+            </div>
         </div>
-        <div class="stat-value purple" style="font-size: 20px; font-weight: 800; color: #8b5cf6; margin: 14px 0 4px;">Live Logging</div>
-        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Automatic session linking</div>
+        <div class="stat-value purple" style="font-size: 20px; margin-top: 14px;">Live Logging</div>
+        <div class="stat-note">Automatic session linking</div>
     </div>
 
 </section>
 
-<div class="card" style="padding: 26px; margin-bottom: 28px;">
+<div class="card" style="margin-bottom: 24px;">
     <div style="margin-bottom: 20px;">
-        <h3 style="margin: 0 0 4px; font-size: 18px; font-weight: 700;">Project Workspaces</h3>
-        <p style="margin: 0; color: #64748b; font-size: 13px;">Verified time logs and assigned responsibilities per project.</p>
+        <h3 style="margin: 0 0 4px;">Project Workspaces</h3>
+        <p style="margin: 0; color: var(--text-secondary); font-size: 13px;">Verified time logs and assigned responsibilities per project.</p>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px;">
         {% for project in projects %}
             {% set total_seconds = project_times.get(project.id, 0) %}
             {% set hours = total_seconds // 3600 %}
             {% set minutes = (total_seconds % 3600) // 60 %}
             {% set seconds = total_seconds % 60 %}
 
-            <div style="border: 1px solid #e2e8f0; border-radius: 14px; padding: 22px; background: #ffffff; display: flex; flex-direction: column; justify-content: space-between;">
+            <div style="border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; background: var(--surface); display: flex; flex-direction: column; justify-content: space-between;">
                 <div>
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-                        <div style="width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #3b82f6, #06b6d4); color: white; display: grid; place-items: center; font-size: 18px;">
-                            📁
+                        <div style="width: 36px; height: 36px; border-radius: var(--radius-md); background: var(--surface-subtle); border: 1px solid var(--border); color: var(--primary); display: grid; place-items: center;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 8 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>
+                            </svg>
                         </div>
-                        <span style="font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;">
-                            ● {{ project.status }}
+                        <span class="badge badge-success">
+                            {{ project.status }}
                         </span>
                     </div>
 
-                    <h4 style="margin: 0 0 6px; font-size: 17px; font-weight: 700; color: #0f172a;">{{ project.name }}</h4>
-                    <ul>
-                    {% for task in project.tasks if task.employee_id == current_user.id %}
-                        {% set duration = task_times.get(task.id, 0) %}
-                        <li>{{ task.title }} — {{ task.progress }}% — {{ '%02d:%02d:%02d'|format(duration // 3600, (duration % 3600) // 60, duration % 60) }} net work</li>
-                    {% endfor %}
-                    </ul>
-                    <p style="margin: 0 0 16px; color: #64748b; font-size: 13px; line-height: 1.5;">
+                    <h4 style="margin: 0 0 6px; font-size: 16px; font-weight: 700; color: var(--text);">{{ project.name }}</h4>
+                    <p style="margin: 0 0 14px; color: var(--text-muted); font-size: 12.5px; line-height: 1.5;">
                         {{ project.description or "No description provided for this project workspace." }}
                     </p>
+
+                    <div style="border-top: 1px solid var(--border); padding-top: 12px; margin-bottom: 14px;">
+                        <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Assigned Tasks:</span>
+                        <ul style="margin: 0; padding-left: 18px; font-size: 12.5px; color: var(--text-secondary); line-height: 1.6;">
+                        {% for task in project.tasks if task.employee_id == current_user.id %}
+                            {% set duration = task_times.get(task.id, 0) %}
+                            <li>{{ task.title }} — {{ task.progress }}% — {{ '%02d:%02d:%02d'|format(duration // 3600, (duration % 3600) // 60, duration % 60) }} net work</li>
+                        {% else %}
+                            <li style="list-style-type: none; margin-left: -18px; color: var(--text-muted);">No individual tasks assigned in this project.</li>
+                        {% endfor %}
+                        </ul>
+                    </div>
                 </div>
 
                 <div>
-                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; margin-bottom: 14px;">
-                        <div style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 0.8px; text-transform: uppercase;">TRACKED PROJECT WORK TIME</div>
-                        <div style="font-size: 22px; font-weight: 800; font-family: monospace; color: #2563eb; margin-top: 4px;">
+                    <div style="background: var(--surface-subtle); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px 14px;">
+                        <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.8px; text-transform: uppercase;">TRACKED WORK TIME</div>
+                        <div style="font-size: 20px; font-weight: 800; font-family: monospace; color: var(--primary); margin-top: 2px;">
                             {{ "%02d:%02d:%02d"|format(hours, minutes, seconds) }}
                         </div>
-                    </div>
-
-                    <div style="font-size: 12px; color: #475569; display: flex; align-items: center; gap: 6px;">
-                        <span>✦</span>
-                        <span>Linked with WorkAI employee session controller</span>
                     </div>
                 </div>
             </div>
         {% else %}
-            <div style="grid-column: 1 / -1; text-align: center; padding: 50px 20px; color: #94a3b8;">
-                <span style="font-size: 36px; display: block; margin-bottom: 8px;">📂</span>
-                <strong style="color: #475569;">No assigned projects found</strong>
-                <p style="margin: 4px 0 0; font-size: 13px;">Projects assigned to you by administrators will appear here.</p>
+            <div style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; color: var(--text-muted);">
+                <strong style="color: var(--text-secondary); display: block; margin-bottom: 4px;">No assigned projects found</strong>
+                <p style="margin: 0; font-size: 13px;">Projects assigned to you by administrators will appear here.</p>
             </div>
         {% endfor %}
     </div>

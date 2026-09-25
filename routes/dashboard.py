@@ -86,30 +86,27 @@ def employee_dashboard():
 @role_required("employee")
 def employee_projects():
     from services.work_summary import calculate_session_work_seconds
+    user_sessions = WorkSession.query.filter_by(employee_id=current_user.id).all()
     task_times = {}
-    for work in WorkSession.query.filter_by(employee_id=current_user.id).all():
-        if work.task_id:
-            task_times[work.task_id] = task_times.get(work.task_id, 0) + calculate_session_work_seconds(work)[0]
-    projects = (
-    Project.query
-    .join(Task, Task.project_id == Project.id)
-    .filter(Task.employee_id == current_user.id)
-    .distinct()
-    .all()
-)
     project_times = {}
 
-    for project in projects:
-        sessions = WorkSession.query.filter_by(
-            employee_id=current_user.id,
-            project_id=project.id
-        ).all()
+    for work in user_sessions:
+        net_secs = calculate_session_work_seconds(work)[0]
+        if work.task_id:
+            task_times[work.task_id] = task_times.get(work.task_id, 0) + net_secs
+        if work.project_id:
+            project_times[work.project_id] = project_times.get(work.project_id, 0) + net_secs
 
-        from services.work_summary import calculate_session_work_seconds
-        project_times[project.id] = sum(
-            calculate_session_work_seconds(session)[0]
-            for session in sessions
-        )
+    projects = (
+        Project.query
+        .join(Task, Task.project_id == Project.id)
+        .filter(Task.employee_id == current_user.id)
+        .distinct()
+        .all()
+    )
+
+    for project in projects:
+        project_times.setdefault(project.id, 0)
 
     return render_template(
         "employee_projects.html",

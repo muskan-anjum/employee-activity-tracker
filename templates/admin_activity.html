@@ -9,130 +9,167 @@
 {% endblock %}
 
 {% block content %}
-<form method="get" style="margin-bottom: 20px;">
-    <label for="history-employee">Employee history</label>
-    <select id="history-employee" name="employee_id">
-        <option value="">All employees</option>
-        {% for employee in employees %}<option value="{{ employee.id }}" {% if employee.id == selected_employee %}selected{% endif %}>{{ employee.name }}</option>{% endfor %}
-    </select><button type="submit">View history</button>
-</form>
+<!-- Employee Filter Toolbar -->
+<div class="card" style="padding: 16px 20px; margin-bottom: 20px;">
+    <form method="get" style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 240px;">
+            <label for="history-employee" style="font-size: 13px; font-weight: 600; color: var(--text-secondary); white-space: nowrap;">
+                Filter Employee:
+            </label>
+            <select id="history-employee" name="employee_id" class="form-select" style="max-width: 320px;">
+                <option value="">All Registered Workforce</option>
+                {% for employee in employees %}
+                    <option value="{{ employee.id }}" {% if employee.id == selected_employee %}selected{% endif %}>{{ employee.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">
+            Apply Filter
+        </button>
+        {% if selected_employee %}
+            <a href="{{ url_for('dashboard.admin_activity') }}" class="btn btn-secondary btn-sm">
+                Clear Filter
+            </a>
+        {% endif %}
+    </form>
+</div>
+
 {% include '_session_history.html' %}
-<section class="stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 24px;">
 
-    <div class="card stat-card" style="padding: 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">CURRENTLY WORKING</div>
-            <span style="font-size: 18px;">🟢</span>
+<section class="stats">
+
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-title">CURRENTLY WORKING</span>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
+            </div>
         </div>
-        <div class="stat-value green" style="font-size: 28px; font-weight: 800; color: #10b981; margin: 10px 0 4px;">{{ currently_working }}</div>
-        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Active clocked-in sessions</div>
+        <div class="stat-value green">{{ currently_working }}</div>
+        <div class="stat-note">Active clocked-in sessions</div>
     </div>
 
-    <div class="card stat-card" style="padding: 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">ON BREAK</div>
-            <span style="font-size: 18px;">☕</span>
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-title">ON BREAK</span>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="18" height="18" x="3" y="3" rx="2"/><line x1="9" x2="9" y1="9" y2="15"/><line x1="15" x2="15" y1="9" y2="15"/>
+                </svg>
+            </div>
         </div>
-        <div class="stat-value orange" style="font-size: 28px; font-weight: 800; color: #f59e0b; margin: 10px 0 4px;">{{ on_break }}</div>
-        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Paused work intervals</div>
+        <div class="stat-value orange">{{ on_break }}</div>
+        <div class="stat-note">Paused work intervals</div>
     </div>
 
-    <div class="card stat-card" style="padding: 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">HIGH IDLE EMPLOYEES</div>
-            <span style="font-size: 18px;">💤</span>
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-title">HIGH IDLE EMPLOYEES</span>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{% if idle_employees > 0 %}var(--warning){% else %}var(--success){% endif %}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+                </svg>
+            </div>
         </div>
-        <div class="stat-value" style="font-size: 28px; font-weight: 800; color: {% if idle_employees > 0 %}#f59e0b{% else %}#10b981{% endif %}; margin: 10px 0 4px;">{{ idle_employees }}</div>
-        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Recent idle &gt; active time</div>
+        <div class="stat-value {% if idle_employees > 0 %}orange{% else %}green{% endif %}">{{ idle_employees }}</div>
+        <div class="stat-note">Recent idle &gt; active time</div>
     </div>
 
-    <div class="card stat-card" style="padding: 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">AI ACTIVITY ALERTS</div>
-            <span style="font-size: 18px;">🤖</span>
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-title">AI ACTIVITY ALERTS</span>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{% if activity_alerts > 0 %}var(--danger){% else %}var(--success){% endif %}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 9v4"/><path d="M12 17h.01"/><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                </svg>
+            </div>
         </div>
-        <div class="stat-value red" style="font-size: 28px; font-weight: 800; color: {% if activity_alerts > 0 %}#ef4444{% else %}#10b981{% endif %}; margin: 10px 0 4px;">{{ activity_alerts }}</div>
-        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Statistical anomaly flags</div>
+        <div class="stat-value {% if activity_alerts > 0 %}red{% else %}green{% endif %}">{{ activity_alerts }}</div>
+        <div class="stat-note">Statistical anomaly flags</div>
     </div>
 
 </section>
 
-<div class="card" style="padding: 26px; margin-bottom: 28px;">
+<div class="card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
         <div>
-            <h3 style="margin: 0 0 4px; font-size: 18px; font-weight: 700;">Interaction history</h3>
-            <p style="margin: 0; color: #64748b; font-size: 13px;">Recorded interaction intervals for the selected employee. Live updates are available on the dashboard.</p>
+            <h3 style="margin: 0 0 4px;">Interaction History</h3>
+            <p style="margin: 0; color: var(--text-secondary); font-size: 13px;">Recorded interaction intervals for the selected employee. Live streaming updates refresh on the main dashboard.</p>
         </div>
 
-        <input type="text" id="streamSearchInput" placeholder="Search employee or time..." onkeyup="filterStreamTable()" style="padding: 8px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; width: 220px;">
+        <input type="text" id="streamSearchInput" class="form-input" placeholder="Search employee or time..." onkeyup="filterStreamTable()" style="max-width: 240px; padding: 7px 12px;">
     </div>
 
     {% if recent_logs %}
-    <div style="overflow-x: auto;">
-        <table id="streamTable" style="width: 100%; border-collapse: separate; border-spacing: 0;">
+    <div class="table-responsive">
+        <table id="streamTable" class="table">
             <thead>
-                <tr style="background: #f8fafc; text-align: left; font-size: 11px; text-transform: uppercase; color: #64748b; letter-spacing: 0.8px;">
-                    <th style="padding: 12px 14px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0; border-radius: 8px 0 0 8px;">Employee</th>
-                    <th style="padding: 12px 14px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0;">Timestamp</th>
-                    <th style="padding: 12px 14px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0;">Active</th>
-                    <th style="padding: 12px 14px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0;">Idle</th>
-                    <th style="padding: 12px 14px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0;">Keyboard Signals</th>
-                    <th style="padding: 12px 14px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0;">Mouse Signals</th>
-                    <th style="padding: 12px 14px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0;">Engagement Ratio</th>
-                    <th style="padding: 12px 14px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0; border-radius: 0 8px 8px 0;">ML Analysis</th>
+                <tr>
+                    <th>Employee</th>
+                    <th>Timestamp</th>
+                    <th>Active</th>
+                    <th>Idle</th>
+                    <th>Keyboard Signals</th>
+                    <th>Mouse Signals</th>
+                    <th>Engagement Ratio</th>
+                    <th>ML Analysis</th>
                 </tr>
             </thead>
             <tbody>
                 {% for log in recent_logs %}
                 {% set interval_tot = (log.active_seconds or 0) + (log.idle_seconds or 0) %}
                 {% set act_percent = (((log.active_seconds or 0) / interval_tot) * 100) | round(0) if interval_tot > 0 else 0 %}
-                <tr style="border-bottom: 1px solid #f1f5f9;">
-                    <td style="padding: 14px; font-weight: 600; color: #0f172a; display: flex; align-items: center; gap: 10px;">
-                        <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #3b82f6, #6366f1); color: white; display: grid; place-items: center; font-weight: 700; font-size: 12px;">
-                            {{ (log.employee.name if log.employee else "E")[0] | upper }}
-                        </div>
-                        <div>
-                            <div>{{ log.employee.name if log.employee else "Employee #" ~ log.employee_id }}</div>
-                            <span style="font-size: 11px; color: #64748b;">{{ log.employee.email if log.employee else "" }}</span>
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="avatar" style="width: 32px; height: 32px; font-size: 12px;">
+                                {{ (log.employee.name if log.employee else "E")[0] | upper }}
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; color: var(--text);">{{ log.employee.name if log.employee else "Employee #" ~ log.employee_id }}</div>
+                                <span style="font-size: 11px; color: var(--text-muted);">{{ log.employee.email if log.employee else "" }}</span>
+                            </div>
                         </div>
                     </td>
 
-                    <td style="padding: 14px; font-size: 12px; color: #64748b;">
+                    <td style="color: var(--text-muted); font-size: 12px;">
                         {{ log.timestamp.strftime('%H:%M:%S') if log.timestamp else "-" }}
                     </td>
 
-                    <td style="padding: 14px; font-size: 13px; font-weight: 700; color: #10b981;">
+                    <td style="font-weight: 700; color: var(--success);">
                         {{ log.active_seconds or 0 }}s
                     </td>
 
-                    <td style="padding: 14px; font-size: 13px; font-weight: 700; color: #f59e0b;">
+                    <td style="font-weight: 700; color: var(--warning);">
                         {{ log.idle_seconds or 0 }}s
                     </td>
 
-                    <td style="padding: 14px; font-size: 13px; color: #334155;">
+                    <td style="color: var(--text-secondary);">
                         {{ log.keyboard_events or 0 }}
                     </td>
 
-                    <td style="padding: 14px; font-size: 13px; color: #334155;">
+                    <td style="color: var(--text-secondary);">
                         {{ log.mouse_events or 0 }}
                     </td>
 
-                    <td style="padding: 14px;">
-                        <span style="font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px;
-                            {% if act_percent >= 70 %}background: #dcfce7; color: #15803d;
-                            {% elif act_percent >= 40 %}background: #fef3c7; color: #b45309;
-                            {% else %}background: #fee2e2; color: #b91c1c;{% endif %}">
+                    <td>
+                        <span class="badge
+                            {% if act_percent >= 70 %}badge-success
+                            {% elif act_percent >= 40 %}badge-warning
+                            {% else %}badge-danger{% endif %}">
                             {{ act_percent }}% Active
                         </span>
                     </td>
 
-                    <td style="padding: 14px;">
+                    <td>
                         {% if log.is_anomaly %}
-                            <span style="font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; background: #fee2e2; color: #dc2626;" title="{{ log.anomaly_reason or 'Model flagged pattern' }}">
-                                ⚠️ Unusual
+                            <span class="badge badge-danger" title="{{ log.anomaly_reason or 'Model flagged pattern' }}">
+                                Unusual
                             </span>
                         {% else %}
-                            <span style="font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; background: #f1f5f9; color: #475569;">
+                            <span class="badge badge-neutral">
                                 Normal
                             </span>
                         {% endif %}
@@ -143,7 +180,7 @@
         </table>
     </div>
     {% else %}
-    <div style="text-align: center; padding: 40px 20px; color: #94a3b8;">
+    <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
         No interaction records logged yet.
     </div>
     {% endif %}
@@ -161,11 +198,7 @@
         const trs = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
         for (let i = 0; i < trs.length; i++) {
             const text = trs[i].textContent || trs[i].innerText;
-            if (text.toLowerCase().indexOf(filter) > -1) {
-                trs[i].style.display = "";
-            } else {
-                trs[i].style.display = "none";
-            }
+            trs[i].style.display = (text.toLowerCase().indexOf(filter) > -1) ? "" : "none";
         }
     }
 </script>

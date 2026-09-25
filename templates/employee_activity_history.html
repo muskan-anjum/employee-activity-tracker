@@ -10,114 +10,131 @@
 
 {% block content %}
 {% include '_session_history.html' %}
+
 {% set total_active = activities | sum(attribute='active_seconds') | default(0) %}
 {% set total_idle = activities | sum(attribute='idle_seconds') | default(0) %}
 {% set total_monitored = total_active + total_idle %}
 {% set avg_prod = ((total_active / total_monitored) * 100) | round(1) if total_monitored > 0 else 0 %}
 
-<section class="stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 24px;">
+<section class="stats">
 
-    <div class="card stat-card" style="padding: 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">LOGGED INTERVALS</div>
-            <span style="font-size: 18px;">📋</span>
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-title">LOGGED INTERVALS</span>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/>
+                </svg>
+            </div>
         </div>
-        <div class="stat-value blue" style="font-size: 28px; font-weight: 800; color: #3b82f6; margin: 10px 0 4px;">{{ activities|length }}</div>
-        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Recorded 30-second cycles</div>
+        <div class="stat-value blue">{{ activities|length }}</div>
+        <div class="stat-note">Recorded 30-second cycles</div>
     </div>
 
-    <div class="card stat-card" style="padding: 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">ACTIVE DURATION</div>
-            <span style="font-size: 18px;">⚡</span>
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-title">ACTIVE DURATION</span>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+            </div>
         </div>
         {% set act_h = total_active // 3600 %}
         {% set act_m = (total_active % 3600) // 60 %}
-        <div class="stat-value green" style="font-size: 28px; font-weight: 800; color: #10b981; margin: 10px 0 4px;">{{ "%02d:%02d"|format(act_h, act_m) }}</div>
-        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Total active interaction seconds</div>
+        <div class="stat-value green">{{ "%02d:%02d"|format(act_h, act_m) }}</div>
+        <div class="stat-note">Total active interaction time</div>
     </div>
 
-    <div class="card stat-card" style="padding: 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">IDLE DURATION</div>
-            <span style="font-size: 18px;">💤</span>
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-title">IDLE DURATION</span>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+                </svg>
+            </div>
         </div>
         {% set idl_h = total_idle // 3600 %}
         {% set idl_m = (total_idle % 3600) // 60 %}
-        <div class="stat-value orange" style="font-size: 28px; font-weight: 800; color: #f59e0b; margin: 10px 0 4px;">{{ "%02d:%02d"|format(idl_h, idl_m) }}</div>
-        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Total detected inactivity</div>
+        <div class="stat-value orange">{{ "%02d:%02d"|format(idl_h, idl_m) }}</div>
+        <div class="stat-note">Total detected inactivity</div>
     </div>
 
-    <div class="card stat-card" style="padding: 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">HISTORICAL RATIO</div>
-            <span style="font-size: 18px;">🎯</span>
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-title">HISTORICAL RATIO</span>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+                </svg>
+            </div>
         </div>
-        <div class="stat-value purple" style="font-size: 28px; font-weight: 800; color: #8b5cf6; margin: 10px 0 4px;">{{ avg_prod }}%</div>
-        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Average active engagement</div>
+        <div class="stat-value purple">{{ avg_prod }}%</div>
+        <div class="stat-note">Average active engagement</div>
     </div>
 
 </section>
 
-<div class="card" style="padding: 26px; margin-bottom: 28px;">
+<div class="card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
         <div>
-            <h3 style="margin: 0 0 4px; font-size: 18px; font-weight: 700;">Activity Logs Table</h3>
-            <p style="margin: 0; color: #64748b; font-size: 13px;">Granular record of keyboard & mouse interaction frequencies per interval.</p>
+            <h3 style="margin: 0 0 4px;">Activity Logs Table</h3>
+            <p style="margin: 0; color: var(--text-secondary); font-size: 13px;">Granular record of keyboard &amp; mouse interaction frequencies per interval.</p>
         </div>
 
-        <input type="text" id="logSearchInput" placeholder="Filter by date or time..." onkeyup="filterLogTable()" style="padding: 8px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; width: 220px;">
+        <input type="text" id="logSearchInput" class="form-input" placeholder="Filter by date or time..." onkeyup="filterLogTable()" style="max-width: 240px; padding: 7px 12px;">
     </div>
 
     {% if activities %}
-    <div style="overflow-x: auto;">
-        <table id="activityTable" style="width: 100%; border-collapse: separate; border-spacing: 0;">
+    <div class="table-responsive">
+        <table id="activityTable" class="table">
             <thead>
-                <tr style="background: #f8fafc; text-align: left; font-size: 11px; text-transform: uppercase; color: #64748b; letter-spacing: 0.8px;">
-                    <th style="padding: 12px 16px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0; border-radius: 8px 0 0 8px;">Timestamp</th>
-                    <th style="padding: 12px 16px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0;">Active Time</th>
-                    <th style="padding: 12px 16px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0;">Idle Time</th>
-                    <th style="padding: 12px 16px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0;">Keyboard Events</th>
-                    <th style="padding: 12px 16px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0;">Mouse Events</th>
-                    <th style="padding: 12px 16px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0;">Activity State</th>
-                    <th style="padding: 12px 16px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0; border-radius: 0 8px 8px 0;">ML Analysis</th>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Active Time</th>
+                    <th>Idle Time</th>
+                    <th>Keyboard Events</th>
+                    <th>Mouse Events</th>
+                    <th>Activity State</th>
+                    <th>ML Analysis</th>
                 </tr>
             </thead>
             <tbody>
                 {% for log in activities | reverse %}
                 {% set interval_total = (log.active_seconds or 0) + (log.idle_seconds or 0) %}
                 {% set interval_pct = (((log.active_seconds or 0) / interval_total) * 100) | round(0) if interval_total > 0 else 0 %}
-                <tr style="border-bottom: 1px solid #f1f5f9;">
-                    <td style="padding: 14px 16px; font-size: 13px; font-weight: 600; color: #1e293b;">
+                <tr>
+                    <td style="font-weight: 600; color: var(--text);">
                         {{ log.timestamp.strftime('%d-%m-%Y %H:%M:%S') if log.timestamp else "-" }}
                     </td>
-                    <td style="padding: 14px 16px; font-size: 13px; color: #10b981; font-weight: 700;">
+                    <td style="color: var(--success); font-weight: 700;">
                         {{ log.active_seconds or 0 }}s
                     </td>
-                    <td style="padding: 14px 16px; font-size: 13px; color: #f59e0b; font-weight: 700;">
+                    <td style="color: var(--warning); font-weight: 700;">
                         {{ log.idle_seconds or 0 }}s
                     </td>
-                    <td style="padding: 14px 16px; font-size: 13px; color: #334155;">
+                    <td style="color: var(--text-secondary);">
                         {{ log.keyboard_events or 0 }}
                     </td>
-                    <td style="padding: 14px 16px; font-size: 13px; color: #334155;">
+                    <td style="color: var(--text-secondary);">
                         {{ log.mouse_events or 0 }}
                     </td>
-                    <td style="padding: 14px 16px;">
-                        <span style="font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px;
-                            {% if interval_pct >= 70 %}background: #dcfce7; color: #15803d;
-                            {% elif interval_pct >= 40 %}background: #fef3c7; color: #b45309;
-                            {% else %}background: #fee2e2; color: #b91c1c;{% endif %}">
+                    <td>
+                        <span class="badge
+                            {% if interval_pct >= 70 %}badge-success
+                            {% elif interval_pct >= 40 %}badge-warning
+                            {% else %}badge-danger{% endif %}">
                             {{ interval_pct }}% Active
                         </span>
                     </td>
-                    <td style="padding: 14px 16px;">
+                    <td>
                         {% if log.is_anomaly %}
-                            <span style="font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; background: #fee2e2; color: #dc2626;" title="{{ log.anomaly_reason or 'Model flagged pattern' }}">
-                                ⚠️ Unusual
+                            <span class="badge badge-danger" title="{{ log.anomaly_reason or 'Model flagged pattern' }}">
+                                Unusual
                             </span>
                         {% else %}
-                            <span style="font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; background: #f1f5f9; color: #475569;">
+                            <span class="badge badge-neutral">
                                 Normal
                             </span>
                         {% endif %}
@@ -128,10 +145,9 @@
         </table>
     </div>
     {% else %}
-    <div style="text-align: center; padding: 50px 20px; color: #94a3b8;">
-        <span style="font-size: 36px; display: block; margin-bottom: 8px;">⏱️</span>
-        <strong style="color: #475569;">No activity recorded yet</strong>
-        <p style="margin: 4px 0 0; font-size: 13px;">Start your work session on the dashboard to begin generating interaction metrics.</p>
+    <div style="text-align: center; padding: 48px 20px; color: var(--text-muted);">
+        <strong style="color: var(--text-secondary); display: block; margin-bottom: 4px;">No activity recorded yet</strong>
+        <p style="margin: 0; font-size: 13px;">Start your work session on the dashboard to begin generating interaction metrics.</p>
     </div>
     {% endif %}
 </div>
@@ -148,11 +164,7 @@
         const trs = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
         for (let i = 0; i < trs.length; i++) {
             const text = trs[i].textContent || trs[i].innerText;
-            if (text.toLowerCase().indexOf(filter) > -1) {
-                trs[i].style.display = "";
-            } else {
-                trs[i].style.display = "none";
-            }
+            trs[i].style.display = (text.toLowerCase().indexOf(filter) > -1) ? "" : "none";
         }
     }
 </script>

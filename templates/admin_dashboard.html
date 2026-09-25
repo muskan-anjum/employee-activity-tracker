@@ -9,85 +9,128 @@
 {% endblock %}
 
 {% block content %}
-<section class="card" style="padding: 24px; margin-bottom: 24px;">
-    <h3>Live workforce presence</h3>
-    <p id="live-status" aria-live="polite">Loading current work sessions…</p>
-    <div id="live-presence"></div>
-    <h4>Project progress</h4><div id="live-projects"></div>
-    <h4>Latest interaction intervals</h4><div id="live-events"></div>
+<!-- Live Workforce Presence & Streaming Feed -->
+<section class="card" style="margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <span class="system-dot"></span>
+            <h3 style="margin: 0;">Live Workforce Telemetry</h3>
+        </div>
+        <span id="live-status" class="badge badge-info" aria-live="polite">
+            Connecting to real-time feed…
+        </span>
+    </div>
+
+    <div class="layout-split" style="margin-bottom: 0;">
+        <div>
+            <h4 style="margin: 0 0 10px; font-size: 13px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Active Work Sessions</h4>
+            <div id="live-presence"></div>
+
+            <h4 style="margin: 18px 0 10px; font-size: 13px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Latest Interaction Intervals</h4>
+            <div id="live-events"></div>
+        </div>
+
+        <div>
+            <h4 style="margin: 0 0 10px; font-size: 13px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Project Task Velocity</h4>
+            <div id="live-projects"></div>
+        </div>
+    </div>
 </section>
+
 <!-- Executive KPI Grid -->
-<section class="stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; margin-bottom: 26px;">
+<section class="stats">
 
-    <div class="card stat-card" style="padding: 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">TOTAL EMPLOYEES</div>
-            <span style="font-size: 18px;">👥</span>
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-title">TOTAL EMPLOYEES</span>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+            </div>
         </div>
-        <div class="stat-value blue" style="font-size: 28px; font-weight: 800; color: #3b82f6; margin: 10px 0 4px;">{{ total_employees }}</div>
-        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Registered workforce</div>
+        <div class="stat-value blue">{{ total_employees }}</div>
+        <div class="stat-note">Registered workforce</div>
     </div>
 
-    <div class="card stat-card" style="padding: 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">CURRENTLY WORKING</div>
-            <span style="font-size: 18px;">🟢</span>
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-title">CURRENTLY WORKING</span>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
+            </div>
         </div>
-        <div class="stat-value green" style="font-size: 28px; font-weight: 800; color: #10b981; margin: 10px 0 4px;">{{ currently_working }}</div>
-        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Active work sessions</div>
+        <div class="stat-value green">{{ currently_working }}</div>
+        <div class="stat-note">Active clocked-in sessions</div>
     </div>
 
-    <div class="card stat-card" style="padding: 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">ON BREAK</div>
-            <span style="font-size: 18px;">☕</span>
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-title">ON BREAK</span>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="18" height="18" x="3" y="3" rx="2"/><line x1="9" x2="9" y1="9" y2="15"/><line x1="15" x2="15" y1="9" y2="15"/>
+                </svg>
+            </div>
         </div>
-        <div class="stat-value orange" style="font-size: 28px; font-weight: 800; color: #f59e0b; margin: 10px 0 4px;">{{ on_break }}</div>
-        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Paused sessions</div>
+        <div class="stat-value orange">{{ on_break }}</div>
+        <div class="stat-note">Paused sessions</div>
     </div>
 
-    <div class="card stat-card" style="padding: 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">ACTIVE PROJECTS</div>
-            <span style="font-size: 18px;">📁</span>
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-title">ACTIVE PROJECTS</span>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 8 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>
+                </svg>
+            </div>
         </div>
-        <div class="stat-value purple" style="font-size: 28px; font-weight: 800; color: #8b5cf6; margin: 10px 0 4px;">{{ active_projects }}</div>
-        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Ongoing initiatives</div>
+        <div class="stat-value blue">{{ active_projects }}</div>
+        <div class="stat-note">Ongoing initiatives</div>
     </div>
 
-    <div class="card stat-card" style="padding: 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">UNUSUAL PATTERNS</div>
-            <span style="font-size: 18px;">🤖</span>
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-title">UNUSUAL PATTERNS</span>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{% if unusual_count > 0 %}var(--danger){% else %}var(--success){% endif %}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 9v4"/><path d="M12 17h.01"/><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                </svg>
+            </div>
         </div>
-        <div class="stat-value red" style="font-size: 28px; font-weight: 800; color: {% if unusual_count > 0 %}#ef4444{% else %}#10b981{% endif %}; margin: 10px 0 4px;">{{ unusual_count }}</div>
-        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Isolation Forest alerts</div>
+        <div class="stat-value {% if unusual_count > 0 %}red{% else %}green{% endif %}">{{ unusual_count }}</div>
+        <div class="stat-note">Isolation Forest alerts</div>
     </div>
 
-    <div class="card stat-card" style="padding: 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div class="stat-title" style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px;">AVG PRODUCTIVITY</div>
-            <span style="font-size: 18px;">🎯</span>
+    <div class="stat-card">
+        <div class="stat-header">
+            <span class="stat-title">AVG PRODUCTIVITY</span>
+            <div class="stat-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+                </svg>
+            </div>
         </div>
-        <div class="stat-value" style="font-size: 28px; font-weight: 800; color: #2563eb; margin: 10px 0 4px;">{{ average_productivity }}%</div>
-        <div class="stat-note" style="font-size: 12px; color: #94a3b8;">Recent active ratio</div>
+        <div class="stat-value blue">{{ average_productivity }}%</div>
+        <div class="stat-note">Monitored active ratio</div>
     </div>
 
 </section>
 
-<!-- Visual Analytics: Chart & Assistant -->
-<section style="display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 20px; margin-bottom: 28px;">
+<!-- Visual Analytics: Chart & Live Overview -->
+<section class="layout-split">
 
     <!-- Weekly Trend Chart -->
-    <div class="card" style="padding: 26px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 8px;">
             <div>
-                <h3 style="margin: 0 0 4px; font-size: 18px; font-weight: 700;">Workforce Productivity Trend</h3>
-                <p style="margin: 0; color: #64748b; font-size: 13px;">7-day historical activity percentage across all employees.</p>
+                <h3 style="margin: 0 0 4px;">Workforce Productivity Trend</h3>
+                <p style="margin: 0; color: var(--text-secondary); font-size: 13px;">7-day historical activity percentage across all employees.</p>
             </div>
-            <span style="font-size: 11px; font-weight: 700; background: #eef2ff; color: #4f46e5; padding: 4px 10px; border-radius: 6px;">
-                ● 7-DAY ANALYTICS
-            </span>
+            <span class="badge badge-info">7-DAY ANALYTICS</span>
         </div>
 
         <div style="position: relative; height: 260px;">
@@ -96,33 +139,38 @@
     </div>
 
     <!-- Live Workforce Quick Overview -->
-    <div class="card" style="padding: 26px; display: flex; flex-direction: column; justify-content: space-between;">
+    <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
         <div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <h3 style="margin: 0; font-size: 18px; font-weight: 700;">Live Workforce Status</h3>
-                <span style="font-size: 11px; background: #ecfdf5; color: #059669; padding: 4px 10px; border-radius: 20px; font-weight: 700;">● REAL-TIME</span>
+                <h3 style="margin: 0;">Live Workforce Status</h3>
+                <span class="badge badge-success">REAL-TIME</span>
             </div>
 
-            <div style="margin-bottom: 18px; padding: 14px; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <span style="font-size: 13px; color: #475569;">Currently Working:</span>
-                    <strong style="color: #10b981;">{{ currently_working }} employee(s)</strong>
+            <div style="background: var(--surface-subtle); border-radius: var(--radius-md); padding: 16px; border: 1px solid var(--border); margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px;">
+                    <span style="color: var(--text-secondary);">Currently Working:</span>
+                    <strong style="color: var(--success);">{{ currently_working }} employee(s)</strong>
                 </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <span style="font-size: 13px; color: #475569;">Currently on Break:</span>
-                    <strong style="color: #f59e0b;">{{ on_break }} employee(s)</strong>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px;">
+                    <span style="color: var(--text-secondary);">Currently on Break:</span>
+                    <strong style="color: var(--warning);">{{ on_break }} employee(s)</strong>
                 </div>
-                <div style="display: flex; justify-content: space-between;">
-                    <span style="font-size: 13px; color: #475569;">Not Clocked In:</span>
-                    <strong style="color: #64748b;">{{ total_employees - currently_working - on_break }} employee(s)</strong>
+                <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                    <span style="color: var(--text-secondary);">Not Clocked In:</span>
+                    <strong style="color: var(--text-muted);">{{ total_employees - currently_working - on_break }} employee(s)</strong>
                 </div>
             </div>
         </div>
 
-        <div style="background: linear-gradient(135deg, rgba(79, 70, 229, 0.06), rgba(6, 182, 212, 0.06)); border: 1px solid rgba(79, 70, 229, 0.15); border-radius: 10px; padding: 16px;">
-            <div style="font-size: 12px; font-weight: 700; color: #4f46e5; margin-bottom: 4px;">⚡ AI Engine Status</div>
-            <p style="margin: 0; font-size: 12px; color: #475569; line-height: 1.5;">
-                Isolation Forest model continuously evaluates activity intervals for statistical outliers. Keystroke frequency, interaction density and idle ratios are tracked.
+        <div style="background: var(--surface-subtle); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--primary); margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                </svg>
+                AI Engine Operational
+            </div>
+            <p style="margin: 0; font-size: 12px; color: var(--text-secondary); line-height: 1.5;">
+                Isolation Forest continuously evaluates interval density and active/idle ratios without recording private key characters or screen contents.
             </p>
         </div>
     </div>
@@ -130,106 +178,106 @@
 </section>
 
 <!-- Interactive WorkAI Insights Assistant -->
-<section class="card" style="padding: 26px; margin-bottom: 28px; background: linear-gradient(135deg, rgba(15, 23, 42, 0.02), rgba(79, 70, 229, 0.04)); border: 1px solid rgba(99, 102, 241, 0.2);">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+<section class="card" style="margin-bottom: 24px; border-color: rgba(37, 99, 235, 0.25);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
         <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #4f46e5, #06b6d4); color: white; display: grid; place-items: center; font-size: 18px; font-weight: 800;">
-                ✦
+            <div style="width: 36px; height: 36px; border-radius: var(--radius-md); background: var(--primary); color: white; display: grid; place-items: center; flex-shrink: 0;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+                </svg>
             </div>
             <div>
-                <h3 style="margin: 0; font-size: 18px; font-weight: 700;">WorkAI Insights Assistant</h3>
-                <p style="margin: 0; color: #64748b; font-size: 13px;">Ask questions or click prompt chips to query workforce analytics in real time.</p>
+                <h3 style="margin: 0;">WorkAI Insights Assistant</h3>
+                <p style="margin: 0; color: var(--text-secondary); font-size: 13px;">Ask questions or click prompt chips to query workforce analytics in real time.</p>
             </div>
         </div>
-        <span style="font-size: 11px; font-weight: 700; background: #e0f2fe; color: #0284c7; padding: 4px 10px; border-radius: 20px;">
-            NATURAL LANGUAGE QUERY
-        </span>
+        <span class="badge badge-info">NATURAL LANGUAGE ENGINE</span>
     </div>
 
     <!-- Preset Query Chips -->
     <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;">
-        <button type="button" onclick="askWorkAI('Summarize workforce performance')" style="padding: 7px 13px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">
-            📊 Summarize Workforce
+        <button type="button" class="btn btn-secondary btn-sm" onclick="askWorkAI('Summarize workforce performance')">
+            Summarize Workforce
         </button>
-        <button type="button" onclick="askWorkAI('Detect unusual activity patterns')" style="padding: 7px 13px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">
-            ⚡ Detect Anomalies
+        <button type="button" class="btn btn-secondary btn-sm" onclick="askWorkAI('Detect unusual activity patterns')">
+            Detect Anomalies
         </button>
-        <button type="button" onclick="askWorkAI('Show high idle activity')" style="padding: 7px 13px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">
-            💤 High Idle Activity
+        <button type="button" class="btn btn-secondary btn-sm" onclick="askWorkAI('Show high idle activity')">
+            High Idle Activity
         </button>
-        <button type="button" onclick="askWorkAI('Analyze project work intelligence')" style="padding: 7px 13px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: pointer;">
-            📁 Project Intelligence
+        <button type="button" class="btn btn-secondary btn-sm" onclick="askWorkAI('Analyze project work intelligence')">
+            Project Intelligence
         </button>
     </div>
 
     <!-- Query Input Row -->
-    <div style="display: flex; gap: 10px; margin-bottom: 16px;">
-        <input type="text" id="assistantQuestion" placeholder="Ask about workforce performance, anomalies, or project work hours..." style="flex: 1; padding: 12px 16px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; outline: none;" onkeydown="if(event.key==='Enter') askWorkAI()">
-        <button type="button" onclick="askWorkAI()" style="padding: 12px 20px; background: #4f46e5; color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer;">
-            Ask WorkAI →
+    <div style="display: flex; gap: 10px; margin-bottom: 14px;">
+        <input type="text" id="assistantQuestion" class="form-input" placeholder="Ask about workforce performance, anomalies, or project work hours..." onkeydown="if(event.key==='Enter') askWorkAI()">
+        <button type="button" class="btn btn-primary" onclick="askWorkAI()" style="white-space: nowrap;">
+            Ask Assistant &rarr;
         </button>
     </div>
 
     <!-- Dynamic Response Box -->
-    <div id="assistantResponse" style="background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px 20px; font-size: 14px; line-height: 1.6; color: #1e293b;">
+    <div id="assistantResponse" style="background: var(--surface-subtle); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px 18px; font-size: 13.5px; line-height: 1.6; color: var(--text);">
         Ready to analyze your workforce data. Select one of the quick queries above or type a specific question.
     </div>
 </section>
 
 <!-- Recent Monitored Activity Feed -->
-<section class="card" style="padding: 26px; margin-bottom: 28px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+<section class="card" style="margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
         <div>
-            <h3 style="margin: 0 0 4px; font-size: 18px; font-weight: 700;">Recent Activity Stream</h3>
-            <p style="margin: 0; color: #64748b; font-size: 13px;">Latest interaction intervals transmitted by active workforce sessions.</p>
+            <h3 style="margin: 0 0 4px;">Recent Activity Stream</h3>
+            <p style="margin: 0; color: var(--text-secondary); font-size: 13px;">Latest interaction intervals transmitted by active workforce sessions.</p>
         </div>
-        <a href="{{ url_for('dashboard.admin_activity') }}" style="font-size: 12px; font-weight: 700; color: #4f46e5; text-decoration: none;">
-            View All Activity →
+        <a href="{{ url_for('dashboard.admin_activity') }}" class="btn btn-secondary btn-sm">
+            View All Activity &rarr;
         </a>
     </div>
 
     {% if recent_logs %}
-    <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
+    <div class="table-responsive">
+        <table class="table">
             <thead>
-                <tr style="background: #f8fafc; text-align: left; font-size: 11px; text-transform: uppercase; color: #64748b; letter-spacing: 0.8px;">
-                    <th style="padding: 12px 16px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0; border-radius: 8px 0 0 8px;">Employee</th>
-                    <th style="padding: 12px 16px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0;">Timestamp</th>
-                    <th style="padding: 12px 16px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0;">Active</th>
-                    <th style="padding: 12px 16px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0;">Idle</th>
-                    <th style="padding: 12px 16px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0;">Keystrokes</th>
-                    <th style="padding: 12px 16px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0;">Mouse Events</th>
-                    <th style="padding: 12px 16px; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0; border-radius: 0 8px 8px 0;">ML Status</th>
+                <tr>
+                    <th>Employee</th>
+                    <th>Timestamp</th>
+                    <th>Active</th>
+                    <th>Idle</th>
+                    <th>Keystrokes</th>
+                    <th>Mouse Events</th>
+                    <th>ML Status</th>
                 </tr>
             </thead>
             <tbody>
                 {% for log in recent_logs[:15] %}
-                <tr style="border-bottom: 1px solid #f1f5f9;">
-                    <td style="padding: 12px 16px; font-weight: 600; color: #0f172a;">
+                <tr>
+                    <td style="font-weight: 600; color: var(--text);">
                         {{ log.employee.name if log.employee else "Employee #" ~ log.employee_id }}
                     </td>
-                    <td style="padding: 12px 16px; font-size: 12px; color: #64748b;">
+                    <td style="color: var(--text-muted); font-size: 12px;">
                         {{ log.timestamp.strftime('%H:%M:%S') if log.timestamp else "-" }}
                     </td>
-                    <td style="padding: 12px 16px; font-size: 13px; font-weight: 700; color: #10b981;">
+                    <td style="font-weight: 700; color: var(--success);">
                         {{ log.active_seconds or 0 }}s
                     </td>
-                    <td style="padding: 12px 16px; font-size: 13px; font-weight: 700; color: #f59e0b;">
+                    <td style="font-weight: 700; color: var(--warning);">
                         {{ log.idle_seconds or 0 }}s
                     </td>
-                    <td style="padding: 12px 16px; font-size: 13px; color: #334155;">
+                    <td style="color: var(--text-secondary);">
                         {{ log.keyboard_events or 0 }}
                     </td>
-                    <td style="padding: 12px 16px; font-size: 13px; color: #334155;">
+                    <td style="color: var(--text-secondary);">
                         {{ log.mouse_events or 0 }}
                     </td>
-                    <td style="padding: 12px 16px;">
+                    <td>
                         {% if log.is_anomaly %}
-                            <span style="font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 20px; background: #fee2e2; color: #dc2626;" title="{{ log.anomaly_reason or 'Model flagged' }}">
-                                ⚠️ Unusual
+                            <span class="badge badge-danger" title="{{ log.anomaly_reason or 'Model flagged' }}">
+                                Unusual
                             </span>
                         {% else %}
-                            <span style="font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 20px; background: #f1f5f9; color: #475569;">
+                            <span class="badge badge-neutral">
                                 Normal
                             </span>
                         {% endif %}
@@ -240,7 +288,7 @@
         </table>
     </div>
     {% else %}
-    <div style="text-align: center; padding: 35px 20px; color: #94a3b8;">
+    <div style="text-align: center; padding: 32px 20px; color: var(--text-muted);">
         No activity records logged today yet.
     </div>
     {% endif %}
@@ -263,12 +311,12 @@
                 datasets: [{
                     label: "Workforce Activity %",
                     data: weeklyActivity,
-                    borderColor: "#4f46e5",
-                    backgroundColor: "rgba(79, 70, 229, 0.08)",
-                    borderWidth: 3,
+                    borderColor: "#2563eb",
+                    backgroundColor: "rgba(37, 99, 235, 0.08)",
+                    borderWidth: 2.5,
                     tension: 0.35,
                     fill: true,
-                    pointBackgroundColor: "#4f46e5",
+                    pointBackgroundColor: "#2563eb",
                     pointRadius: 4,
                     pointHoverRadius: 6
                 }]
@@ -308,7 +356,7 @@
 
         if (presetQuestion && input) input.value = presetQuestion;
 
-        respBox.innerHTML = '<span style="color: #6366f1;">✦ Querying WorkAI Intelligence engine...</span>';
+        respBox.innerHTML = '<span style="color: var(--primary);">✦ Querying WorkAI Intelligence engine...</span>';
 
         try {
             const res = await fetch("/admin/assistant", {

@@ -9,19 +9,22 @@ class ActivityLog(db.Model):
     employee_id = db.Column(
         db.Integer,
         db.ForeignKey("users.id"),
-        nullable=False
+        nullable=False,
+        index=True
     )
 
     session_id = db.Column(
         db.Integer,
         db.ForeignKey("work_sessions.id"),
-        nullable=False
+        nullable=False,
+        index=True
     )
 
     timestamp = db.Column(
         db.DateTime,
         nullable=False,
-        default=db.func.current_timestamp()
+        default=db.func.current_timestamp(),
+        index=True
     )
 
     active_seconds = db.Column(

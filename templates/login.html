@@ -8,429 +8,318 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/workai.css') }}">
 
     <style>
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
         body {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background:
-                radial-gradient(circle at 15% 20%, rgba(99, 102, 241, 0.18), transparent 32%),
-                radial-gradient(circle at 85% 80%, rgba(14, 165, 233, 0.14), transparent 32%),
-                radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.8), rgba(2, 6, 23, 1));
-            background-color: #020617;
-            color: #f8fafc;
+            background-color: #090d16;
+            background-image: 
+                radial-gradient(at 10% 20%, rgba(37, 99, 235, 0.12) 0px, transparent 50%),
+                radial-gradient(at 90% 80%, rgba(16, 185, 129, 0.08) 0px, transparent 50%);
             padding: 24px;
         }
 
-        .login-card {
+        .auth-container {
             width: 100%;
-            max-width: 1060px;
-            min-height: 620px;
-            display: grid;
-            grid-template-columns: 1.15fr 0.85fr;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 24px;
+            max-width: 980px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
             overflow: hidden;
-            box-shadow: 
-                0 30px 80px rgba(0, 0, 0, 0.6),
-                0 0 0 1px rgba(99, 102, 241, 0.15);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
         }
 
-        .hero-section {
-            padding: 60px 50px;
+        .auth-hero {
+            background: #0f172a;
+            padding: 48px;
+            color: #ffffff;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             position: relative;
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.95) 100%);
-            border-right: 1px solid rgba(255, 255, 255, 0.06);
-            overflow: hidden;
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        .hero-section::before {
-            content: '';
-            position: absolute;
-            top: -120px;
-            left: -100px;
-            width: 320px;
-            height: 320px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.25), transparent 70%);
-            pointer-events: none;
+        .auth-hero .brand {
+            padding: 0;
+            margin-bottom: 32px;
         }
 
-        .hero-section::after {
-            content: '';
-            position: absolute;
-            bottom: -100px;
-            right: -80px;
-            width: 280px;
-            height: 280px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(14, 165, 233, 0.2), transparent 70%);
-            pointer-events: none;
-        }
-
-        .brand-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .brand-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #6366f1, #4f46e5);
-            display: grid;
-            place-items: center;
-            color: #ffffff;
+        .auth-hero h1 {
+            font-size: 32px;
             font-weight: 800;
-            font-size: 17px;
-            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
+            line-height: 1.2;
+            letter-spacing: -0.8px;
+            margin-bottom: 16px;
+            color: #f8fafc;
         }
 
-        .brand-title {
-            font-size: 22px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            color: #ffffff;
+        .auth-hero h1 span {
+            color: #60a5fa;
         }
 
-        .hero-body {
-            margin: 40px 0;
-            position: relative;
-            z-index: 1;
-        }
-
-        .hero-body h1 {
-            font-size: 42px;
-            font-weight: 800;
-            line-height: 1.15;
-            letter-spacing: -1.2px;
-            margin-bottom: 18px;
-            color: #ffffff;
-        }
-
-        .hero-body h1 span {
-            background: linear-gradient(135deg, #818cf8, #38bdf8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero-body p {
+        .auth-hero p {
             color: #94a3b8;
-            font-size: 15px;
-            line-height: 1.65;
-            max-width: 480px;
-            margin-bottom: 28px;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 32px;
         }
 
         .feature-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 14px;
         }
 
         .feature-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            font-size: 13.5px;
+            font-size: 13px;
             color: #cbd5e1;
         }
 
-        .feature-check {
-            width: 22px;
-            height: 22px;
+        .feature-icon {
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
-            background: rgba(99, 102, 241, 0.2);
-            color: #818cf8;
+            background: rgba(37, 99, 235, 0.2);
+            color: #60a5fa;
             display: grid;
             place-items: center;
-            font-size: 12px;
-            font-weight: 700;
-            border: 1px solid rgba(99, 102, 241, 0.3);
+            flex-shrink: 0;
         }
 
-        .hero-footer {
+        .auth-footer-tag {
+            margin-top: 32px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
             font-size: 12px;
             color: #64748b;
-            position: relative;
-            z-index: 1;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .form-section {
-            background: #ffffff;
-            padding: 60px 48px;
+        .auth-form-side {
+            padding: 48px;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            color: #0f172a;
+            background: #ffffff;
         }
 
-        .form-header {
-            margin-bottom: 28px;
+        .auth-form-header {
+            margin-bottom: 24px;
         }
 
-        .form-eyebrow {
-            display: inline-block;
-            background: #eef2ff;
-            color: #4f46e5;
-            font-size: 10px;
+        .auth-form-header h2 {
+            font-size: 22px;
             font-weight: 800;
-            letter-spacing: 1.2px;
-            padding: 5px 10px;
-            border-radius: 6px;
-            margin-bottom: 12px;
-        }
-
-        .form-header h2 {
-            font-size: 26px;
-            font-weight: 800;
+            letter-spacing: -0.5px;
             color: #0f172a;
-            letter-spacing: -0.6px;
             margin-bottom: 6px;
         }
 
-        .form-header p {
+        .auth-form-header p {
             color: #64748b;
             font-size: 13.5px;
         }
 
-        .demo-badges {
-            margin-bottom: 22px;
+        .demo-switcher {
             background: #f8fafc;
-            border: 1px dashed #cbd5e1;
-            padding: 12px 14px;
+            border: 1px solid #e2e8f0;
             border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 20px;
         }
 
-        .demo-label {
+        .demo-switcher-label {
             font-size: 11px;
             font-weight: 700;
-            color: #475569;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.6px;
+            color: #64748b;
             margin-bottom: 8px;
             display: flex;
             align-items: center;
             gap: 6px;
         }
 
-        .demo-buttons {
+        .demo-pills {
             display: flex;
             gap: 8px;
         }
 
-        .demo-btn {
+        .demo-pill-btn {
             flex: 1;
             padding: 7px 10px;
-            border: 1px solid #e2e8f0;
-            background: white;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
             border-radius: 6px;
             font-size: 11.5px;
             font-weight: 600;
-            color: #1e293b;
+            color: #334155;
             cursor: pointer;
             transition: all 0.15s ease;
             text-align: center;
         }
 
-        .demo-btn:hover {
-            border-color: #6366f1;
-            color: #4f46e5;
-            background: #eef2ff;
+        .demo-pill-btn:hover {
+            border-color: #2563eb;
+            color: #2563eb;
+            background: #eff6ff;
         }
 
-        .form-group {
-            margin-bottom: 18px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 12.5px;
-            font-weight: 700;
-            color: #334155;
-            margin-bottom: 7px;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid #cbd5e1;
-            border-radius: 10px;
-            font-size: 14px;
-            font-family: inherit;
-            color: #0f172a;
-            outline: none;
-            transition: all 0.2s;
-            background: #f8fafc;
-        }
-
-        .form-input:focus {
-            background: #ffffff;
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
-        }
-
-        .password-container {
+        .password-field-wrapper {
             position: relative;
         }
 
-        .password-container input {
-            padding-right: 70px;
+        .password-field-wrapper input {
+            padding-right: 60px;
         }
 
-        .password-toggle {
+        .password-toggle-btn {
             position: absolute;
             right: 12px;
             top: 50%;
             transform: translateY(-50%);
+            background: none;
             border: none;
-            background: transparent;
-            color: #6366f1;
+            color: #64748b;
             font-size: 12px;
-            font-weight: 700;
+            font-weight: 600;
             cursor: pointer;
+            padding: 4px;
         }
 
-        .submit-btn {
-            width: 100%;
-            padding: 13px;
-            border: none;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #6366f1, #4f46e5);
-            color: #ffffff;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.25);
-            transition: all 0.2s ease;
-            margin-top: 6px;
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 12px 24px rgba(99, 102, 241, 0.35);
-        }
-
-        .submit-btn:active {
-            transform: translateY(0);
-        }
-
-        .flash-box {
-            padding: 11px 14px;
-            border-radius: 8px;
-            font-size: 12.5px;
-            font-weight: 500;
-            margin-bottom: 18px;
-        }
-
-        .flash-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
-        .flash-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
-        .flash-warning { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
-
-        .form-footer {
-            margin-top: 24px;
-            text-align: center;
-            font-size: 11.5px;
-            color: #94a3b8;
+        .password-toggle-btn:hover {
+            color: #2563eb;
         }
 
         @media (max-width: 860px) {
-            .login-card {
+            .auth-container {
                 grid-template-columns: 1fr;
-                max-width: 500px;
+                max-width: 460px;
             }
 
-            .hero-section {
-                padding: 40px 30px;
+            .auth-hero {
+                padding: 32px 28px;
             }
 
-            .form-section {
-                padding: 40px 30px;
+            .auth-form-side {
+                padding: 32px 28px;
+            }
+
+            .auth-hero p, .feature-list, .auth-footer-tag {
+                display: none;
+            }
+
+            .auth-hero .brand {
+                margin-bottom: 0;
+            }
+
+            .auth-hero h1 {
+                font-size: 24px;
+                margin-top: 16px;
+                margin-bottom: 0;
             }
         }
     </style>
-<meta name="csrf-token" content="{{ csrf_token() }}">
-<script src="{{ url_for('static', filename='security.js') }}"></script>
+
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="{{ url_for('static', filename='security.js') }}"></script>
 </head>
 <body>
 
-<div class="login-card">
+<div class="auth-container">
 
-    <section class="hero-section">
-        <div class="brand-badge">
-            <div class="brand-icon">AI</div>
-            <div class="brand-title">WorkAI</div>
-        </div>
+    <section class="auth-hero">
+        <div>
+            <div class="brand">
+                <div class="brand-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                    </svg>
+                </div>
+                WorkAI
+            </div>
 
-        <div class="hero-body">
-            <h1>Autonomous<br>Workforce <span>Intelligence</span></h1>
+            <h1>Enterprise <span>Workforce Intelligence</span></h1>
             <p>
-                Privacy-first employee activity tracking, automated break analytics, and explainable machine learning anomaly detection.
+                Privacy-first employee activity tracking, project velocity analytics, and explainable Machine Learning anomaly detection.
             </p>
 
             <div class="feature-list">
                 <div class="feature-item">
-                    <span class="feature-check">✓</span>
-                    <span>Continuous interaction heartbeat & break auditing</span>
+                    <div class="feature-icon">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                    </div>
+                    <span>Non-invasive interaction heartbeat &amp; break auditing</span>
                 </div>
                 <div class="feature-item">
-                    <span class="feature-check">✓</span>
-                    <span>Explainable Isolation Forest anomaly scoring</span>
+                    <div class="feature-icon">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                    </div>
+                    <span>Explainable Isolation Forest behavioral anomaly scoring</span>
                 </div>
                 <div class="feature-item">
-                    <span class="feature-check">✓</span>
-                    <span>FastAPI OpenAPI & natural-language assistant</span>
+                    <div class="feature-icon">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                    </div>
+                    <span>Granular project &amp; task milestone time attribution</span>
                 </div>
                 <div class="feature-item">
-                    <span class="feature-check">✓</span>
-                    <span>Granular project & task-level time attribution</span>
+                    <div class="feature-icon">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                    </div>
+                    <span>FastAPI OpenAPI &amp; natural-language assistant query engine</span>
                 </div>
             </div>
         </div>
 
-        <div class="hero-footer">
-            <span>🔒 Enterprise Session Security & Role-Based Access Control</span>
+        <div class="auth-footer-tag">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            <span>Role-Based Access Control &bull; Zero Keystroke Logging</span>
         </div>
     </section>
 
-    <section class="form-section">
-        <div class="form-header">
-            <span class="form-eyebrow">ENTERPRISE PORTAL</span>
-            <h2>Welcome Back</h2>
-            <p>Sign in to access your activity tracking dashboard.</p>
+    <section class="auth-form-side">
+        <div class="auth-form-header">
+            <span class="welcome-label">SECURE LOGIN</span>
+            <h2>Sign in to WorkAI</h2>
+            <p>Enter your credentials to access your dashboard.</p>
         </div>
 
         <!-- Quick Demo Switcher -->
-        <div class="demo-badges">
-            <div class="demo-label">
-                <span>⚡ Quick Demo Credentials</span>
+        <div class="demo-switcher">
+            <div class="demo-switcher-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                </svg>
+                <span>Demo Accounts</span>
             </div>
-            <div class="demo-buttons">
-                <button type="button" class="demo-btn" onclick="fillCredentials('admin@workai.com', 'Admin@123')">
-                    👔 Admin Account
+            <div class="demo-pills">
+                <button type="button" class="demo-pill-btn" onclick="fillCredentials('admin@workai.com', 'Admin@123')">
+                    Admin Portal
                 </button>
-                <button type="button" class="demo-btn" onclick="fillCredentials('employee@workai.com', 'Employee@123')">
-                    💼 Employee Account
+                <button type="button" class="demo-pill-btn" onclick="fillCredentials('employee@workai.com', 'Employee@123')">
+                    Employee Portal
                 </button>
             </div>
         </div>
@@ -438,8 +327,9 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="flash-box flash-{{ category }}">
-                        {{ message }}
+                    <div class="flash-alert {{ category }}">
+                        <span>{{ message }}</span>
+                        <button type="button" style="background:none; border:none; color:inherit; cursor:pointer;" onclick="this.parentElement.remove()">✕</button>
                     </div>
                 {% endfor %}
             {% endif %}
@@ -447,8 +337,9 @@
 
         <form method="POST" action="{{ url_for('auth.login') }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
             <div class="form-group">
-                <label for="email">Work Email</label>
+                <label for="email" class="form-label">Work Email</label>
                 <input 
                     type="email" 
                     id="email" 
@@ -461,8 +352,8 @@
             </div>
 
             <div class="form-group">
-                <label for="password">Password</label>
-                <div class="password-container">
+                <label for="password" class="form-label">Password</label>
+                <div class="password-field-wrapper">
                     <input 
                         type="password" 
                         id="password" 
@@ -472,17 +363,17 @@
                         autocomplete="current-password" 
                         required
                     >
-                    <button type="button" class="password-toggle" onclick="togglePasswordVisibility()">Show</button>
+                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility()">Show</button>
                 </div>
             </div>
 
-            <button type="submit" class="submit-btn">
-                Sign In to WorkAI
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 11px; margin-top: 8px;">
+                Sign In to Platform
             </button>
         </form>
 
-        <div class="form-footer">
-            Protected by WorkAI Engine &bull; Zero keystroke logging
+        <div style="margin-top: 24px; text-align: center; font-size: 11.5px; color: var(--text-muted);">
+            Protected by WorkAI Engine &bull; Non-invasive Privacy Guaranteed
         </div>
     </section>
 
@@ -491,7 +382,7 @@
 <script>
     function togglePasswordVisibility() {
         const pwd = document.getElementById('password');
-        const btn = document.querySelector('.password-toggle');
+        const btn = document.querySelector('.password-toggle-btn');
         if (pwd.type === 'password') {
             pwd.type = 'text';
             btn.textContent = 'Hide';

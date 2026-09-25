@@ -1,16 +1,64 @@
-<section class="card" style="padding: 24px; margin-bottom: 24px; overflow-x: auto;">
-    <h3>Work sessions and breaks (UTC)</h3>
-    <table style="width: 100%; text-align: left;">
-        <thead><tr><th>Employee</th><th>Project / task</th><th>Started</th><th>Ended</th><th>Status</th><th>Break intervals</th></tr></thead>
-        <tbody>
-        {% for work in work_sessions %}
-        <tr>
-            <td>{{ work.employee.name }}</td>
-            <td>{{ work.project.name if work.project else 'General work' }} / {{ work.task.title if work.task else 'No task' }}</td>
-            <td>{{ work.start_time }}</td><td>{{ work.end_time or 'Ongoing' }}</td><td>{{ work.status }}</td>
-            <td>{% for pause in work.breaks %}<div>{{ pause.start_time }} — {{ pause.end_time or 'Ongoing' }}</div>{% else %}No breaks{% endfor %}</td>
-        </tr>
-        {% else %}<tr><td colspan="6">No work sessions recorded.</td></tr>{% endfor %}
-        </tbody>
-    </table>
+<section class="card" style="margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+        <div>
+            <h3 style="margin: 0 0 4px;">Work Sessions &amp; Break Intervals (UTC)</h3>
+            <p style="margin: 0; color: var(--text-secondary); font-size: 13px;">Historical log of clocked work intervals, pause breaks, and session statuses.</p>
+        </div>
+        <span class="badge badge-neutral">UTC AUDIT</span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Project / Task</th>
+                    <th>Started</th>
+                    <th>Ended</th>
+                    <th>Status</th>
+                    <th>Break Intervals</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for work in work_sessions %}
+            <tr>
+                <td style="font-weight: 600; color: var(--text);">
+                    {{ work.employee.name }}
+                </td>
+                <td style="color: var(--text-secondary);">
+                    {{ work.project.name if work.project else 'General Work' }} &bull; {{ work.task.title if work.task else 'No Task' }}
+                </td>
+                <td style="font-size: 12px; color: var(--text-muted); font-family: monospace;">
+                    {{ work.start_time }}
+                </td>
+                <td style="font-size: 12px; color: var(--text-muted); font-family: monospace;">
+                    {{ work.end_time or 'Ongoing' }}
+                </td>
+                <td>
+                    <span class="badge
+                        {% if work.status == 'Completed' %}badge-neutral
+                        {% elif work.status == 'Working' %}badge-success
+                        {% elif work.status == 'On Break' %}badge-warning
+                        {% else %}badge-neutral{% endif %}">
+                        {{ work.status }}
+                    </span>
+                </td>
+                <td style="font-size: 12px; color: var(--text-secondary);">
+                    {% for pause in work.breaks %}
+                        <div style="font-family: monospace; font-size: 11px; margin-bottom: 2px;">{{ pause.start_time }} &mdash; {{ pause.end_time or 'Ongoing' }}</div>
+                    {% else %}
+                        <span style="color: var(--text-muted);">No breaks</span>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 32px 16px; color: var(--text-muted);">
+                    No work sessions recorded.
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </section>

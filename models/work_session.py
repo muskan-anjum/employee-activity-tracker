@@ -9,7 +9,8 @@ class WorkSession(db.Model):
     employee_id = db.Column(
         db.Integer,
         db.ForeignKey("users.id"),
-        nullable=False
+        nullable=False,
+        index=True
     )
 
     project_id = db.Column(
@@ -27,7 +28,8 @@ class WorkSession(db.Model):
     start_time = db.Column(
         db.DateTime,
         nullable=False,
-        default=db.func.current_timestamp()
+        default=db.func.current_timestamp(),
+        index=True
     )
 
     end_time = db.Column(db.DateTime, nullable=True)
